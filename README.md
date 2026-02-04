@@ -1,11 +1,11 @@
 <div align="center">
-    ...
+     <img width="1024" height="1024" alt="Helio Not in use" src="https://github.com/user-attachments/assets/03fabdb2-57b3-41cc-a80b-e459f3c2e92f" />
 	<h1>Helios</h1>
     <p>The control room organising your future.</p>
 	<div>
     <br>
     <picture>
-    
+	...
     <picture>
 </div>
 
