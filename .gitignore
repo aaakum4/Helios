@@ -1,6 +1,8 @@
 # Node dependencies
 node_modules/
 node_modules 2/
+helios 2/
+.vite/
 
 # Vite build output
 dist/
