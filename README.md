@@ -1,6 +1,16 @@
-** Insert image here~
+<div align="center">
+    ...
+	<h1>Helios</h1>
+    <p>The control room organising your future.</p>
+	<div>
+    <br>
+    <picture>
+    ...
+    <picture>
+</div>
 
-# Helios
+---
+
 An app designed to help students, or anyone who needs help with management or organisation by having all the useful apps and features in one place.
 
 ### Background
