@@ -5,3 +5,7 @@ An app designed to help students, or anyone who needs help with management or or
 
 ### Background
 In my final year of school, juggling assessments, homework, deadlines, and study time has made it clear how disjointed existing tools are. Across my years I have tried Todoist, Notion, Timetable, YTP, and many other but I think that the biggest problem was that any one of these app's couldn't do it all. This is where I am trying to step up, my project is an attempt to build the app I wish I’d had, a central control room for managing school life, with features like assessment tracking, task management, calendars, study timers, and structured note-taking. While student-focused, the system is designed to be extensible for anyone who wants better control over their time and responsibilities.
+
+> ![Note]
+> Helios is in an early beta stage. If you encounter any issues, please report them too [our issue tracker](https://github.com/Helios/issues/new).
+
