@@ -26,9 +26,31 @@ Builds are generated automatically upon [release]().
 
 Before the first stable release, I would like the following features to be implemented:
 
+- [x] An app logo
 - [ ] An easy to use UI
 - [ ] Creation of timetables
 - [ ] Timetables sync to a calendar
 - [ ] To-do list
 - [ ] File access (for quick access to syllabus documents, and more...)
 - [ ] ...
+
+## Buidling
+
+### Prerequisites
+
+- ?
+- ?
+- ?
+
+### Instructions
+
+???
+
+## Using Helios
+
+Please refer to the [Getting Started]() tutorial.
+
+## Licensing
+All files, unless otherwise stated, are licensed under the Lesser GPL v3.0 or later. A copy of the license can be found in the `LICENSE` file.
+
+All assets which contain [Helios brand images]() are property of the Rela organisation and may not be used without permission.
