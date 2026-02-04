@@ -21,3 +21,14 @@ Builds are generated automatically upon [release]().
 -   [Linux (rpm)]()
 -   [Linux (tar.gz)]()
 -   [Linux (deb)]()
+
+## Roadmap
+
+Before the first stable release, I would like the following features to be implemented:
+
+- [ ] An easy to use UI
+- [ ] Creation of timetables
+- [ ] Timetables sync to a calendar
+- [ ] To-do list
+- [ ] File access (for quick access to syllabus documents, and more...)
+- [ ] ...
