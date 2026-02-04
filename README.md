@@ -11,3 +11,13 @@ In my final year of school, juggling assessments, homework, deadlines, and study
 > [!NOTE]
 > Helios is in an early beta stage. If you encounter any issues, please report them too [our issue tracker](https://github.com/aaakum4/Helios/issues/new).
 
+## Download
+
+Builds are generated automatically upon [release]().
+
+-   [macOS (Intel)]()
+-   [macOS (Apple Silicon)]()
+-   [Windows]()
+-   [Linux (rpm)]()
+-   [Linux (tar.gz)]()
+-   [Linux (deb)]()
