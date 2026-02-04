@@ -7,7 +7,7 @@ export default function StartupScreen({ onLaunch}) {
         <div className="startup-screen"> onClick={onLaunch}>
             <h1 className="startup-title">Welcome to Helios</h1>
             <img
-            src="path/to/your/logo.png"
+            src="assets/helios-logo.png"
             alt="Helios Logo"
             className="startup-logo"
             />
