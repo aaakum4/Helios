@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap");
+
+.main-screen {
+  height: 100vh;
+  width: 100vw;
+  background: white;
+  font-family: "Inter", sans-serif;
+  color: #222;
+}
+
+.helios-corner {
+  position: fixed;
+  bottom: 16px;
+  right: 20px;
+  font-size: 14px;
+  color: #999;
+  animation: fadePulse 4s ease-in-out infinite;
+}
+
+@keyframes fadePulse {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.2; }
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.char-counter {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #555;
+  background: #f1f1f1;
+  border-radius: 6px;
+  opacity: 0;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app-container {
+  width: 90vw;
+  height: 90vh;
+  margin: 5vh auto;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background: #ffffff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
