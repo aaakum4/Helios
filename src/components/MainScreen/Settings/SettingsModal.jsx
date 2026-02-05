@@ -5,7 +5,7 @@ export default function SettingsModal({ onClose }) {
         <div className="settings-backdrop" onClick={onClose}>
             <div
             className="settings-modal"
-            onClick={(e) => e.stopPropagation ()} 
+            onClick={(e) => e.stopPropagation()} 
         >
             <h2>Settings</h2>
 

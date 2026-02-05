@@ -1,0 +1,8 @@
+html {
+    -webkit-app-region: drag;
+}
+
+.app-container {
+    -webkit-app-region: no-drag;
+    position: relative;
+}
