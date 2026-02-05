@@ -1,5 +1,5 @@
 <div align="center">
-     <img src="assets/icon.png" alt="Helios logo" width="256">
+     <img src="/icon.png" alt="Helios logo" width="256">
      <h1>Helios</h1>
      <p>The control room organising your future.</p>
      </div>
