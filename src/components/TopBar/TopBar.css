@@ -54,7 +54,7 @@
   transition: transform 0.15s ease, opacity 0.15s ease;
   position: absolute;
   right: 12%;
-  top: 9%;
+  top: 6%;
 }
 
 .settings-cog:hover {

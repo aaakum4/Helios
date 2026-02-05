@@ -1,0 +1,67 @@
+.settings-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.settings-modal {
+    width: 360px;
+    height: 560px;
+    max-height: 85%;
+
+    background: white;
+    border-radius: 22px;
+    border: 1px solid #e5e5e5;
+
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+
+    animation: settingsPop 0.25s ease-out;
+}
+
+@keyframes settingsPop {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(12px);
+    }
+    to{
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.settings-modal::before {
+    content: "";
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: #ccc;
+    margin: 6px auto 12px;
+}
+
+.settings-close {
+    margin-top: auto;
+    height: 30px;
+    width: 100%;
+    border-radius: 22px;
+
+    border: 2px solid #d44;
+    background: rgba(255, 0, 0, 0.5);
+
+    cursor: pointer;
+}
+
+.settings-close:hover {
+    background: rgba(212, 68, 68, 0.25);
+}
+
+.settings-close {
+    margin-bottom: 4px;
+}
