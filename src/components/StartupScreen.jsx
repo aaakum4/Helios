@@ -12,14 +12,14 @@ export default function StartupScreen({ onLaunch }) {
 
 setTimeout(() => {
   if (audioRef.current) audioRef.current.play();
-}, 400); 
+}, 300); 
     };
 
   useEffect(() => {
     if (animate) {
       const timer = setTimeout(() => {
         onLaunch();
-      }, 1200);
+      }, 1600);
       return () => clearTimeout(timer);
     }
   }, [animate, onLaunch]);

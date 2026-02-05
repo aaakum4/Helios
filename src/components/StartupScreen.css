@@ -38,8 +38,8 @@
 }
 
 .startup-icon {
-    width: 120px;
-    height: 120px;
+    width: 200px;
+    height: 200px;
     margin-top: 20px 0;
 }
 
@@ -57,6 +57,7 @@
 
 .startup-subtext {
     font-size: 1rem;
+    font-family: 'orbitron', sans-serif;
     color: #aaaaaa;
     animation: pulse 1.5s ease-in-out infinite;
 }
