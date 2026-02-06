@@ -1,0 +1,28 @@
+:root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --text: #111111;
+    --muted: #6b6b6b;
+    --border: #e5e5e5;
+    --accent: #0a84ff;
+}
+
+.dark-theme {
+    --bg: #c0c0c0;
+    --surface: #6a6a6a;
+    --text: #111111;
+    --muted: #333333;
+    --border: #8a8a8a;
+    --accent: #0a84ff;
+}
+
+html {
+    -webkit-app-region: drag;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.app-container {
+    -webkit-app-region: no-drag;
+    position: relative;
+}

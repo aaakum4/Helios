@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import TopBar from "../TopBar/TopBar";
 import SettingsModal from "./Settings/SettingsModal";
 import "./MainScreen.css";
@@ -10,6 +10,16 @@ export default function MainScreen() {
   const [showCounter, setShowCounter] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const hideTimer = useRef(null);
+  const appContainerRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const savedGlow = localStorage.getItem("glow") || "none";
+      if (appContainerRef.current) {
+        appContainerRef.current.classList.add(`glow-${savedGlow}`);
+      }
+    } catch (e) {}
+  }, []);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -23,7 +33,7 @@ export default function MainScreen() {
 };
     
 return (
-  <div className="app-container">
+  <div className="app-container" ref={appContainerRef}>
       <div className="main-screen">
         <TopBar
             text={text}
