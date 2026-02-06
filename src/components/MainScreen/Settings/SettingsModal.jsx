@@ -43,19 +43,6 @@ export default function SettingsModal({ onClose }) {
         } catch (e) {}
     }, [glowColor]);
 
-    const applyTheme = () => {
-        try {
-            document.documentElement.classList.toggle("dark-theme", isDark);
-            localStorage.setItem("theme", isDark ? "dark" : "light");
-            console.log("Applied theme:", isDark ? "dark" : "light");
-        } catch (e) {}
-    };
-
-    useEffect(() => {
-        // debug: log current theme selection
-        console.log("Theme state isDark:", isDark);
-    }, [isDark]);
-
     return (
         <div className="settings-backdrop" onClick={onClose}>
             <div className="settings-modal" onClick={(e) => e.stopPropagation()}>

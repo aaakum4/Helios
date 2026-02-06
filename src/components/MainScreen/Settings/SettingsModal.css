@@ -65,7 +65,6 @@
     margin-top: 12px;
 }
 
-/* Apple-style switch */
 .theme-switch {
     display: inline-block;
 }
@@ -107,7 +106,6 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.18);
 }
 
-/* Glow color options */
 .glow-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -176,4 +174,43 @@
 
 .settings-apply:hover {
     filter: brightness(0.95);
+}
+
+html.dark-theme .settings-modal {
+    background: #3a3a3a;
+    border-color: #555555;
+    color: #ffffff;
+}
+
+html.dark-theme .settings-modal::before {
+    background: #666666;
+}
+
+html.dark-theme .settings-section {
+    color: #ffffff;
+}
+
+html.dark-theme .settings-section label {
+    color: #ffffff;
+}
+
+html.dark-theme .glow-option {
+    color: #ffffff;
+}
+
+html.dark-theme .glow-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+html.dark-theme .theme-switch input:checked + .switch-track {
+    background: #0a84ff;
+}
+
+html.dark-theme .settings-close {
+    border-color: #d44;
+    color: #ffffff;
+}
+
+html.dark-theme .settings-close:hover {
+    background: rgba(212, 68, 68, 0.25);
 }

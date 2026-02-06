@@ -52,14 +52,22 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  background: var(--surface);
+  background: #ffffff;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: box-shadow 250ms ease, background 250ms ease, border-color 250ms ease;
 }
 
-/* Glow effects */
+html.dark-theme .app-container {
+  background: #4a4a4a;
+}
+
+html.dark-theme .main-screen {
+  background: #e8e8e8;
+  color: #ffffff;
+}
+
 .glow-none {
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
