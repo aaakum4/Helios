@@ -16,12 +16,12 @@ html {
 }
 
 html.dark-theme {
-    --bg: #e8e8e8;
+    --bg: #e8e8e8; /* light grey background */
     --text: #ffffff;
     --border: #666666;
-    --surface: #3a3a3a;
+    --surface: #4a4a4a; /* main app container grey */
     --muted: #b0b0b0;
-    --top-bar-bg: #2c2c2c;
+    --top-bar-bg: #2a2a2a; /* top bar dark grey */
 }
 
 body {

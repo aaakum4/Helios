@@ -83,7 +83,6 @@ export default function SettingsModal({ onClose }) {
                 </div>
 
                 <div className="settings-actions">
-                    <button className="settings-apply" onClick={applyTheme}>Apply</button>
                     <button className="settings-close" onClick={onClose}>Close</button>
                 </div>
             </div>
