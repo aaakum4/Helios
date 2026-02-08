@@ -16,12 +16,12 @@ html {
 }
 
 html.dark-theme {
-    --bg: #e8e8e8; /* light grey background */
+    --bg: #e8e8e8;
     --text: #ffffff;
     --border: #666666;
-    --surface: #4a4a4a; /* main app container grey */
+    --surface: #4a4a4a;
     --muted: #b0b0b0;
-    --top-bar-bg: #2a2a2a; /* top bar dark grey */
+    --top-bar-bg: #2a2a2a;
 }
 
 body {
@@ -31,6 +31,5 @@ body {
 
 #root {
     width: 100%;
-    height: 100%;
-    scroll-behavior: none;
+    height: 100%; 
 }
