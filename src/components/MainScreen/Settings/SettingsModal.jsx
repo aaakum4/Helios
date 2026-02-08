@@ -25,8 +25,8 @@ export default function SettingsModal({ onClose }) {
     const getInitialSound = () => {
         try {
             const stored = localStorage.getItem("soundEnabled");
-            if (stored === "true") return true;
             if (stored === "false") return false;
+            if (stored === "true") return true;
         } catch (e) {}
         return true;
     };
@@ -53,9 +53,9 @@ export default function SettingsModal({ onClose }) {
         } catch (e) {}
     }, [glowColor]);
 
-    useEffect (() => {
+    useEffect(() => {
         try {
-            localStorage.setItem("soundEnabled", soundEnabled);
+            localStorage.setItem("soundEnabled", soundEnabled ? "true" : "false");
         } catch (e) {}
     }, [soundEnabled]);
 

@@ -20,8 +20,8 @@ export default function StartupScreen({ onLaunch }) {
     setAnimate(true);
 
 setTimeout(() => {
-  if (audioRef.current) audioRef.current.play();
-}, 300); 
+  if (audioRef.current && getSoundEnabled()) audioRef.current.play();
+}, 300);
     };
 
   useEffect(() => {
