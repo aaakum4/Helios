@@ -22,8 +22,18 @@ export default function SettingsModal({ onClose }) {
         return "none";
     };
 
+    const getInitialSound = () => {
+        try {
+            const stored = localStorage.getItem("soundEnabled");
+            if (stored === "true") return true;
+            if (stored === "false") return false;
+        } catch (e) {}
+        return true;
+    };
+
     const [isDark, setIsDark] = useState(() => getInitialDark());
     const [glowColor, setGlowColor] = useState(() => getInitialGlow());
+    const [soundEnabled, setSoundEnabled] = useState(() => getInitialSound());
 
     useEffect(() => {
         try {
@@ -42,6 +52,12 @@ export default function SettingsModal({ onClose }) {
             }
         } catch (e) {}
     }, [glowColor]);
+
+    useEffect (() => {
+        try {
+            localStorage.setItem("soundEnabled", soundEnabled);
+        } catch (e) {}
+    }, [soundEnabled]);
 
     return (
         <div className="settings-backdrop" onClick={onClose}>
@@ -62,7 +78,21 @@ export default function SettingsModal({ onClose }) {
                         </label>
                     </div>
                 </div>
-
+                <div className="settings-section">
+                    <label>Startup sound</label>
+                    <div className="theme-switch" onClick={() => setSoundEnabled((v) => !v)} style={{ cursor: "pointer" }}>
+                        <input
+                            id="sound-toggle"
+                            type="checkbox"
+                            checked={soundEnabled}
+                            onChange={() =>setSoundEnabled((v) => !v)}
+                        />
+                        <label className="switch-track" htmlFor="sound-toggle">
+                            <span className="switch-knob" />
+                        </label>
+                    </div>
+                </div>
+                
                 <div className="settings-section glow-label-section">
                     <label>Window glow</label>
                 </div>

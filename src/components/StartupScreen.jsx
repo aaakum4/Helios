@@ -5,6 +5,15 @@ export default function StartupScreen({ onLaunch }) {
   const [animate, setAnimate] = useState(false);
   const audioRef = useRef(null);
 
+  const getSoundEnabled = () => {
+    try {
+      const stored = localStorage.getItem("soundEnabled");
+      if (stored === "false") return false;
+      return true;
+    } catch (e) {}
+    return true;
+  };
+
   const handleClick = () => {
     setAnimate(false);
     void document.getElementById("helios-icon").offsetWidth; 

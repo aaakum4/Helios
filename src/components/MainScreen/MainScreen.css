@@ -96,3 +96,41 @@ html.dark-theme .main-screen {
 .glow-pink {
   box-shadow: 0 0 30px rgba(255, 107, 214, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
+
+.back-button {
+  position: fixed;
+  bottom: 16px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'orbitron', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease;
+  z-index: 50;
+}
+
+.back-button:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.back-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+html.dark-theme .back-button {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+html.dark-theme .back-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

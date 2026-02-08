@@ -20,7 +20,7 @@ export default function App() {
       {!launched ? (
         <StartupScreen onLaunch={() => setLaunched(true)} />
       ) : (
-        <MainScreen />
+        <MainScreen onBack={() => setLaunched(false)} />
       )}
     </>
   );

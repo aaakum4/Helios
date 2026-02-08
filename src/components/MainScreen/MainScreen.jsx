@@ -5,7 +5,7 @@ import "./MainScreen.css";
 
 const MAX_CHARS = 50;
 
-export default function MainScreen() {
+export default function MainScreen({ onBack }) {
   const [text, setText] = useState("");
   const [showCounter, setShowCounter] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -35,6 +35,11 @@ export default function MainScreen() {
 return (
   <div className="app-container" ref={appContainerRef}>
       <div className="main-screen">
+        <button className="back-button" onClick={onBack}>
+          <span className="back-arrow">←</span>
+          Back
+        </button>
+
         <TopBar
             text={text}
             onChange={handleChange}
