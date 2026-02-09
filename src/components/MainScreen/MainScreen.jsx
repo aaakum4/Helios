@@ -41,10 +41,12 @@ export default function MainScreen({ onBack }) {
   return (
     <div className="app-container" ref={appContainerRef}>
       <div className="main-screen">
-        <button className="back-button" onClick={onBack}>
-          <span className="back-arrow">←</span>
-          Back
-        </button>
+        {!activeNodeId && (
+          <button className="back-button" onClick={onBack}>
+            <span className="back-arrow">←</span>
+            Back
+          </button>
+        )}
 
         <TopBar
           text={text}

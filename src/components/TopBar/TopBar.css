@@ -24,8 +24,6 @@
   align-items: center;
   margin-left: auto;
   z-index: 10;
-  padding-right: 140px;
-  padding-bottom: 3px;
 }
 
 .top-input {
@@ -68,10 +66,8 @@ html.dark-theme .top-input:focus {
   color: #222;
   transition: transform 0.15s ease, opacity 0.15s ease, color 250ms ease;
   position: absolute;
-  right: 12%;
-  top: 10%;
-  background: none;
-  border: none;
+  right: 19px;
+  top: 6px;
   padding: 0;
 }
 
