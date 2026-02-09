@@ -80,7 +80,7 @@ return (
             </div>
         </div>
 
-        <div>
+        <div className="pomodoro-controls">
             <button className="pomodoro-button" onClick={handlePlayPause}>
                 {isRunning ? 'Pause' : 'Start'}
             </button>

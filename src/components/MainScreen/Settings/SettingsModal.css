@@ -70,6 +70,70 @@
     display: inline-block;
 }
 
+.theme-options {
+    position: relative;
+    display: flex;
+    gap: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    min-width: 210px;
+}
+
+.theme-options::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc((100% - 6px) / 3);
+    background: #0a84ff;
+    border-radius: 999px;
+    transform: translateX(0);
+    transition: transform 180ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.theme-options[data-active="system"]::before {
+    transform: translateX(0);
+}
+
+.theme-options[data-active="light"]::before {
+    transform: translateX(100%);
+}
+
+.theme-options[data-active="dark"]::before {
+    transform: translateX(200%);
+}
+
+.theme-option {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    transition: color 150ms ease;
+    position: relative;
+    z-index: 1;
+}
+
+.theme-option input {
+    display: none;
+}
+
+.theme-option.is-active {
+    color: #ffffff;
+}
+
 .theme-switch input {
     display: none;
 }
@@ -177,41 +241,41 @@
     filter: brightness(0.95);
 }
 
-html.dark-theme .settings-modal {
+html[data-theme="dark"] .settings-modal {
     background: #3a3a3a;
     border-color: #555555;
     color: #ffffff;
 }
 
-html.dark-theme .settings-modal::before {
+html[data-theme="dark"] .settings-modal::before {
     background: #666666;
 }
 
-html.dark-theme .settings-section {
+html[data-theme="dark"] .settings-section {
     color: #ffffff;
 }
 
-html.dark-theme .settings-section label {
+html[data-theme="dark"] .settings-section label {
     color: #ffffff;
 }
 
-html.dark-theme .glow-option {
+html[data-theme="dark"] .glow-option {
     color: #ffffff;
 }
 
-html.dark-theme .glow-option:hover {
+html[data-theme="dark"] .glow-option:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
-html.dark-theme .theme-switch input:checked + .switch-track {
+html[data-theme="dark"] .theme-switch input:checked + .switch-track {
     background: #0a84ff;
 }
 
-html.dark-theme .settings-close {
+html[data-theme="dark"] .settings-close {
     border-color: #d44;
     color: #ffffff;
 }
 
-html.dark-theme .settings-close:hover {
+html[data-theme="dark"] .settings-close:hover {
     background: rgba(212, 68, 68, 0.25);
 }

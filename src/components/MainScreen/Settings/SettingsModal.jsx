@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./SettingsModal.css";
+import { getStoredThemeMode, setThemeMode as applyThemeMode } from "../../../core/theme";
 
 export default function SettingsModal({ onClose }) {
-    const getInitialDark = () => {
-        try {
-            const stored = localStorage.getItem("theme");
-            if (stored === "dark") return true;
-            if (stored === "light") return false;
-        } catch (e) {}
-        return (
-            typeof window !== "undefined" &&
-            window.matchMedia &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches
-        );
-    };
+    const getInitialThemeMode = () => getStoredThemeMode();
 
     const getInitialGlow = () => {
         try {
@@ -31,16 +21,13 @@ export default function SettingsModal({ onClose }) {
         return true;
     };
 
-    const [isDark, setIsDark] = useState(() => getInitialDark());
+    const [themeMode, setThemeMode] = useState(() => getInitialThemeMode());
     const [glowColor, setGlowColor] = useState(() => getInitialGlow());
     const [soundEnabled, setSoundEnabled] = useState(() => getInitialSound());
 
     useEffect(() => {
-        try {
-            document.documentElement.classList.toggle("dark-theme", isDark);
-            localStorage.setItem("theme", isDark ? "dark" : "light");
-        } catch (e) {}
-    }, [isDark]);
+        applyThemeMode(themeMode);
+    }, [themeMode]);
 
     useEffect(() => {
         try {
@@ -64,18 +51,28 @@ export default function SettingsModal({ onClose }) {
             <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
                 <h2>Settings</h2>
 
-                <div className="settings-section">
-                    <label>Light/Dark Mode</label>
-                    <div className="theme-switch" onClick={() => setIsDark((v) => !v)} style={{ cursor: "pointer" }}>
-                        <input
-                            id="theme-toggle"
-                            type="checkbox"
-                            checked={isDark}
-                            onChange={() => setIsDark((v) => !v)}
-                        />
-                        <label className="switch-track" htmlFor="theme-toggle">
-                            <span className="switch-knob" />
-                        </label>
+                <div className="settings-section theme-section">
+                    <label>Theme</label>
+                    <div className="theme-options" data-active={themeMode}>
+                        {[
+                            { value: "system", label: "System" },
+                            { value: "light", label: "Light" },
+                            { value: "dark", label: "Dark" },
+                        ].map((option) => (
+                            <label
+                                key={option.value}
+                                className={`theme-option ${themeMode === option.value ? "is-active" : ""}`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="theme-mode"
+                                    value={option.value}
+                                    checked={themeMode === option.value}
+                                    onChange={() => setThemeMode(option.value)}
+                                />
+                                <span className="theme-option-label">{option.label}</span>
+                            </label>
+                        ))}
                     </div>
                 </div>
                 <div className="settings-section">

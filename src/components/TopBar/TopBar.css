@@ -45,13 +45,13 @@
   background: white;
 }
 
-html.dark-theme .top-input {
+html[data-theme="dark"] .top-input {
   border-color: #555555;
   background: #3a3a3a;
   color: #ffffff;
 }
 
-html.dark-theme .top-input:focus {
+html[data-theme="dark"] .top-input:focus {
   border-color: #888;
   background: #4a4a4a;
 }
@@ -71,7 +71,7 @@ html.dark-theme .top-input:focus {
   padding: 0;
 }
 
-html.dark-theme .settings-cog {
+html[data-theme="dark"] .settings-cog {
   color: #e0e0e0;
 }
 

@@ -151,24 +151,24 @@
     font-size: 1.1rem;
 }
 
-html.dark-theme .node-card {
+html[data-theme="dark"] .node-card {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-html.dark-theme .node-card-title {
+html[data-theme="dark"] .node-card-title {
     color: #ffffff;
 }
 
-html.dark-theme .node-card-description {
+html[data-theme="dark"] .node-card-description {
     color: #e0e0e0;
 }
 
-html.dark-theme .node-card-button {
+html[data-theme="dark"] .node-card-button {
     background:  linear-gradient(125deg, #2a5aa8, #1a3f7a);
 }
 
-html.dark-theme .node-card-button:hover {
+html[data-theme="dark"] .node-card-button:hover {
     background: linear-gradient(125deg, #3a6ab8, #2a4f8a);
 }
 

@@ -79,11 +79,11 @@
   transition: box-shadow 250ms ease, background 250ms ease, border-color 250ms ease;
 }
 
-html.dark-theme .app-container {
+html[data-theme="dark"] .app-container {
   background: var(--surface);
 }
 
-html.dark-theme .main-screen {
+html[data-theme="dark"] .main-screen {
   background: var(--bg);
   color: var(--text);
 }
@@ -145,11 +145,11 @@ html.dark-theme .main-screen {
   line-height: 1;
 }
 
-html.dark-theme .back-button {
+html[data-theme="dark"] .back-button {
   background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
 }
 
-html.dark-theme .back-button:hover {
+html[data-theme="dark"] .back-button:hover {
   background: rgba(255, 255, 255, 0.25);
 }
