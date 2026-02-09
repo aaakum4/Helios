@@ -16,7 +16,7 @@ html {
 }
 
 html.dark-theme {
-    --bg: #e8e8e8;
+    --bg: #444444;
     --text: #ffffff;
     --border: #666666;
     --surface: #4a4a4a;

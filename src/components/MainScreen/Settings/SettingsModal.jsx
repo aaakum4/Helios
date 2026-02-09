@@ -65,7 +65,7 @@ export default function SettingsModal({ onClose }) {
                 <h2>Settings</h2>
 
                 <div className="settings-section">
-                    <label>App theme</label>
+                    <label>Light/Dark Mode</label>
                     <div className="theme-switch" onClick={() => setIsDark((v) => !v)} style={{ cursor: "pointer" }}>
                         <input
                             id="theme-toggle"

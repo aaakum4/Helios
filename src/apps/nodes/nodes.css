@@ -5,7 +5,7 @@
     justify-content: center;
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(74, 144, 226, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -15,7 +15,7 @@
 
 .node-card:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(74, 144, 226, 0.2);
+    border-color: rgba(0, 0, 0, 0.2);
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
 }
@@ -28,13 +28,13 @@
 .node-card-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--text-primary, #eaeaea);
+    color: var(--text-primary, #000000);
     margin: 0.5rem 0;
 }
 
 .node-card-description {
     font-size: 0.85rem;
-    color: var(--text-secondary, #b0b0b0);
+    color: var(--text-secondary, #292929);
     margin: 0.5rem 0 1rem 0;
     line-height: 1.4;
 }
@@ -153,4 +153,55 @@
     height: 100%;
     color: var(--text-secondary, #b0b0b0);
     font-size: 1.1rem;
+}
+
+html.dark-theme .node-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+html.dark-theme .node-card-title {
+    color: #ffffff;
+}
+
+html.dark-theme .node-card-description {
+    color: #e0e0e0;
+}
+
+html.dark-theme .node-card-button {
+    background:  linear-gradient(125deg, #2a5aa8, #1a3f7a);
+}
+
+html.dark-theme .node-card-button:hover {
+    background: linear-gradient(125deg, #3a6ab8, #2a4f8a);
+}
+
+.glow-blue .node-card:hover {
+    box-shadow: 0 8px 24px rgba(74, 144, 226, 0.4);
+    border-color: rgba(74, 144, 226, 0.6);
+}
+
+.glow-red .node-card:hover {
+    box-shadow: 0 8px 24px rgba(220, 53, 69, 0.4);
+    border-color: rgba(220, 53, 69, 0.6);
+}
+
+.glow-orange .node-card:hover {
+    box-shadow: 0 8px 24px rgba(255, 159, 64, 0.4);
+    border-color: rgba(255, 159, 64, 0.6);
+}
+
+.glow-purple .node-card:hover {
+    box-shadow: 0 8px 24px rgba(156, 39, 176, 0.4);
+    border-color: rgba(156, 39, 176, 0.6);
+}
+
+.glow-green .node-card:hover {
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+    border-color: rgba(76, 175, 80, 0.6);
+}
+
+.glow-pink .node-card:hover {
+    box-shadow: 0 8px 24px rgba(236, 64, 122, 0.4);
+    border-color: rgba(236, 64, 122, 0.6);
 }
