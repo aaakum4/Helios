@@ -116,7 +116,7 @@ return (
                 onClick={() => setClockColor('black')}
                 className={clockColor === 'black' ? 'is-active' : ''}
               >
-                White
+                Black
               </button>
               <button
                 type="button"
