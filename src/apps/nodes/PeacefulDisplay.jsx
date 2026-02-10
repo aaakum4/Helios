@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useLocalStorage } from '../core/useLocalStorage';
-import { useTime } from '../core/TimeProvider';
+import { useLocalStorage } from '../../core/useLocalStorage';
+import { useTime } from '../../core/TimeProvider';
 import './PeacefulDisplay.css';
 
 export default function PeacefulDisplay() {
@@ -41,6 +41,25 @@ return (
       <div
         className={`peaceful-display-particles ${mode === 'winter' ? 'particles-snow' : 'particles-leaves'}`}
       >
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
+        <span className="particle" />
         <span className="particle" />
         <span className="particle" />
         <span className="particle" />

@@ -87,6 +87,7 @@
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     animation: slideUp 0.3s ease;
+    position: relative;
 }
 
 @keyframes slideUp {
@@ -135,6 +136,20 @@
 .node-fullscreen-close:hover {
     background: rgba(74, 144, 226, 0.2);
     color: var(--text-primary, #eaeaea);
+}
+
+.node-fullscreen-close-floating {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+.node-fullscreen-close-floating:hover {
+    background: rgba(0, 0, 0, 0.55);
 }
 
 .node-fullscreen-content {
