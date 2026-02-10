@@ -1,10 +1,94 @@
 .peaceful-display-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  overflow: hidden;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  height: 100%;
-  background: linear-gradient(135deg, var(--color-primary, #1a1a2e) 0%, var(--color-secondary, #16213e) 100%);
-  color: var(--text-primary, #eaeaea);
+  background: var(--sky-gradient);
+  color: #f7f7f7;
+}
+
+.peaceful-display-container.mode-summer {
+  --sky-gradient: linear-gradient(180deg, #73c8ff 0%, #f9f2c8 100%);
+  --hill-back: #97cfa3;
+  --hill-mid: #7fbd8b;
+  --hill-front: #5da470;
+}
+
+.peaceful-display-container.mode-autumn {
+  --sky-gradient: linear-gradient(180deg, #f4b184 0%, #f6dcc4 100%);
+  --hill-back: #d59b6b;
+  --hill-mid: #c57b4f;
+  --hill-front: #9f5f33;
+}
+
+.peaceful-display-container.mode-winter {
+  --sky-gradient: linear-gradient(180deg, #b9d7f4 0%, #eef4fb 100%);
+  --hill-back: #d7e3f1;
+  --hill-mid: #bfd1e4;
+  --hill-front: #a9bfd8;
+}
+
+.peaceful-display-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.peaceful-display-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.peaceful-display-sun {
+  position: absolute;
+  top: 5%;
+  right: 10%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff6b7 0%, #f7d06b 60%, #f0b04a 100%);
+  box-shadow: 0 0 40px rgba(247, 208, 107, 0.55);
+  z-index: 2;
+}
+
+.peaceful-display-hills {
+  position: absolute;
+  bottom: -5%;
+  left: -5%;
+  right: -5%;
+  height: 60%;
+  z-index: 2;
+}
+
+.peaceful-display-hill {
+  position: absolute;
+  bottom: 0;
+  width: 120%;
+  height: 60%;
+  border-radius: 50% 50% 0 0;
+}
+
+.peaceful-display-hill.hill-back {
+  left: -10%;
+  height: 50%;
+  background: var(--hill-back);
+  z-index: 1;
+}
+
+.peaceful-display-hill.hill-mid {
+  left: -5%;
+  height: 60%;
+  background: var(--hill-mid);
+  z-index: 2;
+}
+
+.peaceful-display-hill.hill-front {
+  left: 0;
+  height: 70%;
+  background: var(--hill-front);
+  z-index: 3;
 }
