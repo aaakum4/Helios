@@ -56,3 +56,83 @@
     gap: 4px;
 }
 
+.subheading-button {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 6px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.subheading-button:hover {
+    background: var(--border);
+}
+
+.subheading-button.active {
+    background: var(--muted);
+    font-weight: 500;
+}
+
+.subheading-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.todo-count {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.subheading-delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.subheading-item:hover .subheading-delete-btn {
+    opacity: 0.6;
+}
+
+.subheading-delete-btn:hover {
+    opacity: 1;
+    background: var(--border);
+}
+
+.subheadings-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.subheadings-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.subheadings-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.subheadings-list::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+}
