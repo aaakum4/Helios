@@ -1,0 +1,42 @@
+.todo-sidebar {
+    flex: 0 0 180px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 12px;
+}
+
+.sidebar-add-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 28px;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 8px 0;
+    margin: 0 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+}
+
+.sidebar-add-btn:hover {
+    background: var(--border);
+    transform: scale(1.1);
+}
+
+.sidebar-add-btn:active {
+    transform: scale(0.95);
+}
+
+.sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+}
