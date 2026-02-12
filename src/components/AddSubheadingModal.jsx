@@ -1,5 +1,5 @@
 import {useRef, useEffect, useState} from 'react';
-import './AddSubjeadingModal.css';
+import './AddSubheadingModal.css';
 
 export default function AddSubheadingModal({ onClose, onConfirm }) {
     const [title, setTitle] = useState('');

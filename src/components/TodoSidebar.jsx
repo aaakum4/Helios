@@ -40,7 +40,7 @@ export default function TodoSidebar({
                             title="Delete subheading"
                             aria-label={`Delete ${subheading.title}`}
                         >
-                            U+0078
+                            x
                         </button>
                     </div>
                 ))}

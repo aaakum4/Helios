@@ -1,11 +1,11 @@
-import React, { use } from 'react';
+import { useState } from 'react';
 import { useLocalStorage } from '../../core/useLocalStorage';
-import TodoSidebar from './components/TodoSidebar';
-import TodoList from './components/TodoList';
-import AddSubheadingModal from '.components/AddSubheadingModal';
+import TodoSidebar from '../../components/TodoSidebar';
+import AddSubheadingModal from '../../components/AddSubheadingModal';
+import TodoList from '../../components/TodoList';
 import './Todo.css';
 
-function useTodoState() { 
+function useTodoState() {
   const [todosData, setTodosData] = useLocalStorage('todosData', {
     subheadings: [
       {
@@ -13,120 +13,120 @@ function useTodoState() {
         title: 'Inbox',
         todos: [],
       },
-  ],
-});
+    ],
+  });
 
-const [selectedSubheadingsID, setSelectedSubheadingsID] = useState(() => {
-  if (todosData.subheadings.length > 0) {
-    return todosData.subheadings[0].id;
-  }
-  return null;
-});
+  const [selectedSubheadingID, setSelectedSubheadingID] = useState(() => {
+    if (todosData.subheadings.length > 0) {
+      return todosData.subheadings[0].id;
+    }
+    return null;
+  });
 
-const addSubheading = (title) => {
-  const newSubheading = {
-    id: `subheading-${Date.now()}`,
-    title,
-    todos: [],
-  };
-  setTodosData((prev) => ({
-    ...prev,
-    subheadings: [...prev.subheadings, newSubheading],
-  }));
-  
-  setSelectedSubheadingsID(newSubheading.id);
-  return newSubheading.id;
-};
+  const addSubheading = (title) => {
+    const newSubheading = {
+      id: `subheading-${Date.now()}`,
+      title,
+      todos: [],
+    };
+    setTodosData((prev) => ({
+      ...prev,
+      subheadings: [...prev.subheadings, newSubheading],
+    }));
 
-const deleteSubheading = (subheadingID) => {
-  setTodosData((prev) => ({
-    ...prev,
-    subheadings: prev.subheadings.filter((s) => s.id !== subheadingID),
-  }));
-
-  if (selectedSubheadingsID == subheadingID && todosData.subheadings.length > 1) {
-    const remainingSubheadings = todosData.subheadings.filter((s) => s.id !== subheadingID);
-    setSelectedSubheadingsID(remainingSubheadings[0].id);
-  }
-};
-
-const addTodo = (subheadingID, title, dueDate = '') => {
-  const newTodo = {
-    id: `todo-${Date.now()}`,
-    title,
-    completed: false,
-    dueDate,
+    setSelectedSubheadingID(newSubheading.id);
+    return newSubheading.id;
   };
 
-  setTodosData((prev) => ({
-    ...prev,
-    subheadings: prev.subheadings.map((s) =>
-      s.id === subheadingID ? { ...s, todos: [...s.todos, newTodo] } : s
-    ),
-  }));
+  const deleteSubheading = (subheadingID) => {
+    setTodosData((prev) => ({
+      ...prev,
+      subheadings: prev.subheadings.filter((s) => s.id !== subheadingID),
+    }));
 
-  return newTodo.id;
-};
+    if (selectedSubheadingID === subheadingID && todosData.subheadings.length > 1) {
+      const remainingSubheadings = todosData.subheadings.filter((s) => s.id !== subheadingID);
+      setSelectedSubheadingID(remainingSubheadings[0].id);
+    }
+  };
 
-const updateTodo = (subheadingID, todoID, updates) => {
-  setTodosData((prev) => ({
-    ...prev,
-    subheadings: prev.subheadings.map((s) =>
-      s.id === subheadingID
-        ? {
-            ...s,
-            todos: s.todos.map((t) =>
-              t.id === todoID ? { ...t, ...updates } : t
-            ),
-          }
-        : s
-    ),
-  }));
-};
+  const addTodo = (subheadingID, title, dueDate = '') => {
+    const newTodo = {
+      id: `todo-${Date.now()}`,
+      title,
+      completed: false,
+      dueDate,
+    };
 
-const deleteTodo = (subheadingID, todoID) => {
-  setTodosData((prev) => ({
-    ...prev,
-    subheadings: prev.subheadings.map((s) =>
-      s.id === subheadingID
-        ? { ...s, todos: s.todos.filter((t) => t.id !== todoID) }
-        : s
-    ),
-  }));
-};
+    setTodosData((prev) => ({
+      ...prev,
+      subheadings: prev.subheadings.map((s) =>
+        s.id === subheadingID ? { ...s, todos: [...s.todos, newTodo] } : s
+      ),
+    }));
 
-const toggleTodoCompletetion = (subheadingID, todoID) => {
-  setTodosData((prev) => ({
-    ...prev,
-    subheadings: prev.subheadings.map((s) =>
-      s.id === subheadingID
-        ? {
-            ...s,
-            todos: s.todos.map((t) =>
-              t.id === todoID ? { ...t, completed: !t.completed } : t
-            ),
-          }
-        : s
-    ),
-  }));
-};
+    return newTodo.id;
+  };
 
-const getCurrentSubheading = () => {
-  return todosData.subheadings.find((s) => s.id === selectedSubheadingsID);
-};
+  const updateTodo = (subheadingID, todoID, updates) => {
+    setTodosData((prev) => ({
+      ...prev,
+      subheadings: prev.subheadings.map((s) =>
+        s.id === subheadingID
+          ? {
+              ...s,
+              todos: s.todos.map((t) =>
+                t.id === todoID ? { ...t, ...updates } : t
+              ),
+            }
+          : s
+      ),
+    }));
+  };
 
-return {
-  subheadings: todosData.subheadings,
-  selectedSubheadingsID,
-  setSelectedSubheadingsID,
-  addSubheading,
-  deleteSubheading,
-  addTodo,
-  updateTodo,
-  deleteTodo,
-  toggelTodoCompletion,
-  getCurrentSubheading,
-};
+  const deleteTodo = (subheadingID, todoID) => {
+    setTodosData((prev) => ({
+      ...prev,
+      subheadings: prev.subheadings.map((s) =>
+        s.id === subheadingID
+          ? { ...s, todos: s.todos.filter((t) => t.id !== todoID) }
+          : s
+      ),
+    }));
+  };
+
+  const toggleTodoCompletion = (subheadingID, todoID) => {
+    setTodosData((prev) => ({
+      ...prev,
+      subheadings: prev.subheadings.map((s) =>
+        s.id === subheadingID
+          ? {
+              ...s,
+              todos: s.todos.map((t) =>
+                t.id === todoID ? { ...t, completed: !t.completed } : t
+              ),
+            }
+          : s
+      ),
+    }));
+  };
+
+  const getCurrentSubheading = () => {
+    return todosData.subheadings.find((s) => s.id === selectedSubheadingID);
+  };
+
+  return {
+    subheadings: todosData.subheadings,
+    selectedSubheadingID,
+    setSelectedSubheadingID,
+    addSubheading,
+    deleteSubheading,
+    addTodo,
+    updateTodo,
+    deleteTodo,
+    toggleTodoCompletion,
+    getCurrentSubheading,
+  };
 }
 
 export default function Todo() {
@@ -137,9 +137,9 @@ export default function Todo() {
     <div className="todo-container">
       <TodoSidebar
         subheadings={todoState.subheadings}
-        selectedSubheadingsID={todoState.selectedSubheadingsID}
-        onSelectSubheading={todoState.setSelectedSubheadingsID}
-        onAddSubheading={() => setShowAddModal(true)}
+        selectedSubheadingID={todoState.selectedSubheadingID}
+        onSelectSubheading={todoState.setSelectedSubheadingID}
+        onAddSubheadingClick={() => setShowAddModal(true)}
         onDeleteSubheading={todoState.deleteSubheading}
       />
 
@@ -148,7 +148,7 @@ export default function Todo() {
         onAddTodo={todoState.addTodo}
         onUpdateTodo={todoState.updateTodo}
         onDeleteTodo={todoState.deleteTodo}
-        onToggleTodoCompletion={todoState.toggleTodoCompletetion}
+        onToggleTodoCompletion={todoState.toggleTodoCompletion}
       />
 
       {showAddModal && (
