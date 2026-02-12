@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./TodoList.css";
 
 export default function TodoList({
@@ -10,6 +10,8 @@ export default function TodoList({
 }) {
     const [title, setTitle] = useState('');
     const [dueDate, setDueDate] = useState('');
+    const [removingTodoIds, setRemovingTodoIds] = useState(() => new Set());
+    const removalTimersRef = useRef(new Map());
 
     if (!currentSubheading) {
         return (
@@ -18,6 +20,43 @@ export default function TodoList({
             </div>
         );
     }
+
+    const handleToggle = (todo) => {
+        const isCompleting = !todo.completed;
+
+        onToggleTodoCompletion(currentSubheading.id, todo.id);
+
+        if (isCompleting) {
+            setRemovingTodoIds((prev) => {
+                const next = new Set(prev);
+                next.add(todo.id);
+                return next;
+            });
+
+            const timerId = setTimeout(() => {
+                onDeleteTodo(currentSubheading.id, todo.id);
+                removalTimersRef.current.delete(todo.id);
+                setRemovingTodoIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(todo.id);
+                    return next;
+                });
+            }, 2000);
+
+            removalTimersRef.current.set(todo.id, timerId);
+        } else {
+            const timerId = removalTimersRef.current.get(todo.id);
+            if (timerId) {
+                clearTimeout(timerId);
+                removalTimersRef.current.delete(todo.id);
+            }
+            setRemovingTodoIds((prev) => {
+                const next = new Set(prev);
+                next.delete(todo.id);
+                return next;
+            });
+        }
+    };
 
     const handleAdd = () => {
         if (!title.trim()) {
@@ -66,17 +105,22 @@ export default function TodoList({
             ) : (
                 <div className="todo-items">
                     {currentSubheading.todos.map((todo) => (
-                        <div key={todo.id} className={`todo-item ${todo.completed ? 'done' : ''}`}>
+                        <div 
+                            key={todo.id} 
+                            className={`todo-item ${todo.completed ? 'done' : ''} ${
+                                removingTodoIds.has(todo.id) ? 'removing' : ''
+                            }`}
+                        >
                             <input
                                 type="checkbox"
-                                checked="{todo.completed}"
-                                onChanged={() => onToggleTodoCompletion(currentSubheading.id, todo.id)}
+                                checked={todo.completed}
+                                onChange={() => handleToggle(todo)}
                             />
                             <input
                                 type="text"
                                 className="todo-title-input"
                                 value={todo.title}
-                                onChange={(event) => 
+                                onChange={(event) =>
                                     onUpdateTodo(currentSubheading.id, todo.id, { title: event.target.value })
                                 }
                             />
@@ -85,13 +129,13 @@ export default function TodoList({
                                 className="todo-date-input"
                                 value={todo.dueDate || ''}
                                 onChange={(event) =>
-                                    onUpdateTodo(currentSubheading.id, todo.id, { dueDate: event.target.valye })
+                                    onUpdateTodo(currentSubheading.id, todo.id, { dueDate: event.target.value })
                                 }
                             />
                             <button
                                 className="todo-delete-btn"
                                 onClick={() => onDeleteTodo(currentSubheading.id, todo.id)}
-                                aria-label={'Delete ${todo.title}'}
+                                aria-label={`Delete ${todo.title}`}
                                 title="Delete todo"
                             >
                                 x
