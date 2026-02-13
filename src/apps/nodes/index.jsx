@@ -1,11 +1,13 @@
-// Node registry: metadata and lazy-loaded components for each app node
 import { lazy } from 'react';
 
-// Lazy-load node components for performance
 const PomodoroComponent = lazy(() => import('./Pomodoro'));
 const TimetableComponent = lazy(() => import('./Timetable'));
 const PeacefulDisplayComponent = lazy(() => import('./PeacefulDisplay'));
 const TodoComponent = lazy(() => import('./Todo'));
+const GoalsComponent = lazy(() => import('./Goals'));
+const FocusTrackerComponent = lazy(() => import('./FocusTracker'));
+const ReflectionComponent = lazy(() => import('./Reflection'));
+const InteractiveCalendarComponent = lazy(() => import('./InteractiveCalendar'));
 
 export const nodes = [
   {
@@ -36,6 +38,34 @@ export const nodes = [
     icon: '✓',
     component: TodoComponent,
   },
+  {
+    id: 'goals',
+    title: 'Goals',
+    description: 'Set intent-led goals to guide focus.',
+    icon: '🎯',
+    component: GoalsComponent,
+  },
+  {
+    id: 'focusTracker',
+    title: 'Focus Tracker',
+    description: 'Light focus check-ins to monitor your focus levels.',
+    icon: '📊',
+    component: FocusTrackerComponent,
+  },
+  {
+    id: 'reflection',
+    title: 'Reflection',
+    description: 'Wellbeing and reflection to stay in tune with your needs.',
+    icon: '📝',
+    component: ReflectionComponent,
+  },
+  {
+    id: 'interactiveCalendar',
+    title: 'Calendar',
+    description: 'Interactive calendar to manage your schedule.',
+    icon: '📆',
+    component: InteractiveCalendarComponent,
+  }
 ];
 
 export function getNodeById(id) {
