@@ -25,6 +25,7 @@ export default function MainScreen({ onBack }) {
   const [dragOverId, setDragOverId] = useState(null);
   const hideTimer = useRef(null);
   const appContainerRef = useRef(null);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     try {
@@ -43,7 +44,9 @@ export default function MainScreen({ onBack }) {
 
   const handleNodeMouseDown = (e, nodeId) => {
     e.preventDefault();
+    e.stopPropagation();
     setDraggedId(nodeId);
+    isDraggingRef.current = false;
 
     const startY = e.clientY || e.touches?.[0]?.clientY;
     const startX = e.clientX || e.touches?.[0]?.clientX;
@@ -53,6 +56,7 @@ export default function MainScreen({ onBack }) {
       const currentX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
 
       if (Math.abs(currentY - startY) > 5 || Math.abs(currentX - startX) > 5) {
+        isDraggingRef.current = true;
         setDragOverId(nodeId);
       }
     };
@@ -64,6 +68,10 @@ export default function MainScreen({ onBack }) {
       window.removeEventListener("touchend", handleMouseUpDrag);
       setDraggedId(null);
       setDragOverId(null);
+      
+      setTimeout(() => {
+        isDraggingRef.current = false;
+      }, 100);
     };
 
     window.addEventListener("mousemove", handleMouseMoveDrag);
@@ -134,7 +142,11 @@ export default function MainScreen({ onBack }) {
                 >
                   <NodeCard
                     node={node}
-                    onClick={() => setActiveNodeId(node.id)}
+                    onClick={() => {
+                      if (!isDraggingRef.current) {
+                        setActiveNodeId(node.id);
+                      }
+                    }}
                     onDragStart={(e) => handleNodeMouseDown(e, node.id)}
                     isDragging={draggedId === node.id}
                   />
