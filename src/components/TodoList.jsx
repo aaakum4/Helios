@@ -41,7 +41,7 @@ export default function TodoList({
                     next.delete(todo.id);
                     return next;
                 });
-            }, 2000);
+            }, 1500);
 
             removalTimersRef.current.set(todo.id, timerId);
         } else {
