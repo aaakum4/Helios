@@ -1,50 +1,26 @@
 import React, { useEffect, useState } from "react";
 import "./SettingsModal.css";
+import { useLocalStorage } from "../../../core/useLocalStorage";
 import { getStoredThemeMode, setThemeMode as applyThemeMode } from "../../../core/theme";
 
 export default function SettingsModal({ onClose }) {
-    const getInitialThemeMode = () => getStoredThemeMode();
+  const [themeMode, setThemeMode] = useLocalStorage("settings:themeMode", () => getStoredThemeMode());
+  const [glowColor, setGlowColor] = useLocalStorage("settings:glowColor", "none");
+  const [soundEnabled, setSoundEnabled] = useLocalStorage("settings:soundEnabled", true);
 
-    const getInitialGlow = () => {
-        try {
-            return localStorage.getItem("glow") || "none";
-        } catch (e) {}
-        return "none";
-    };
+  useEffect(() => {
+    applyThemeMode(themeMode);
+  }, [themeMode]);
 
-    const getInitialSound = () => {
-        try {
-            const stored = localStorage.getItem("soundEnabled");
-            if (stored === "false") return false;
-            if (stored === "true") return true;
-        } catch (e) {}
-        return true;
-    };
-
-    const [themeMode, setThemeMode] = useState(() => getInitialThemeMode());
-    const [glowColor, setGlowColor] = useState(() => getInitialGlow());
-    const [soundEnabled, setSoundEnabled] = useState(() => getInitialSound());
-
-    useEffect(() => {
-        applyThemeMode(themeMode);
-    }, [themeMode]);
-
-    useEffect(() => {
-        try {
-            const appContainer = document.querySelector(".app-container");
-            if (appContainer) {
-                appContainer.classList.remove("glow-none", "glow-blue", "glow-red", "glow-orange", "glow-purple", "glow-green", "glow-pink");
-                appContainer.classList.add(`glow-${glowColor}`);
-                localStorage.setItem("glow", glowColor);
-            }
-        } catch (e) {}
-    }, [glowColor]);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem("soundEnabled", soundEnabled ? "true" : "false");
-        } catch (e) {}
-    }, [soundEnabled]);
+  useEffect(() => {
+    try {
+      const appContainer = document.querySelector(".app-container");
+      if (appContainer) {
+        appContainer.classList.remove("glow-none", "glow-blue", "glow-red", "glow-orange", "glow-purple", "glow-green", "glow-pink");
+        appContainer.classList.add(`glow-${glowColor}`);
+      }
+    } catch (e) {}
+  }, [glowColor]);
 
     return (
         <div className="settings-backdrop" onClick={onClose}>

@@ -1,0 +1,79 @@
+.reflection-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-primary, #1a1a2e) 0%, var(--color-secondary, #16213e) 100%);
+    color: var(--text-primary, #eaeaea);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.reflection-header p2 {
+    margin: 0 0 6px 0;
+    font-size: 28px;
+}
+
+.reflection-header p {
+    margin: 0;
+    color: var(--text-secondary, #b0b0b0);
+}
+
+.reflection-tabs {
+    display: flex;
+    gap: 12px;
+}
+
+.reflection-tabs button {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary, #eaeaea);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reflection-tabs button.active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.reflection-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.reflection-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.reflection-card h3 {
+    margin: 0 0 8px 0;
+}
+
+.reflection-card p {
+    margin: 0;
+    color: var(--text-secondary, #b0b0b0);
+}
+
+.journal-panel textarea {
+    width: 100%;
+    min-height: 220px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-primary, #eaeaea);
+    font-family: inherit;
+    resize: vertical;
+}
+
+.journal-note {
+    font-size: 12px;
+    color: var(--text-secondary, #b0b0b0);
+    margin-top: 8px;
+}

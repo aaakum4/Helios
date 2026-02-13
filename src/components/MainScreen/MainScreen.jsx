@@ -13,8 +13,65 @@ export default function MainScreen({ onBack }) {
   const [showCounter, setShowCounter] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeNodeId, setActiveNodeId] = useState(null);
+  const [nodeOrder, setNodeOrder] = useState(() => {
+    try {
+      const saved = localStorage.getItem("nodeOrder");
+      return saved ? JSON.parse(saved) : nodes.map((n) => n.id);
+    } catch {
+      return nodes.map((n) => n.id);
+    }
+});
+  const [draggedId, setDraggedId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
   const hideTimer = useRef(null);
   const appContainerRef = useRef(null);
+
+  const handleMousemove = (e, nodeId) => {
+    if (draggedId && draggedId !== nodeId) {
+      setDragOverId(nodeId);
+    }
+  };
+
+  const handleDragStart = (e, nodeId) => {
+    setDraggedId(nodeId);
+  };
+
+  const handleDragEnd = (e, nodeId) => {
+    setDraggedId(null);
+    setDragOverId(null);
+  };
+
+  const handleMouseMove = (e, nodeId) => {
+    if (draggedId && draggedId !== nodeId) {
+      setDragOverId(nodeId);
+    }
+  };
+
+  const handleMouseDown = (e, nodeId) => {
+    e.preventDefault();
+    setDraggedId(nodeId);
+
+    const startY = e.clientY || e.touches?.[0]?.clientY;
+    const startX = e.clientX || e.touches?.[0]?.clientX;
+
+    if (Math.abs(currentY - startY) > 5 || Math.abs(currentX - startX) > 5) {
+      setDragOverId(nodeId);
+    }
+  };
+
+  const handleMouseUpDrag = () => {
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUpDrag);
+    window.removeEventListener("touchmove", handleMouseMove);
+    window.removeEventListener("touchend", handleMouseUpDrag);
+    setDraggedId(null);
+    setDragOverId(null);
+  }
+
+  window.addEventListener("mouseup", handleMouseUpDrag);
+  window.addEventListener("touchend", handleMouseUpDrag);
+  window.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("touchmove", handleMouseMove);
 
   useEffect(() => {
     try {
@@ -60,15 +117,40 @@ export default function MainScreen({ onBack }) {
 
         <div className="main-screen-content">
           <div className="nodes-grid">
-            {nodes.map((node) => (
-              <NodeCard
-                key={node.id}
-                node={node}
-                onClick={() => setActiveNodeId(node.id)}
-              />
-            ))}
+            {sortedNodes.map((node, index) => {
+              const handleGridMouseEnter = (targetIndex) => {
+                if (draggedId) {
+                  const draggedIndex = nodeOrder.indexOf(draggedId);
+                  if (draggedIndex !== targetIndex) {
+                    const newOrder = [...nodeOrder];
+                    newOrder.splice(draggedIndex, 1);
+                    newOrder.splice(targetIndex, 0, draggedId);
+                    setNodeOrder(newOrder);
+                  }
+                }
+              };
+
+              return (
+                <div
+                  key={node.id}
+                  onMouseEnter={() => handleGridMouseEnter(index)}
+                  className={`node-card-wrapper ${
+                    draggedId === node.id ? "dragging" : ""
+                  } ${dragOverId === node.id ? "drag-over" : ""}`}
+                >
+                  <NodeCard
+                    node={node}
+                    onClick={() => setActiveNodeId(node.id)}
+                    onDragStart={(e) => handleDragStart(e, node.id)}
+                    onDragEnd={(e) => handleDragEnd(e, node.id)}
+                    isDragging={draggedId === node.id}
+                  />
+                </div>
+              );
+            })}
           </div>
-          <div className="helios-corner">Helios</div>
+        
+        <div className="helios-corner">Helios</div>
         </div>
 
         {activeNode && (
