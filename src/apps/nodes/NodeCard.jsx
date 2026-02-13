@@ -1,14 +1,12 @@
 import './nodes.css';
 
-export default function NodeCard({ node, onClick }) {
+export default function NodeCard({ node, onClick, onDragStart, isDragging }) {
   return (
     <div className="node-card" onClick={onClick}>
       <button
         className="node-move-button"
         onMouseDown={onDragStart}
-        onMouseUp={onDragEnd}
         onTouchStart={onDragStart}
-        onTouchEnd={onDragEnd}
         title="Drag to reorder"
       >
         ⋮⋮

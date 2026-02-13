@@ -6,15 +6,7 @@
     height: 100%;
     background: linear-gradient(135deg, var(--color-primary, #1a1a2e) 0%, var(--color-secondary, #16213e) 100%);
     color: var(--text-primary, #eaeaea);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.reflection-header p2 {
-    margin: 0 0 6px 0;
-    font-size: 28px;
-}
-
-.reflection-header p {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     margin: 0;
     color: var(--text-secondary, #b0b0b0);
 }

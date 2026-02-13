@@ -20,58 +20,17 @@ export default function MainScreen({ onBack }) {
     } catch {
       return nodes.map((n) => n.id);
     }
-});
+  });
   const [draggedId, setDraggedId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const hideTimer = useRef(null);
   const appContainerRef = useRef(null);
 
-  const handleMousemove = (e, nodeId) => {
-    if (draggedId && draggedId !== nodeId) {
-      setDragOverId(nodeId);
-    }
-  };
-
-  const handleDragStart = (e, nodeId) => {
-    setDraggedId(nodeId);
-  };
-
-  const handleDragEnd = (e, nodeId) => {
-    setDraggedId(null);
-    setDragOverId(null);
-  };
-
-  const handleMouseMove = (e, nodeId) => {
-    if (draggedId && draggedId !== nodeId) {
-      setDragOverId(nodeId);
-    }
-  };
-
-  const handleMouseDown = (e, nodeId) => {
-    e.preventDefault();
-    setDraggedId(nodeId);
-
-    const startY = e.clientY || e.touches?.[0]?.clientY;
-    const startX = e.clientX || e.touches?.[0]?.clientX;
-
-    if (Math.abs(currentY - startY) > 5 || Math.abs(currentX - startX) > 5) {
-      setDragOverId(nodeId);
-    }
-  };
-
-  const handleMouseUpDrag = () => {
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUpDrag);
-    window.removeEventListener("touchmove", handleMouseMove);
-    window.removeEventListener("touchend", handleMouseUpDrag);
-    setDraggedId(null);
-    setDragOverId(null);
-  }
-
-  window.addEventListener("mouseup", handleMouseUpDrag);
-  window.addEventListener("touchend", handleMouseUpDrag);
-  window.addEventListener("mousemove", handleMouseMove);
-  window.addEventListener("touchmove", handleMouseMove);
+  useEffect(() => {
+    try {
+      localStorage.setItem("nodeOrder", JSON.stringify(nodeOrder));
+    } catch (e) {}
+  }, [nodeOrder]);
 
   useEffect(() => {
     try {
@@ -81,6 +40,37 @@ export default function MainScreen({ onBack }) {
       }
     } catch (e) {}
   }, []);
+
+  const handleNodeMouseDown = (e, nodeId) => {
+    e.preventDefault();
+    setDraggedId(nodeId);
+
+    const startY = e.clientY || e.touches?.[0]?.clientY;
+    const startX = e.clientX || e.touches?.[0]?.clientX;
+
+    const handleMouseMoveDrag = (moveEvent) => {
+      const currentY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY;
+      const currentX = moveEvent.clientX || moveEvent.touches?.[0]?.clientX;
+
+      if (Math.abs(currentY - startY) > 5 || Math.abs(currentX - startX) > 5) {
+        setDragOverId(nodeId);
+      }
+    };
+
+    const handleMouseUpDrag = () => {
+      window.removeEventListener("mousemove", handleMouseMoveDrag);
+      window.removeEventListener("mouseup", handleMouseUpDrag);
+      window.removeEventListener("touchmove", handleMouseMoveDrag);
+      window.removeEventListener("touchend", handleMouseUpDrag);
+      setDraggedId(null);
+      setDragOverId(null);
+    };
+
+    window.addEventListener("mousemove", handleMouseMoveDrag);
+    window.addEventListener("mouseup", handleMouseUpDrag);
+    window.addEventListener("touchmove", handleMouseMoveDrag);
+    window.addEventListener("touchend", handleMouseUpDrag);
+  };
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -92,6 +82,10 @@ export default function MainScreen({ onBack }) {
     if (hideTimer.current) clearTimeout(hideTimer.current);
     hideTimer.current = setTimeout(() => setShowCounter(false), 1000);
   };
+
+  const sortedNodes = nodeOrder
+    .map((id) => nodes.find((n) => n.id === id))
+    .filter(Boolean);
 
   const activeNode = activeNodeId ? nodes.find((n) => n.id === activeNodeId) : null;
 
@@ -141,16 +135,14 @@ export default function MainScreen({ onBack }) {
                   <NodeCard
                     node={node}
                     onClick={() => setActiveNodeId(node.id)}
-                    onDragStart={(e) => handleDragStart(e, node.id)}
-                    onDragEnd={(e) => handleDragEnd(e, node.id)}
+                    onDragStart={(e) => handleNodeMouseDown(e, node.id)}
                     isDragging={draggedId === node.id}
                   />
                 </div>
               );
             })}
           </div>
-        
-        <div className="helios-corner">Helios</div>
+          <div className="helios-corner">Helios</div>
         </div>
 
         {activeNode && (
