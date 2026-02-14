@@ -13,20 +13,76 @@
 
 .main-screen-content {
   flex: 1;
-  padding: 0;
+  padding-top: 2rem;
   position: relative;
   display: flex;
+  flex-direction: row;
   justify-content: center;
-  align-items: center;
+  --panel-width: 45%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-screen-content[data-panel-state="expanded"] {
+  justify-content: flex-start;
+}
+
+.nodes-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 8px 2.5rem 24px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-screen-content[data-panel-state="expanded"] .nodes-container {
+  width: calc(100% - var(--panel-width));
+  overflow-y: auto;
+  overflow-x: visible;
+  max-height: calc(100vh - 56px - 10vh);
+  padding-right: 2.5rem;
 }
 
 .nodes-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-  max-width: 1200px;
+  gap: 2.5rem;
   width: 100%;
-  padding: 0 2rem;
+  padding: 0;
+}
+
+@media (max-width: 1199px) {
+  .nodes-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .nodes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 599px) {
+  .nodes-container {
+    padding: 8px 1.5rem 16px;
+  }
+
+  .nodes-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .main-screen-content[data-panel-state="expanded"] .nodes-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: none;
+  }
 }
 
 .node-card-wrapper {
@@ -86,6 +142,8 @@
 .app-container {
   width: 90vw;
   height: 90vh;
+  min-width: 1215px;
+  min-height: 765px;
   margin: 5vh auto;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -179,4 +237,21 @@ html[data-theme="dark"] .back-button {
 html[data-theme="dark"] .back-button:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nodes-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nodes-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nodes-container::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.nodes-container::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }

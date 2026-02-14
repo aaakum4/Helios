@@ -4,6 +4,7 @@ import SettingsModal from "./Settings/SettingsModal";
 import { nodes } from "../../apps/nodes/index";
 import NodeCard from "../../apps/nodes/NodeCard";
 import NodeFullScreen from "../../apps/nodes/NodeFullScreen";
+import SidePanel from "../SidePanel/SidePanel";
 import "./MainScreen.css";
 
 const MAX_CHARS = 50;
@@ -12,6 +13,7 @@ export default function MainScreen({ onBack }) {
   const [text, setText] = useState("");
   const [showCounter, setShowCounter] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [panelState, setPanelState] = useState('hidden');
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [nodeOrder, setNodeOrder] = useState(() => {
     try {
@@ -91,6 +93,18 @@ export default function MainScreen({ onBack }) {
     hideTimer.current = setTimeout(() => setShowCounter(false), 1000);
   };
 
+  const handlePanelToggle = () => {
+    setPanelState((prev) => (prev === 'expanded' ? 'hidden' : 'expanded'));
+  };
+  
+  const handlePanelHover = (isHovering) => {
+    if (panelState === 'hidden' && isHovering) {
+      setPanelState('peek');
+    } else if (panelState === 'peek' && !isHovering) {
+      setPanelState('hidden');
+    }
+  };
+
   const sortedNodes = nodeOrder
     .map((id) => nodes.find((n) => n.id === id))
     .filter(Boolean);
@@ -117,29 +131,11 @@ export default function MainScreen({ onBack }) {
 
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
 
-        <div className="main-screen-content">
-          <div className="nodes-grid">
-            {sortedNodes.map((node, index) => {
-              const handleGridMouseEnter = (targetIndex) => {
-                if (draggedId) {
-                  const draggedIndex = nodeOrder.indexOf(draggedId);
-                  if (draggedIndex !== targetIndex) {
-                    const newOrder = [...nodeOrder];
-                    newOrder.splice(draggedIndex, 1);
-                    newOrder.splice(targetIndex, 0, draggedId);
-                    setNodeOrder(newOrder);
-                  }
-                }
-              };
-
-              return (
-                <div
-                  key={node.id}
-                  onMouseEnter={() => handleGridMouseEnter(index)}
-                  className={`node-card-wrapper ${
-                    draggedId === node.id ? "dragging" : ""
-                  } ${dragOverId === node.id ? "drag-over" : ""}`}
-                >
+        <div className="main-screen-content" data-panel-state={panelState}>
+          <div className="nodes-container">
+            <div className="nodes-grid">
+              {sortedNodes.map((node) => (
+                <div key={node.id} className="node-card-wrapper">
                   <NodeCard
                     node={node}
                     onClick={() => {
@@ -151,10 +147,15 @@ export default function MainScreen({ onBack }) {
                     isDragging={draggedId === node.id}
                   />
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-          <div className="helios-corner">Helios</div>
+
+          <SidePanel
+            state={panelState}
+            onToggle={handlePanelToggle}
+            onHover={handlePanelHover}
+          />
         </div>
 
         {activeNode && (

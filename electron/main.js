@@ -21,8 +21,8 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 900,
-    minHeight: 700,
+    minWidth: 1350,
+    minHeight: 850,
     show: false,
     vibrancy: "sidebar",
     titleBarStyle: "hiddenInset",
