@@ -45,6 +45,10 @@ export default function MainScreen({ onBack }) {
   }, []);
 
   const handleNodeMouseDown = (e, nodeId) => {
+    if (panelState === "expanded") {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     setDraggedId(nodeId);
@@ -82,6 +86,32 @@ export default function MainScreen({ onBack }) {
     window.addEventListener("touchend", handleMouseUpDrag);
   };
 
+  const handleNodeMouseEnter = (nodeId) => {
+    if (panelState === "expanded") {
+      return;
+    }
+
+    if (!draggedId || draggedId === nodeId) {
+      return;
+    }
+
+    setNodeOrder((prevOrder) => {
+      const fromIndex = prevOrder.indexOf(draggedId);
+      const toIndex = prevOrder.indexOf(nodeId);
+
+      if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) {
+        return prevOrder;
+      }
+
+      const nextOrder = [...prevOrder];
+      nextOrder.splice(fromIndex, 1);
+      nextOrder.splice(toIndex, 0, draggedId);
+      return nextOrder;
+    });
+
+    setDragOverId(nodeId);
+  };
+
   const handleChange = (e) => {
     const value = e.target.value;
     if (value.length <= MAX_CHARS) {
@@ -115,7 +145,14 @@ export default function MainScreen({ onBack }) {
     <div className="app-container" ref={appContainerRef}>
       <div className="main-screen">
         {!activeNodeId && (
-          <button className="back-button" onClick={onBack}>
+            <button
+              className={
+                panelState === "expanded"
+                  ? "back-button back-button--hidden"
+                  : "back-button"
+              }
+              onClick={onBack}
+            >
             <span className="back-arrow">←</span>
             Back
           </button>
@@ -135,7 +172,18 @@ export default function MainScreen({ onBack }) {
           <div className="nodes-container">
             <div className="nodes-grid">
               {sortedNodes.map((node) => (
-                <div key={node.id} className="node-card-wrapper">
+                <div
+                  key={node.id}
+                  className={
+                    draggedId === node.id
+                      ? "node-card-wrapper dragging"
+                      : dragOverId === node.id
+                      ? "node-card-wrapper drag-over"
+                      : "node-card-wrapper"
+                  }
+                  onMouseEnter={() => handleNodeMouseEnter(node.id)}
+                  onTouchMove={() => handleNodeMouseEnter(node.id)}
+                >
                   <NodeCard
                     node={node}
                     onClick={() => {

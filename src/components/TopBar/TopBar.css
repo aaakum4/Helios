@@ -3,6 +3,7 @@
   display: flex;
   align-items: center;
   padding: 0 16px;
+  gap: 12px;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   background: var(--top-bar-bg);
@@ -30,7 +31,7 @@
 .top-input {
   width: 100%;
   max-width: 420px;
-  min-width: 0;
+  min-width: 220px;
   height: 36px;
   padding: 0 14px;
   border-radius: 18px;
@@ -60,15 +61,12 @@ html[data-theme="dark"] .top-input:focus {
 .settings-cog {
   background: none;
   border: none;
-  font-size: 36px;
+  font-size: 32px;
   cursor: pointer;
   user-select: none;
   opacity: 0.8;
   color: #222;
   transition: transform 0.15s ease, opacity 0.15s ease, color 250ms ease;
-  position: absolute;
-  right: 19px;
-  top: 6px;
   padding: 0;
 }
 
@@ -86,7 +84,19 @@ html[data-theme="dark"] .settings-cog {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 420px;
+  max-width: 520px;
+  min-width: 220px;
+}
+
+@media (max-width: 900px) {
+  .top-input {
+    min-width: 180px;
+  }
+
+  .input-wrapper {
+    min-width: 180px;
+    max-width: 420px;
+  }
 }
 
 .char-counter {
