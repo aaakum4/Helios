@@ -5,6 +5,7 @@ import { nodes } from "../../apps/nodes/index";
 import NodeCard from "../../apps/nodes/NodeCard";
 import NodeFullScreen from "../../apps/nodes/NodeFullScreen";
 import SidePanel from "../SidePanel/SidePanel";
+import { useLocalStorage } from "../../core/useLocalStorage";
 import "./MainScreen.css";
 
 const MAX_CHARS = 50;
@@ -141,6 +142,73 @@ export default function MainScreen({ onBack }) {
 
   const activeNode = activeNodeId ? nodes.find((n) => n.id === activeNodeId) : null;
 
+  const [todosData, setTodosData] = useLocalStorage("todosData", {
+    subheadings: [
+      {
+        id: "inbox-default",
+        title: "Inbox",
+        todos: [],
+      },
+    ],
+  });
+
+  const handleQuickAddTodo = (title, subheadingId = "inbox-default", dueDate = "") => {
+    const trimmed = title.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const newTodo = {
+      id: `todo-${Date.now()}`,
+      title: trimmed,
+      completed: false,
+      dueDate: dueDate || "",
+    };
+
+    setTodosData((prev) => {
+      const existingSubheadings = Array.isArray(prev.subheadings)
+        ? prev.subheadings
+        : [];
+      
+      let targetIndex = existingSubheadings.findIndex(
+        (s) => s.id === subheadingId
+      );
+
+      if (targetIndex === -1) {
+        targetIndex = existingSubheadings.findIndex(
+          (s) => s.id === "inbox-default"
+        );
+
+        if (targetIndex === -1) {
+          return {
+            ...prev, 
+            subheadings: [
+              {
+                id: "inbox-default",
+                title: "Inbox",
+                todos: [newTodo],
+              },
+              ...existingSubheadings,
+            ],
+          };
+        }
+      }
+
+      const nextSubheadings = [...existingSubheadings];
+      const target = nextSubheadings[targetIndex];
+      const targetTodos = Array.isArray(target?.todos) ? target.todos : [];
+      nextSubheadings[targetIndex] = {
+        ...target,
+        todos: [newTodo, ...targetTodos],
+      };
+
+      return {
+        ...prev,
+        subheadings: nextSubheadings,
+      };
+    });
+  };
+
   return (
     <div className="app-container" ref={appContainerRef}>
       <div className="main-screen">
@@ -203,6 +271,8 @@ export default function MainScreen({ onBack }) {
             state={panelState}
             onToggle={handlePanelToggle}
             onHover={handlePanelHover}
+            onQuickAddTodo={handleQuickAddTodo}
+            subheadings={todosData.subheadings}
           />
         </div>
 

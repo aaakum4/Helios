@@ -7,11 +7,14 @@ export default function StartupScreen({ onLaunch }) {
 
   const getSoundEnabled = () => {
     try {
-      const stored = localStorage.getItem("soundEnabled");
-      if (stored === "false") return false;
+      const stored = localStorage.getItem("settings:soundEnabled");
+      if (stored !== null) {
+        return JSON.parse(stored);
+      }
       return true;
-    } catch (e) {}
-    return true;
+    } catch (e) {
+      return true;
+    }
   };
 
   const handleClick = () => {
@@ -19,10 +22,14 @@ export default function StartupScreen({ onLaunch }) {
     void document.getElementById("helios-icon").offsetWidth; 
     setAnimate(true);
 
-setTimeout(() => {
-  if (audioRef.current && getSoundEnabled()) audioRef.current.play();
-}, 300);
-    };
+    setTimeout(() => {
+      if (audioRef.current && getSoundEnabled()) {
+        audioRef.current.play().catch(err => {
+          console.log("Audio playback failed:", err);
+        });
+      }
+    }, 300);
+  };
 
   useEffect(() => {
     if (animate) {

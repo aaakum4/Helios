@@ -53,12 +53,12 @@ export default function SettingsModal({ onClose }) {
                 </div>
                 <div className="settings-section">
                     <label>Startup sound</label>
-                    <div className="theme-switch" onClick={() => setSoundEnabled((v) => !v)} style={{ cursor: "pointer" }}>
+                    <div className="theme-switch" style={{ cursor: "pointer" }}>
                         <input
                             id="sound-toggle"
                             type="checkbox"
                             checked={soundEnabled}
-                            onChange={() =>setSoundEnabled((v) => !v)}
+                            onChange={() => setSoundEnabled((v) => !v)}
                         />
                         <label className="switch-track" htmlFor="sound-toggle">
                             <span className="switch-knob" />
