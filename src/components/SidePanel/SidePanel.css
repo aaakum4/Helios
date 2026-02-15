@@ -63,6 +63,12 @@
     transform: translateX(100%);
 }
 
+.side-panel--hidden,
+.side-panel--peek {
+    --tab-width: 32px;
+    --tab-height: 64px;
+}
+
 .side-panel--hidden .side-panel__tab {
     transform: translateX(0);
 }
