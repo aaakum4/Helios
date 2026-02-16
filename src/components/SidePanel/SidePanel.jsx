@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTime } from "../../core/TimeProvider";
+import { useAppContext } from "../../core/AppContext";
 import "./SidePanel.css";
 
 export default function SidePanel({ state, onToggle, onHover, onQuickAddTodo, subheadings }) {
@@ -6,6 +8,80 @@ export default function SidePanel({ state, onToggle, onHover, onQuickAddTodo, su
     const [selectedSubheadingId, setSelectedSubheadingId] = useState("inbox-default");
     const [dueDate, setDueDate] = useState("");
     const [buttonState, setButtonState] = useState("idle"); // idle, success
+    const { time } = useTime();
+    const {
+        timetableBlocks,
+        rotationMode,
+        activeWeekIndex,
+        activeMonthWeek,
+    } = useAppContext();
+
+    const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const formatMinutes = (minutes) => {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        const suffix = h >= 12 ? "PM" : "AM";
+        const h12 = ((h + 11) % 12) + 1;
+        return `${h12}:${String(m).padStart(2, "0")} ${suffix}`;
+    };
+
+    const matchesRotation = (block) => {
+        if (block.rotation !== rotationMode) {
+            return false;
+        }
+        if (rotationMode === "fortnightly") {
+            return block.weekIndex === activeWeekIndex;
+        }
+        if (rotationMode === "monthly") {
+            return block.monthWeekIndex === activeMonthWeek;
+        }
+        return true;
+    };
+
+    const { currentBlock, nextBlock } = useMemo(() => {
+        const visibleBlocks = (timetableBlocks || []).filter(matchesRotation);
+        if (!time || visibleBlocks.length === 0) {
+            return { currentBlock: null, nextBlock: null };
+        }
+
+        const todayIndex = time.getDay();
+        const nowMinutes = time.getHours() * 60 + time.getMinutes();
+
+        let active = null;
+        for (const block of visibleBlocks) {
+            if (block.dayIndex !== todayIndex) {
+                continue;
+            }
+            if (block.startMinutes <= nowMinutes && nowMinutes < block.endMinutes) {
+                if (!active || block.startMinutes < active.startMinutes) {
+                    active = block;
+                }
+            }
+        }
+
+        let upcoming = null;
+        for (const block of visibleBlocks) {
+            const dayDistance = (block.dayIndex - todayIndex + 7) % 7;
+            if (dayDistance === 0 && block.startMinutes <= nowMinutes) {
+                continue;
+            }
+            if (!upcoming) {
+                upcoming = block;
+                continue;
+            }
+            const upcomingDistance = (upcoming.dayIndex - todayIndex + 7) % 7;
+            if (dayDistance < upcomingDistance) {
+                upcoming = block;
+                continue;
+            }
+            if (dayDistance === upcomingDistance && block.startMinutes < upcoming.startMinutes) {
+                upcoming = block;
+            }
+        }
+
+        return { currentBlock: active, nextBlock: upcoming };
+    }, [timetableBlocks, rotationMode, activeWeekIndex, activeMonthWeek, time]);
 
     const handleQuickSubmit = () => {
         if (onQuickAddTodo && quickInput.trim()) {
@@ -48,16 +124,34 @@ return (
             <div className="side-panel__body">
                 <div className="side-panel__section">
                     <h3 className="side-panel__section-title">Currently</h3>
-                    <div className="side-panel__placeholder">
-                        <p>No active session</p>
-                    </div>
+                    {currentBlock ? (
+                        <div className="side-panel__session" style={{ borderColor: currentBlock.color }}>
+                            <div className="side-panel__session-title">{currentBlock.title}</div>
+                            <div className="side-panel__session-time">
+                                {DAYS[currentBlock.dayIndex]} • {formatMinutes(currentBlock.startMinutes)} - {formatMinutes(currentBlock.endMinutes)}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="side-panel__placeholder">
+                            <p>Nothing on now.</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="side-panel__section">
                     <h3 className="side-panel__section-title">Next</h3>
-                    <div className="side-panel__placeholder">
-                        <p>Nothing scheduled</p>
-                    </div>
+                    {nextBlock ? (
+                        <div className="side-panel__session" style={{ borderColor: nextBlock.color }}>
+                            <div className="side-panel__session-title">{nextBlock.title}</div>
+                            <div className="side-panel__session-time">
+                                {DAYS[nextBlock.dayIndex]} • {formatMinutes(nextBlock.startMinutes)} - {formatMinutes(nextBlock.endMinutes)}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="side-panel__placeholder">
+                            <p>Nothing coming up.</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="side-panel__section side-panel__section--inbox">

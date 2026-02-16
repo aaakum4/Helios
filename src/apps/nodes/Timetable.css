@@ -43,8 +43,40 @@ html[data-theme="dark"] .timetable-root {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
+}
+
+.timetable-add-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid var(--tt-line);
+  background: var(--tt-surface);
+  color: var(--tt-text);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.timetable-add-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+}
+
+.timetable-add-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.timetable-add-btn:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.4);
+  outline-offset: 3px;
 }
 
 .timetable-title-group {

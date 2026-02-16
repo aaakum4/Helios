@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAppContext } from '../../core/AppContext';
+import { useTime } from '../../core/TimeProvider';
 import './Timetable.css';
 
 const DAYS = [
@@ -75,10 +77,22 @@ const createDraft = (dayIndex, startMinutes, endMinutes, rotationMode, weekIndex
 });
 
 export default function Timetable() {
-  const [rotationMode, setRotationMode] = useState("weekly");
-  const [activeWeekIndex, setActiveWeekIndex] = useState(0);
-  const [activeMonthWeek, setActiveMonthWeek] = useState(1);
-  const [blocks, setBlocks] = useState([]);
+  const { time } = useTime();
+  const rootRef = useRef(null);
+  const scrollRef = useRef(null);
+  const headerRef = useRef(null);
+  const timeLabelRef = useRef(null);
+  const userScrolledRef = useRef(false);
+  const {
+    rotationMode,
+    setRotationMode,
+    activeWeekIndex,
+    setActiveWeekIndex,
+    activeMonthWeek,
+    setActiveMonthWeek,
+    timetableBlocks,
+    setTimetableBlocks,
+  } = useAppContext();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState("create");
@@ -90,8 +104,8 @@ export default function Timetable() {
   const [saveError, setSaveError] = useState("");
 
   const visibleBlocks = useMemo(() => {
-    return blocks.filter((block) => matchesRotation(block, rotationMode, activeWeekIndex, activeMonthWeek));
-  }, [blocks, rotationMode, activeWeekIndex, activeMonthWeek]);
+    return timetableBlocks.filter((block) => matchesRotation(block, rotationMode, activeWeekIndex, activeMonthWeek));
+  }, [timetableBlocks, rotationMode, activeWeekIndex, activeMonthWeek]);
 
   const blocksByDay = useMemo(() => {
     const map = new Map(DAYS.map((_, index) => [index, []]));
@@ -153,7 +167,7 @@ export default function Timetable() {
     };
 
     for (const dayIndex of targetDays) {
-      const overlap = blocks.some((block) => {
+      const overlap = timetableBlocks.some((block) => {
         if (sheetMode === "edit" && block.id === draft.id) {
           return false;
         }
@@ -179,7 +193,7 @@ export default function Timetable() {
     }
 
     if (sheetMode === "edit") {
-      setBlocks((prev) => prev.map((block) => (block.id === draft.id ? { ...draft } : block)));
+      setTimetableBlocks((prev) => prev.map((block) => (block.id === draft.id ? { ...draft } : block)));
       setSheetOpen(false);
       return;
     }
@@ -190,7 +204,7 @@ export default function Timetable() {
       dayIndex
     }));
     
-    setBlocks((prev) => [...prev, ...newBlocks]);
+    setTimetableBlocks((prev) => [...prev, ...newBlocks]);
     setSheetOpen(false);
   };
 
@@ -198,7 +212,7 @@ export default function Timetable() {
     if (sheetMode !== "edit" || !draft.id) {
       return;
     }
-    setBlocks((prev) => prev.filter((block) => block.id !== draft.id));
+    setTimetableBlocks((prev) => prev.filter((block) => block.id !== draft.id));
     setSheetOpen(false);
   };
 
@@ -212,13 +226,52 @@ export default function Timetable() {
     return "Weekly";
   }, [rotationMode, activeWeekIndex, activeMonthWeek]);
 
+  const handleQuickAdd = () => {
+    const now = time || new Date();
+    const dayIndex = now.getDay();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const rounded = roundToNearest(nowMinutes, 15);
+    const minStart = START_HOUR * 60;
+    const maxStart = END_HOUR * 60 - 15;
+    const startMinutes = Math.max(minStart, Math.min(maxStart, rounded));
+    const endMinutes = Math.min(startMinutes + 60, END_HOUR * 60);
+    openCreateSheet(dayIndex, startMinutes, endMinutes);
+  };
+
+  useEffect(() => {
+    if (!time || !scrollRef.current || !timeLabelRef.current) {
+      return;
+    }
+    if (userScrolledRef.current) {
+      return;
+    }
+
+    const minutesFromStart = time.getHours() * 60 + time.getMinutes() - START_HOUR * 60;
+    const clampedMinutes = Math.max(0, Math.min(TOTAL_MINUTES, minutesFromStart));
+    const hourHeight = timeLabelRef.current.offsetHeight;
+    if (!Number.isFinite(hourHeight) || hourHeight <= 0) {
+      return;
+    }
+
+    const minuteHeight = hourHeight / 60;
+    const headerHeight = headerRef.current ? headerRef.current.offsetHeight : 0;
+    const targetOffset = headerHeight + clampedMinutes * minuteHeight;
+    const centeredScrollTop = targetOffset - scrollRef.current.clientHeight / 2;
+    const maxScrollTop = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
+
+    const rafId = requestAnimationFrame(() => {
+      scrollRef.current.scrollTop = Math.max(0, Math.min(maxScrollTop, centeredScrollTop));
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [time]);
+
   return (
-    <div className="timetable-root">
+    <div className="timetable-root" ref={rootRef}>
       <div className="timetable-controls">
-        <div className="rotation-title-group">
-          <h2 className="timetable-title">Timetable</h2>
-          <p className="timetable-subtitle">Scheduling.</p>
-        </div>
+        <button className="timetable-add-btn" type="button" onClick={handleQuickAdd} aria-label="Add block">
+          +
+        </button>
         <div className="timetable-rotation">
           <div className="timetable-segment" role="tablist" aria-label="Rotation mode">
             {["weekly", "fortnightly", "monthly"].map((mode) => (
@@ -270,8 +323,16 @@ export default function Timetable() {
       </div>
 
       <div className="timetable-shell">
-        <div className="timetable-scroll">
-          <div className="timetable-header-row">
+        <div
+          className="timetable-scroll"
+          ref={scrollRef}
+          onScroll={(event) => {
+            if (event?.nativeEvent?.isTrusted) {
+              userScrolledRef.current = true;
+            }
+          }}
+        >
+          <div className="timetable-header-row" ref={headerRef}>
             <div className="timetable-corner">Time</div>
             {DAYS.map((day) => (
               <div key={day} className="timetable-day-header">
@@ -282,8 +343,12 @@ export default function Timetable() {
 
           <div className="timetable-body-row">
             <div className="timetable-time-axis">
-              {HOURS.map((hour) => (
-                <div key={hour} className="timetable-time-label">
+              {HOURS.map((hour, index) => (
+                <div
+                  key={hour}
+                  className="timetable-time-label"
+                  ref={index === 0 ? timeLabelRef : null}
+                >
                   {formatTimeLabel(hour)}
                 </div>
               ))}
@@ -396,6 +461,7 @@ export default function Timetable() {
                   <input
                     className="timetable-input"
                     type="time"
+                    step={900}
                     min={minutesToTimeValue(START_HOUR * 60)}
                     max={minutesToTimeValue(END_HOUR * 60)}
                     value={minutesToTimeValue(draft.startMinutes)}
@@ -411,6 +477,7 @@ export default function Timetable() {
                   <input
                     className="timetable-input"
                     type="time"
+                    step={900}
                     min={minutesToTimeValue(START_HOUR * 60)}
                     max={minutesToTimeValue(END_HOUR * 60)}
                     value={minutesToTimeValue(draft.endMinutes)}

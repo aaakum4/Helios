@@ -1,4 +1,5 @@
 import { createContext, useState, useContext } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 const AppContext = createContext();
 
@@ -9,9 +10,58 @@ export function AppProvider({ children }) {
         focusMode: false,
     });
 
+    const [timetableData, setTimetableData] = useLocalStorage("timetableData", {
+        blocks: [],
+        rotationMode: "weekly",
+        activeWeekIndex: 0,
+        activeMonthWeek: 1,
+    });
+
+    const setTimetableBlocks = (value) => {
+        setTimetableData((prev) => {
+            const nextBlocks = typeof value === "function" ? value(prev.blocks || []) : value;
+            return {
+                ...prev,
+                blocks: nextBlocks,
+            };
+        });
+    };
+
+    const setRotationMode = (value) => {
+        setTimetableData((prev) => ({
+            ...prev,
+            rotationMode: value,
+        }));
+    };
+
+    const setActiveWeekIndex = (value) => {
+        setTimetableData((prev) => ({
+            ...prev,
+            activeWeekIndex: value,
+        }));
+    };
+
+    const setActiveMonthWeek = (value) => {
+        setTimetableData((prev) => ({
+            ...prev,
+            activeMonthWeek: value,
+        }));
+    };
+
     return (
-        <AppContext.Provider value={{ settings, setSettings}}>
-            {children}
+        <AppContext.Provider value={{ 
+            settings,
+            setSettings,
+            timetableBlocks: timetableData.blocks || [],
+            rotationMode: timetableData.rotationMode || 'weekly',
+            activeWeekIndex: typeof timetableData.activeWeekIndex === "number" ? timetableData.activeWeekIndex : 0,
+            activeMonthWeek: typeof timetableData.activeMonthWeek === "number" ? timetableData.activeMonthWeek : 1,
+            setTimetableBlocks,
+            setRotationMode,
+            setActiveWeekIndex,
+            setActiveMonthWeek,
+        }}>
+        {children}
         </AppContext.Provider>
     );
 }

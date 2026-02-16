@@ -161,6 +161,28 @@
     font-size: 0.9rem;
 }
 
+.side-panel__session {
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.side-panel__session-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.side-panel__session-time {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
 .side-panel__quick-input {
     width: 100%;
     padding: 0.75rem;
