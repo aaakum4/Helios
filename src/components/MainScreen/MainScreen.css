@@ -4,7 +4,7 @@
   height: 100%;
   width: 100%;
   background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif, 'SF Pro';
   color: var(--text);
   position: relative;
   display: flex;

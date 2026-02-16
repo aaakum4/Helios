@@ -61,13 +61,14 @@ html[data-theme="dark"] .top-input:focus {
 .settings-cog {
   background: none;
   border: none;
-  font-size: 32px;
+  font-size: 24px;
   cursor: pointer;
   user-select: none;
   opacity: 0.8;
   color: #222;
   transition: transform 0.15s ease, opacity 0.15s ease, color 250ms ease;
   padding: 0;
+  font-family: 'SF Pro';
 }
 
 html[data-theme="dark"] .settings-cog {

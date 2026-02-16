@@ -32,7 +32,7 @@ export default function TopBar({
           className="settings-cog"
           onClick={onSettingsClick}
         >
-          ⚙
+          􀣋
         </button>
       </div>
     </div>
