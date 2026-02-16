@@ -1,71 +1,349 @@
-.reflection-container {
+.reflection-root {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 32px;
     height: 100%;
-    background: linear-gradient(135deg, var(--color-primary, #1a1a2e) 0%, var(--color-secondary, #16213e) 100%);
-    color: var(--text-primary, #eaeaea);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    margin: 0;
-    color: var(--text-secondary, #b0b0b0);
+    padding: 2rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
 }
 
-.reflection-tabs {
+.reflection-nav {
     display: flex;
-    gap: 12px;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
 }
 
-.reflection-tabs button {
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-primary, #eaeaea);
+.reflection-nav-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    letter-spacing: 0.01em;
+}
+
+.reflection-nav-btn:hover {
+    color: var(--text);
+}
+
+.reflection-nav-btn.is-active {
+    color: var(--text);
+    border-bottom-color: var(--accent, #3b82f6);
+}
+
+.reflection-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.reflection-view {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.reflection-view-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.reflection-question-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reflection-question {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reflection-question p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text);
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.reflection-answer-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: none;
+    transition: border-color 0.2s ease;
+}
+
+.reflection-answer-input:focus {
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.reflection-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.reflection-btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    letter-spacing: 0.01em;
 }
 
-.reflection-tabs button.active {
-    background: rgba(255, 255, 255, 0.2);
+.reflection-btn--primary {
+    background: var(--accent, #3b82f6);
+    color: white;
 }
 
-.reflection-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
+.reflection-btn--primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
-.reflection-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 16px;
+.reflection-btn--primary:active {
+    transform: translateY(0);
 }
 
-.reflection-card h3 {
-    margin: 0 0 8px 0;
+.reflection-btn--secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
 }
 
-.reflection-card p {
-    margin: 0;
-    color: var(--text-secondary, #b0b0b0);
+.reflection-btn--secondary:hover {
+    background: var(--bg);
+    border-color: var(--text);
 }
 
-.journal-panel textarea {
-    width: 100%;
-    min-height: 220px;
-    padding: 16px;
+.journal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.2);
-    color: var(--text-primary, #eaeaea);
-    font-family: inherit;
-    resize: vertical;
+    padding: 2rem;
 }
 
-.journal-note {
-    font-size: 12px;
-    color: var(--text-secondary, #b0b0b0);
-    margin-top: 8px;
+.journal-title-input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: border-color 0.2s ease;
+}
+
+.journal-title-input:focus {
+    outline: none;
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.journal-title-input::placeholder {
+    color: var(--muted);
+}
+
+.journal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.journal-date {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.archive-selectors {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.archive-selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.archive-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.archive-select {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+    cursor: pointer;
+}
+
+.archive-select:focus {
+    outline: none;
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.archive-view-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 300px;
+}
+
+.archive-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.archive-empty p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.archive-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.archive-date-header {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.archive-entry {
+    padding: 1.5rem;
+    background: var(--bg);
+    border-left: 4px solid var(--accent, #3b82f6);
+    border-radius: 8px;
+}
+
+.archive-entry--journal {
+    border-left-color: #8b5cf6;
+}
+
+.archive-entry--reflection {
+    border-left-color: #06b6d4;
+}
+
+.archive-entry-title {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.archive-enrty-body {
+    margin: 0;
+    color: var(--text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.archive-qa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.archive-qa {
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 6px;
+}
+
+.archive-q {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.archive-a {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.5;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+.archive-missing p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.reflection-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reflection-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reflection-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.reflection-content::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
