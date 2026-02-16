@@ -1,18 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./SidePanel.css";
 
 export default function SidePanel({ state, onToggle, onHover, onQuickAddTodo, subheadings }) {
-    useEffect(() => {
-        if (state === 'expanded') {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [state]);
-
     const [quickInput, setQuickInput] = useState("");
     const [selectedSubheadingId, setSelectedSubheadingId] = useState("inbox-default");
     const [dueDate, setDueDate] = useState("");

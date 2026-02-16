@@ -194,6 +194,14 @@ export default function Timetable() {
     setSheetOpen(false);
   };
 
+  const handleDelete = () => {
+    if (sheetMode !== "edit" || !draft.id) {
+      return;
+    }
+    setBlocks((prev) => prev.filter((block) => block.id !== draft.id));
+    setSheetOpen(false);
+  };
+
   const rotationLabel = useMemo(() => {
     if (rotationMode === "fortnightly") {
       return activeWeekIndex === 0 ? "Week One" : "Week Two";
@@ -299,7 +307,7 @@ export default function Timetable() {
                       <div key={hour} className="timetable-hour-line" />
                     ))}
                   </div>
-                    {blocksByDay.get(dayIndex) || [].map((block) => {
+                    {(blocksByDay.get(dayIndex) || []).map((block) => {
                       const offsetMinutes = block.startMinutes - START_HOUR * 60;
                       const blockHeight = block.endMinutes - block.startMinutes;
                       return (
@@ -308,7 +316,7 @@ export default function Timetable() {
                           className="timetable-block"
                           style={{
                             top: `calc(${offsetMinutes} * var(--minute-height))`,
-                            height: `calc(${blockMinutes} * var(--minute-height))`,
+                            height: `calc(${blockHeight} * var(--minute-height))`,
                             backgroundColor: block.color,
                           }}
                           onClick={(event) => {
@@ -322,7 +330,7 @@ export default function Timetable() {
                             {minutesToTimeValue(block.startMinutes)} - {minutesToTimeValue(block.endMinutes)}
                           </div>
                         </button>
-                      );;
+                      );
                     })}
                 </div>
               ))}
@@ -383,7 +391,22 @@ export default function Timetable() {
                 </div>
               </div>
               <div className="timetable-card-row">
-                <span className="timetable-card-label">Time</span>
+                <span className="timetable-card-label">Start time</span>
+                <div className="timetable-card-content">
+                  <input
+                    className="timetable-input"
+                    type="time"
+                    min={minutesToTimeValue(START_HOUR * 60)}
+                    max={minutesToTimeValue(END_HOUR * 60)}
+                    value={minutesToTimeValue(draft.startMinutes)}
+                    onChange={(event) =>
+                      setDraft((prev) => ({ ...prev, startMinutes: timeValueToMinutes(event.target.value) }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="timetable-card-row">
+                <span className="timetable-card-label">End time</span>
                 <div className="timetable-card-content">
                   <input
                     className="timetable-input"
@@ -490,6 +513,14 @@ export default function Timetable() {
             </div>
 
             {saveError && <div className="timetable-error">{saveError}</div>}
+
+            {sheetMode === "edit" && (
+              <div className="timetable-sheet-footer">
+                <button className="timetable-delete-btn" onClick={handleDelete} type="button">
+                  Delete block
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

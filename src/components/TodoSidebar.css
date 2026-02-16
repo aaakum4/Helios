@@ -1,5 +1,5 @@
 .todo-sidebar {
-    flex: 0 0 180px;
+    flex: 0 0 210px;
     background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex;
@@ -61,10 +61,10 @@
     background: transparent;
     border: 1px solid transparent;
     color: var(--text);
-    padding: 10px 12px;
+    padding: 12px 14px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 6px;
+    font-size: 12px;
     text-align: left;
     display: flex;
     flex-direction: column;
