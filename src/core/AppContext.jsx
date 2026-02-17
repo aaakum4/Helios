@@ -48,6 +48,9 @@ export function AppProvider({ children }) {
         }));
     };
 
+    const [focusSubjects, setFocusSubjects] = useLocalStorage("focusSubjects", []);
+    const [focusLogs, setFocusLogs] = useLocalStorage("focusLogs", []);
+
     return (
         <AppContext.Provider value={{ 
             settings,
@@ -60,6 +63,10 @@ export function AppProvider({ children }) {
             setRotationMode,
             setActiveWeekIndex,
             setActiveMonthWeek,
+            focusSubjects,
+            setFocusSubjects,
+            focusLogs,
+            setFocusLogs,
         }}>
         {children}
         </AppContext.Provider>
