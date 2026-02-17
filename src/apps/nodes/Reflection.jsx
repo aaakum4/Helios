@@ -17,8 +17,6 @@ const getTodayKey = () => {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 };
 
-const normalizeKey = (key) => String(key).replace(/_/g, '-');
-
 const formatDate = (year, month, day) => {
     const monthName = MONTHS[month - 1];
     return `${day} ${monthName} ${year}`;
@@ -38,14 +36,29 @@ const parseYYYYMMDD = (key) => {
     return { year, month, day };
 };
 
-const normalizeDataMap = (data) => Object.keys(data || {}).reduce((acc, key) => {
-    acc[normalizeKey(key)] = data[key];
-    return acc;
-}, {});
+const normalizeKey = (key) => {
+    const parsed = parseYYYYMMDD(key);
+    if (!parsed) {
+        return String(key).replace(/_/g, '-');
+    }
+    const { year, month, day } = parsed;
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
+const normalizeDataMap = (data) => {
+    if (!data || typeof data !== 'object') {
+        return {};
+    }
+    return Object.keys(data).reduce((acc, key) => {
+        const normalizedKey = normalizeKey(key);
+        acc[normalizedKey] = data[key];
+        return acc;
+    }, {});
+};
 
 export default function Reflection() {
-    const [reflectionsData, setReflectionsData] = useLocalStorage('reflection:responses', {});
-    const [journalData, setJournalData] = useLocalStorage('journal:entries', {});
+    // Single unified archive keyed by date: { "2026-02-16": { journal: {...}, reflection: {...} } }
+    const [reflectionArchive, setReflectionArchive] = useLocalStorage('reflection:archive', {});
     const [activeTab, setActiveTab] = useState('reflect');
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -63,34 +76,56 @@ export default function Reflection() {
     const [archiveMonth, setArchiveMonth] = useState(new Date().getMonth() + 1);
     const [archiveDay, setArchiveDay] = useState(new Date().getDate());
 
-    const normalizedReflections = useMemo(() => normalizeDataMap(reflectionsData), [reflectionsData]);
-    const normalizedJournals = useMemo(() => normalizeDataMap(journalData), [journalData]);
+    // Helper to get entry for a specific date from unified archive
+    const getArchiveEntryByDate = (year, month, day) => {
+        const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const entry = reflectionArchive[key];
+        if (entry) {
+            return entry;
+        }
+        // Fallback: search by parsed key for legacy format compatibility
+        for (const archiveKey in reflectionArchive) {
+            const parsed = parseYYYYMMDD(archiveKey);
+            if (parsed && parsed.year === year && parsed.month === month && parsed.day === day) {
+                return reflectionArchive[archiveKey];
+            }
+        }
+        return undefined;
+    };
+
+    // Normalize archive keys for calculations
+    const normalizedArchiveKeys = useMemo(() => {
+        return Object.keys(reflectionArchive).map(key => {
+            const parsed = parseYYYYMMDD(key);
+            if (parsed) {
+                return `${parsed.year}-${String(parsed.month).padStart(2, '0')}-${String(parsed.day).padStart(2, '0')}`;
+            }
+            return key;
+        });
+    }, [reflectionArchive]);
 
     const availableYears = useMemo(() => {
-        const allKeys = Object.keys(normalizedReflections).concat(Object.keys(normalizedJournals));
-        const years = new Set(allKeys.map(k => {
+        const years = new Set(normalizedArchiveKeys.map(k => {
             const p = parseYYYYMMDD(k);
             return p ? p.year : null;
         }).filter(Boolean));
         if (years.size === 0) return [];
         return Array.from(years).sort((a, b) => b - a);
-    }, [normalizedReflections, normalizedJournals]);
+    }, [normalizedArchiveKeys]);
 
     const availableMonths = useMemo(() => {
-        const allKeys = Object.keys(normalizedReflections).concat(Object.keys(normalizedJournals));
-        const months = new Set(allKeys.map(k => parseYYYYMMDD(k)).filter(Boolean)
+        const months = new Set(normalizedArchiveKeys.map(k => parseYYYYMMDD(k)).filter(Boolean)
             .filter(p => p.year === archiveYear)
             .map(p => p.month));
         return Array.from(months).sort((a, b) => a - b);
-    }, [normalizedReflections, normalizedJournals, archiveYear]);
+    }, [normalizedArchiveKeys, archiveYear]);
 
     const availableDays = useMemo(() => {
-        const allKeys = Object.keys(normalizedReflections).concat(Object.keys(normalizedJournals));
-        const days = new Set(allKeys.map(k => parseYYYYMMDD(k)).filter(Boolean)
+        const days = new Set(normalizedArchiveKeys.map(k => parseYYYYMMDD(k)).filter(Boolean)
             .filter(p => p.year === archiveYear && p.month === archiveMonth)
             .map(p => p.day));
         return Array.from(days).sort((a, b) => a - b);
-    }, [normalizedReflections, normalizedJournals, archiveYear, archiveMonth]);
+    }, [normalizedArchiveKeys, archiveYear, archiveMonth]);
 
     const handleQuestionNext = () => {
         const newAnswers = [...answers];
@@ -122,14 +157,37 @@ export default function Reflection() {
         }
 
         prevDayKeyRef.current = currentDayKey;
-        setCurrentQuestion(0);
-        setAnswers(Array(QUESTIONS.length).fill(''));
+        
+        // Parse the current day key to get year, month, day
+        const currentDateParsed = parseYYYYMMDD(currentDayKey);
+        if (!currentDateParsed) {
+            // Wipe editor state if date is invalid
+            setCurrentQuestion(0);
+            setAnswers(Array(QUESTIONS.length).fill(''));
+            setJournalTitle('');
+            setJournalBody('');
+            return;
+        }
 
-        const existingJournal = normalizedJournals[currentDayKey];
-        if (existingJournal) {
-            setJournalTitle(existingJournal.title || '');
-            setJournalBody(existingJournal.body || '');
+        // Get the archive entry for this date (contains both journal and reflection)
+        const archiveEntry = getArchiveEntryByDate(currentDateParsed.year, currentDateParsed.month, currentDateParsed.day);
+
+        // Hydrate reflection answers from archive for this date
+        if (archiveEntry && archiveEntry.reflection && archiveEntry.reflection.answers) {
+            setCurrentQuestion(0);
+            setAnswers(archiveEntry.reflection.answers);
         } else {
+            // Wipe reflection editor state if no saved answers
+            setCurrentQuestion(0);
+            setAnswers(Array(QUESTIONS.length).fill(''));
+        }
+
+        // Hydrate journal from archive for this date
+        if (archiveEntry && archiveEntry.journal) {
+            setJournalTitle(archiveEntry.journal.title || '');
+            setJournalBody(archiveEntry.journal.body || '');
+        } else {
+            // Wipe journal editor state if no saved entry
             setJournalTitle('');
             setJournalBody('');
         }
@@ -139,16 +197,27 @@ export default function Reflection() {
             clearTimeout(feedbackTimeoutRef.current);
             feedbackTimeoutRef.current = null;
         }
-    }, [currentDayKey, normalizedJournals]);
+    }, [currentDayKey, reflectionArchive]);
 
     const handleQuestionSubmit = () => {
-        setReflectionsData(prev => {
+        const currentDateParsedForQuestion = parseYYYYMMDD(currentDayKey);
+        if (!currentDateParsedForQuestion) {
+            return;
+        }
+
+        setReflectionArchive(prev => {
             const next = { ...prev };
-            delete next[currentDayKey.replace(/-/g, '_')];
-            next[currentDayKey] = {
+            // Get or create the entry for this date
+            const key = currentDayKey;
+            const entry = next[key] || {};
+            
+            // Update only the reflection part, preserve journal
+            entry.reflection = {
                 answers: answers,
                 submittedAt: new Date().toISOString(),
             };
+            
+            next[key] = entry;
             return next;
         });
         setCurrentQuestion(0);
@@ -160,19 +229,30 @@ export default function Reflection() {
             return;
         }
 
-        const savedJournal = normalizedJournals[currentDayKey];
-        const isEdited = !!savedJournal && (
-            (savedJournal.title || '') !== journalTitle || (savedJournal.body || '') !== journalBody
+        const currentDateParsedForJournal = parseYYYYMMDD(currentDayKey);
+        if (!currentDateParsedForJournal) {
+            return;
+        }
+
+        const archiveEntry = getArchiveEntryByDate(currentDateParsedForJournal.year, currentDateParsedForJournal.month, currentDateParsedForJournal.day);
+        const isEdited = !!archiveEntry && !!archiveEntry.journal && (
+            (archiveEntry.journal.title || '') !== journalTitle || (archiveEntry.journal.body || '') !== journalBody
         );
 
-        setJournalData(prev => {
+        setReflectionArchive(prev => {
             const next = { ...prev };
-            delete next[currentDayKey.replace(/-/g, '_')];
-            next[currentDayKey] = {
+            // Get or create the entry for this date
+            const key = currentDayKey;
+            const entry = next[key] || {};
+            
+            // Update only the journal part, preserve reflection
+            entry.journal = {
                 title: journalTitle,
                 body: journalBody,
                 submittedAt: new Date().toISOString(),
             };
+            
+            next[key] = entry;
             return next;
         });
 
@@ -188,33 +268,67 @@ export default function Reflection() {
     };
 
     const archiveKey = `${archiveYear}-${String(archiveMonth).padStart(2, '0')}-${String(archiveDay).padStart(2, '0')}`;
-    const archiveReflection = normalizedReflections[archiveKey];
-    const archiveJournal = normalizedJournals[archiveKey];
-    const hasArchiveData = archiveReflection || archiveJournal;
+    const archiveEntry = getArchiveEntryByDate(archiveYear, archiveMonth, archiveDay);
+    const archiveJournal = archiveEntry?.journal;
+    const archiveReflection = archiveEntry?.reflection;
+    
+    const hasArchiveData = !!archiveEntry;
 
-    const deleteEntryForDate = (setter, key) => {
-        setter((prev) => {
+    const deleteEntryForDate = (type) => {
+        // type is 'journal' or 'reflection'
+        setReflectionArchive(prev => {
             const next = { ...prev };
-            delete next[key];
-            delete next[key.replace(/-/g, '_')];
+            const entry = next[archiveKey];
+            
+            if (!entry) {
+                return next;
+            }
+            
+            if (type === 'journal') {
+                // Remove only journal, keep reflection
+                delete entry.journal;
+            } else if (type === 'reflection') {
+                // Remove only reflection, keep journal
+                delete entry.reflection;
+            }
+            
+            // If entry is now completely empty, remove it
+            if (!entry.journal && !entry.reflection) {
+                delete next[archiveKey];
+            } else {
+                next[archiveKey] = entry;
+            }
+            
             return next;
         });
     };
 
     const handleDeleteArchiveJournal = () => {
-        deleteEntryForDate(setJournalData, archiveKey);
+        const confirmed = window.confirm(`Delete the journal entry for ${formatDate(archiveYear, archiveMonth, archiveDay)}?`);
+        if (!confirmed) {
+            return;
+        }
+        deleteEntryForDate('journal');
     };
 
     const handleDeleteArchiveReflection = () => {
-        deleteEntryForDate(setReflectionsData, archiveKey);
+        const confirmed = window.confirm(`Delete the reflection answers for ${formatDate(archiveYear, archiveMonth, archiveDay)}?`);
+        if (!confirmed) {
+            return;
+        }
+        deleteEntryForDate('reflection');
     };
 
-    const savedReflection = normalizedReflections[currentDayKey];
-    const isReflectionCompleted = !!savedReflection;
-
-    const savedJournal = normalizedJournals[currentDayKey];
-    const isJournalEdited = !!savedJournal && (
-        (savedJournal.title || '') !== journalTitle || (savedJournal.body || '') !== journalBody
+    const currentDateParsed = parseYYYYMMDD(currentDayKey);
+    const currentYear = currentDateParsed?.year || new Date().getFullYear();
+    const currentMonth = currentDateParsed?.month || (new Date().getMonth() + 1);
+    const currentDay = currentDateParsed?.day || new Date().getDate();
+    
+    // Get current day entry from unified archive
+    const currentArchiveEntry = getArchiveEntryByDate(currentYear, currentMonth, currentDay);
+    const isReflectionCompleted = !!currentArchiveEntry?.reflection;
+    const isJournalEdited = !!currentArchiveEntry?.journal && (
+        (currentArchiveEntry.journal.title || '') !== journalTitle || (currentArchiveEntry.journal.body || '') !== journalBody
     );
 
     return (

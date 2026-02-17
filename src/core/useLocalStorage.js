@@ -13,14 +13,17 @@ export function useLocalStorage(key, initialValue) {
 
   const setValue = (value) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      
-      // Dispatch custom event to sync across components
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key, value: valueToStore }
-      }));
+      setStoredValue((prev) => {
+        const valueToStore = value instanceof Function ? value(prev) : value;
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+
+        // Dispatch custom event to sync across components
+        window.dispatchEvent(new CustomEvent('localStorageChange', {
+          detail: { key, value: valueToStore }
+        }));
+
+        return valueToStore;
+      });
     } catch (error) {
       console.error(`Error setting localStorage key "${key}":`, error);
     }
