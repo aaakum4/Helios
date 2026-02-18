@@ -270,6 +270,166 @@ export default function FocusTracker() {
         );
     }
 
-    return (
-        <div className="focus-tracker-root">
+  return (
+    <div className="focus-tracker-root">
+      <div className="focus-tracker-header">
+        <h1 className="focus-tracker-title">Focus Tracker</h1>
+        <div className="focus-tracker-actions">
+          <button
+            className="focus-tracker-btn focus-tracker-btn--secondary"
+            onClick={() => setShowStats(!showStats)}
+          >
+            {showStats ? 'Hide Stats' : 'Show Stats'}
+          </button>
+          <button
+            className="focus-tracker-btn focus-tracker-btn--primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            + New Subject
+          </button>
+        </div>
+      </div>
+      
+      {showStats && (
+        <div className="focus-tracker-stats">
+          <div className="focus-tracker-stats-header">
+            <h2 className="focus-tracker-stats-title">Statistics</h2>
+            <div className="focus-tracker-period-toggle">
+              {['daily', 'weekly', 'monthly', 'yearly'].map((p) => (
+                <button
+                  key={p}
+                  className={`focus-tracker-period-btn ${statPeriod === p ? 'is-active' : ''}`}
+                  onClick={() => setStatPeriod(p)}
+                >
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {statsData.total === 0 ? (
+            <div className="focus-tracker-stats-empty">
+              No data for this period.
+            </div>
+          ) : (
+            <div className="focus-tracker-stats-content">
+              {renderPieChart()}
+              <div className="focus-tracker-legend">
+                {statsData.entries.map((entry) => (
+                  <div key={entry.subjectId} className="focus-tracker-legend-item">
+                    <div
+                      className="focus-tracker-legend-color"
+                      style={{ backgroundColor: entry.color }}
+                    />
+                    <div className="focus-tracker-legend-info">
+                      <div className="focus-tracker-legend-name">{entry.name}</div>
+                      <div className="focus-tracker-legend-time">{formatTime(entry.duration)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      <div className="focus-tracker-subjects">
+        {focusSubjects.length === 0 ? (
+          <div className="focus-tracker-empty">
+            No subjects yet. Create one to start tracking!
+          </div>
+        ) : (
+          focusSubjects.map((subject) => {
+            const isActive = activeSubjectId === subject.id;
+            const elapsed = isActive ? todayElapsed[subject.id] || 0 : 0;
             
+            return (
+              <div key={subject.id} className="focus-tracker-subject">
+                <button
+                  className="focus-tracker-play-btn"
+                  style={{
+                    borderColor: subject.color,
+                    color: subject.color,
+                  }}
+                  onClick={() => handlePlayPause(subject.id)}
+                >
+                  {isActive ? '⏸' : '▶'}
+                </button>
+                <div className="focus-tracker-subject-info">
+                  <div className="focus-tracker-subject-name">{subject.name}</div>
+                  <div className="focus-tracker-subject-time">{formatTime(elapsed)}</div>
+                </div>
+                <button
+                  className="focus-tracker-delete-btn"
+                  onClick={() => handleDeleteSubject(subject.id)}
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+      
+      {showCreateModal && (
+        <div className="focus-tracker-modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="focus-tracker-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="focus-tracker-modal-header">
+              <h3 className="focus-tracker-modal-title">New Subject</h3>
+              <button
+                className="focus-tracker-modal-close"
+                onClick={() => setShowCreateModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="focus-tracker-modal-body">
+              <div className="focus-tracker-field">
+                <label className="focus-tracker-label">Subject Name</label>
+                <input
+                  type="text"
+                  className="focus-tracker-input"
+                  value={newSubjectName}
+                  onChange={(e) => setNewSubjectName(e.target.value)}
+                  placeholder="e.g., Math, Reading, Coding"
+                  autoFocus
+                />
+              </div>
+              
+              <div className="focus-tracker-field">
+                <label className="focus-tracker-label">Color</label>
+                <div className="focus-tracker-color-grid">
+                  {COLORS.map((color) => (
+                    <button
+                      key={color}
+                      className={`focus-tracker-color-swatch ${newSubjectColor === color ? 'is-selected' : ''}`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setNewSubjectColor(color)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="focus-tracker-modal-footer">
+              <button
+                className="focus-tracker-btn focus-tracker-btn--secondary"
+                onClick={() => setShowCreateModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="focus-tracker-btn focus-tracker-btn--primary"
+                onClick={handleCreateSubject}
+                disabled={!newSubjectName.trim()}
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

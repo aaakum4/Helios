@@ -1,75 +1,43 @@
-.focus-container {
+.focus-tracker-root {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 32px;
+    gap: 1.5rem;
+    padding: 2rem;
     height: 100%;
-    background: linear-gradient(135deg, var(--color-primary, #1a1a2e) 0%, var(--color-secondary, #16213e) 100%);
-    color: var(--text-primary, #eaeaea);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-    margin: 0;
-    color: var(--text-secondary, #b0b0b0);
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    overflow-y: auto;
 }
 
-.focus-insight {
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-    padding: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.focus-gradient {
-    height: 12px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(248, 113, 113, 0.7), rgba(250, 204, 21, 0.7), rgba(34, 197, 94, 0.7));
-}
-
-.focus-legend {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--text-secondary, #b0b0b0);
-    margin-top: 8px;
-}
-
-.focus-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.focus-row {
+.focus-tracker-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.focus-row strong {
-    margin-right: 10px;
+.focus-tracker-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text);
 }
 
-.focus-level {
-    text-transform: capitalize;
-    color: var(--text-secondary, #b0b0b0);
+.focus-tracker-actions {
+    display: flex;
+    gap: 0.75rem;
 }
 
-.focus-row.focus-high {
-    box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.3);
+.focus-tracker-btn {
+    padding: 0.65rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.01em;
 }
 
-.focus-row.focus-medium {
-    box-shadow: inset 0 0 0 1px rgba(250, 204, 21, 0.3);
-}
-
-.focus-row.focus-low {
-    box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.3);
-}
-
-.focus-note {
-    font-size: 13px;
-    color: var(--text-secondary, #b0b0b0);
-}
