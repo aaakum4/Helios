@@ -4,10 +4,8 @@ const PomodoroComponent = lazy(() => import('./Pomodoro'));
 const TimetableComponent = lazy(() => import('./Timetable'));
 const PeacefulDisplayComponent = lazy(() => import('./PeacefulDisplay'));
 const TodoComponent = lazy(() => import('./Todo'));
-const GoalsComponent = lazy(() => import('./Goals'));
 const FocusTrackerComponent = lazy(() => import('./FocusTracker'));
 const ReflectionComponent = lazy(() => import('./Reflection'));
-const InteractiveCalendarComponent = lazy(() => import('./InteractiveCalendar'));
 
 export const nodes = [
   {
@@ -39,13 +37,6 @@ export const nodes = [
     component: TodoComponent,
   },
   {
-    id: 'goals',
-    title: 'Goals',
-    description: 'Set intent-led goals to guide focus.',
-    icon: '􀢊',
-    component: GoalsComponent,
-  },
-  {
     id: 'focusTracker',
     title: 'Focus Tracker',
     description: 'Light focus check-ins to monitor your focus levels.',
@@ -58,13 +49,6 @@ export const nodes = [
     description: 'Wellbeing and reflection to stay in tune with your needs.',
     icon: '􀤟',
     component: ReflectionComponent,
-  },
-  {
-    id: 'interactiveCalendar',
-    title: 'Calendar',
-    description: 'Interactive calendar to manage your schedule.',
-    icon: '􀉉',
-    component: InteractiveCalendarComponent,
   }
 ];
 
