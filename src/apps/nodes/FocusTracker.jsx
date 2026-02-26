@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useAppContext } from '../core/AppContext';
-import { useTime } from '../core/TimeProvider';
+import { useAppContext } from '../../core/AppContext';
+import { useTime } from '../../core/TimeProvider';
 import './FocusTracker.css';
 
 const COLORS = [
@@ -20,21 +20,29 @@ function getTodayKey() {
     return `${y}-${m}-${d}`;
 }
 
+function getDateKeyFromTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 function formatTime(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${string(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 function getDateRangeForPeriod(period) {
     const now = new Date();
     const todayStr = getTodayKey();
 
-    if (period === 'daily') retyrn [todayStr, todayStr];
+    if (period === 'daily') return [todayStr, todayStr];
 
     if (period === 'weekly') {
-        const getOfWeek = now.getDay();
+        const dayOfWeek = now.getDay();
         const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
         const monday = new Date(now);
         monday.setDate(now.getDate() + mondayOffset);
@@ -64,7 +72,7 @@ function getDateRangeForPeriod(period) {
 }
 
 export default function FocusTracker() {
-    const { focusSubjects, setFocusSubjects, focusLogs, setFocusLogs } = useAppContext();
+  const { focusSubjects, setFocusSubjects, studySessions, setStudySessions } = useAppContext();
     const { hours, minutes, seconds } = useTime();
 
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -80,25 +88,30 @@ export default function FocusTracker() {
     const [showStats, setShowStats] = useState(false);
 
     const timerIntervalRef = useRef(null);
+    const createLockRef = useRef(false);
+    const lastCreateRef = useRef({ name: '', ts: 0 });
 
     const currentDateKey = useMemo(() => getTodayKey(), [hours, minutes, seconds]);
 
     useEffect(() => {
-        if (sessionStartDate && sessionStartDate !== currentDateKey) {
-            saveCurrentSession();
-            setSessionStartTime(Date.now());
-            setSessionStartDate(currentDateKey);
+      if (sessionStartDate && sessionStartDate !== currentDateKey) {
+        saveCurrentSession();
+        setTodayElapsed({});
+        if (activeSubjectId) {
+          setSessionStartTime(Date.now());
+          setSessionStartDate(currentDateKey);
         }
-    }, [currentDateKey]);
+      }
+    }, [currentDateKey, activeSubjectId, sessionStartDate]);
 
     useEffect(() => {
         if (activeSubjectId) {
             timerIntervalRef.current = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-                setTodayElapsed((prev) => ({
-                    ...prev,
-                    [activeSubjectId]: elapsed,
-                }));
+              const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+              setTodayElapsed((prev) => ({
+                ...prev,
+                [activeSubjectId]: elapsed,
+              }));
             }, 1000);
         } else {
             if (timerIntervalRef.current) {
@@ -122,60 +135,125 @@ export default function FocusTracker() {
         };
     }, []);
 
-    function saveCurrentSession() {
+    function saveCurrentSession(durationOverrideSeconds = null) {
         if (!activeSubjectId || !sessionStartTime || !sessionStartDate) return;
 
-        const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-        if(elapsed <= 0) return;
+      const elapsed = durationOverrideSeconds ?? Math.floor((Date.now() - sessionStartTime) / 1000);
+        if (elapsed <= 0) return;
 
-        const Log = {
+        const endTime = Date.now();
+        const session = {
             id: createId(),
             subjectId: activeSubjectId,
-            date: sessionStartDate,
+            startTime: sessionStartTime,
+            endTime,
             duration: elapsed,
-            timestamp: Date.now(),
-        }
+            type: 'manual',
+            completed: true,
+        };
 
-        setFocusLogs((prev) => [...prev, log]);
+        setStudySessions((prev) => {
+            if (prev.some((entry) => entry.id === session.id)) {
+                if (import.meta.env.DEV) {
+                    console.debug('[FocusTracker] duplicate session blocked', {
+                        id: session.id,
+                        subjectId: session.subjectId,
+                    });
+                }
+                return prev;
+            }
+            return [...prev, session];
+        });
     }
 
     function handlePlayPause(subjectId) {
         if (activeSubjectId === subjectId) {
-            saveCurrentSession();
-            setActiveSubjectId(null);
-            setSessionStartTime(null);
-            setSessionStartDate(null);
-            setTodayElapsed((prev) => ({ ...prev, [subjectId]: 0 }));
+          const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+          saveCurrentSession(elapsed);
+          setActiveSubjectId(null);
+          setSessionStartTime(null);
+          setSessionStartDate(null);
+          setTodayElapsed((prev) => {
+            const updated = { ...prev };
+            delete updated[subjectId];
+            return updated;
+          });
         } else {
-            if (activeSubjectId) {
-                saveCurrentSession();
-                setTodayElapsed((prev) => ({ ...prev, [activeSubjectId]: 0 }));
-            }
-            setActiveSubjectId(subjectId);
-            setSessionStartTime(Date.now());
-            setSessionStartDate(currentDateKey);
-            setTodayElapsed((prev) => ({ ...prev, [subjectId]: 0 }));
+          if (activeSubjectId) {
+            const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+            saveCurrentSession(elapsed);
+            setTodayElapsed((prev) => {
+              const updated = { ...prev };
+              delete updated[activeSubjectId];
+              return updated;
+            });
+          }
+          setActiveSubjectId(subjectId);
+          setSessionStartTime(Date.now());
+          setSessionStartDate(currentDateKey);
         }
     }
     
     function handleCreateSubject() {
-        if (!newSubjectName.trim()) return;
+      const trimmedName = newSubjectName.trim();
+      if (!trimmedName || createLockRef.current) {
+        if (import.meta.env.DEV) {
+          console.debug('[FocusTracker] create blocked', {
+            name: trimmedName,
+            locked: createLockRef.current,
+          });
+        }
+        return;
+      }
+      const now = Date.now();
+      if (lastCreateRef.current.name === trimmedName && now - lastCreateRef.current.ts < 500) {
+        if (import.meta.env.DEV) {
+          console.debug('[FocusTracker] create deduped', {
+            name: trimmedName,
+            elapsedMs: now - lastCreateRef.current.ts,
+          });
+        }
+        return;
+      }
+      lastCreateRef.current = { name: trimmedName, ts: now };
+      createLockRef.current = true;
 
-        const newSubject = {
-            id: createId(),
-            name: newSubjectName.trim(),
-            color: newSubjectColor,
-            createdAt: Date.now(),
-        };
+      if (import.meta.env.DEV) {
+        console.debug('[FocusTracker] create start', {
+          name: trimmedName,
+          color: newSubjectColor,
+        });
+      }
 
-        setFocusSubjects((prev) => [...prev, subject]);
-        setNewSubjectName('');
-        setNewSubjectColor(COLORS[0]);
-        setShowCreateModal(false);
+      const newSubject = {
+        id: createId(),
+        name: trimmedName,
+        color: newSubjectColor,
+        createdAt: Date.now(),
+      };
+
+      setFocusSubjects((prev) => {
+        if (prev.some((subject) => subject.id === newSubject.id)) {
+          if (import.meta.env.DEV) {
+            console.debug('[FocusTracker] duplicate id blocked', {
+              id: newSubject.id,
+              name: newSubject.name,
+            });
+          }
+          return prev;
+        }
+        return [...prev, newSubject];
+      });
+      setNewSubjectName('');
+      setNewSubjectColor(COLORS[0]);
+      setShowCreateModal(false);
+      setTimeout(() => {
+        createLockRef.current = false;
+      }, 300);
     }
 
     function handleDeleteSubject(subjectId) {
-        const hasLogs = focusLogs.some(log => log.subjectId === subjectId);
+      const hasLogs = studySessions.some(session => session.subjectId === subjectId);
 
         if (hasLogs) {
             const confirmDelete = window.confirm(
@@ -194,28 +272,49 @@ export default function FocusTracker() {
         setFocusSubjects((prev) => prev.filter(sub => sub.id !== subjectId));
     }
 
+const todaySessionTotals = useMemo(() => {
+        const todayKey = currentDateKey;
+        const totals = {};
+        
+        studySessions.forEach((session) => {
+            if (!session.startTime || !session.subjectId) return;
+            const key = getDateKeyFromTimestamp(session.endTime || session.startTime);
+            if (key === todayKey) {
+                if (!totals[session.subjectId]) {
+                    totals[session.subjectId] = 0;
+                }
+                totals[session.subjectId] += session.duration || 0;
+            }
+        });
+        
+        return totals;
+    }, [studySessions, currentDateKey]);
+
     const statsData = useMemo(() => {
         const [startDate, endDate] = getDateRangeForPeriod(statPeriod);
 
-        const relevantLogs = focusLogs.filter((los) => {
-            return log.date >= startDate && log.date <= endDate;
-        });
+      const subjectIds = new Set(focusSubjects.map((subject) => subject.id));
+      const relevantSessions = studySessions.filter((session) => {
+        if (!session.startTime) return false;
+        const key = getDateKeyFromTimestamp(session.endTime || session.startTime);
+        return key >= startDate && key <= endDate && subjectIds.has(session.subjectId);
+      });
 
         const subjectTotals = {};
-        relevantLogs.forEach((log) => {
-            if (!subjectTotals[log.subjectId]) {
-                subjectTotals[log.subjectId] = 0;
+      relevantSessions.forEach((session) => {
+        if (!subjectTotals[session.subjectId]) {
+          subjectTotals[session.subjectId] = 0;
             }
-            subjectTotals[log.subjectId] += log.duration;
+        subjectTotals[session.subjectId] += session.duration || 0;
         });
 
         const entries = Object.entries(subjectTotals).map(([subjectId, totalDuration]) => {
             const subject = focusSubjects.find((s) => s.id === subjectId);
             return {
                 subjectId,
-                name: subject ? subject.name : 'Deleted Subject',
-                color: subject ? subject.color : '#888888',
-                duration,
+              name: subject.name,
+              color: subject.color,
+              duration: totalDuration,
             };
         });
 
@@ -224,7 +323,7 @@ export default function FocusTracker() {
         const total = entries.reduce((sum, e) => sum + e.duration, 0);
 
         return { entries, total };
-    }, [focusLogs, focusSubjects, statPeriod]);
+    }, [studySessions, focusSubjects, statPeriod]);
 
     function renderPieChart() {
         const { entries, total } = statsData;
@@ -341,7 +440,9 @@ export default function FocusTracker() {
         ) : (
           focusSubjects.map((subject) => {
             const isActive = activeSubjectId === subject.id;
-            const elapsed = isActive ? todayElapsed[subject.id] || 0 : 0;
+            const completedToday = todaySessionTotals[subject.id] || 0;
+            const currentManual = todayElapsed[subject.id] || 0;
+            const totalToday = completedToday + currentManual;
             
             return (
               <div key={subject.id} className="focus-tracker-subject">
@@ -357,7 +458,7 @@ export default function FocusTracker() {
                 </button>
                 <div className="focus-tracker-subject-info">
                   <div className="focus-tracker-subject-name">{subject.name}</div>
-                  <div className="focus-tracker-subject-time">{formatTime(elapsed)}</div>
+                  <div className="focus-tracker-subject-time">{formatTime(totalToday)}</div>
                 </div>
                 <button
                   className="focus-tracker-delete-btn"
@@ -384,49 +485,62 @@ export default function FocusTracker() {
               </button>
             </div>
             
-            <div className="focus-tracker-modal-body">
-              <div className="focus-tracker-field">
-                <label className="focus-tracker-label">Subject Name</label>
-                <input
-                  type="text"
-                  className="focus-tracker-input"
-                  value={newSubjectName}
-                  onChange={(e) => setNewSubjectName(e.target.value)}
-                  placeholder="e.g., Math, Reading, Coding"
-                  autoFocus
-                />
-              </div>
-              
-              <div className="focus-tracker-field">
-                <label className="focus-tracker-label">Color</label>
-                <div className="focus-tracker-color-grid">
-                  {COLORS.map((color) => (
-                    <button
-                      key={color}
-                      className={`focus-tracker-color-swatch ${newSubjectColor === color ? 'is-selected' : ''}`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => setNewSubjectColor(color)}
-                    />
-                  ))}
+            <form
+              className="focus-tracker-modal-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (import.meta.env.DEV) {
+                  console.debug('[FocusTracker] form submit');
+                }
+                handleCreateSubject();
+              }}
+            >
+              <div className="focus-tracker-modal-body">
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Subject Name</label>
+                  <input
+                    type="text"
+                    className="focus-tracker-input"
+                    value={newSubjectName}
+                    onChange={(e) => setNewSubjectName(e.target.value)}
+                    placeholder="e.g., Math, Reading, Coding"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Color</label>
+                  <div className="focus-tracker-color-grid">
+                    {COLORS.map((color) => (
+                      <button
+                        key={color}
+                        className={`focus-tracker-color-swatch ${newSubjectColor === color ? 'is-selected' : ''}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setNewSubjectColor(color)}
+                        type="button"
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="focus-tracker-modal-footer">
-              <button
-                className="focus-tracker-btn focus-tracker-btn--secondary"
-                onClick={() => setShowCreateModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="focus-tracker-btn focus-tracker-btn--primary"
-                onClick={handleCreateSubject}
-                disabled={!newSubjectName.trim()}
-              >
-                Create
-              </button>
-            </div>
+
+              <div className="focus-tracker-modal-footer">
+                <button
+                  className="focus-tracker-btn focus-tracker-btn--secondary"
+                  onClick={() => setShowCreateModal(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  className="focus-tracker-btn focus-tracker-btn--primary"
+                  type="submit"
+                  disabled={!newSubjectName.trim()}
+                >
+                  Create
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

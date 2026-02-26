@@ -11,6 +11,27 @@
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
 }
 
+.pomodoro-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+    gap: 2rem;
+    width: 100%;
+    max-width: 960px;
+    align-items: start;
+}
+
+.pomodoro-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.pomodoro-side {
+    display: flex;
+    justify-content: center;
+}
+
 .pomodoro-display {
     display: flex;
     flex-direction: column;
@@ -118,6 +139,98 @@
     gap: 1.5rem;
     width: 100%;
     max-width: 400px;
+}
+
+.pomodoro-subject-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 320px;
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(74, 144, 226, 0.25);
+}
+
+.pomodoro-subject-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.pomodoro-subject-status {
+    color: #4a90e2;
+}
+
+.pomodoro-subject-select {
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(74, 144, 226, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #eaeaea);
+    font-size: 0.95rem;
+}
+
+.pomodoro-subject-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pomodoro-active-subject {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #b0b0b0);
+}
+
+.pomodoro-subject-error {
+    font-size: 0.85rem;
+    color: #ef4444;
+}
+
+.pomodoro-subject-add {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pomodoro-subject-input {
+    flex: 1;
+    padding: 0.55rem 0.7rem;
+    border-radius: 8px;
+    border: 1px solid rgba(74, 144, 226, 0.35);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #eaeaea);
+}
+
+.pomodoro-subject-add-btn {
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #4a90e2, #357adb);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pomodoro-subject-add-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .pomodoro-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .pomodoro-side {
+        justify-content: center;
+    }
+
+    .pomodoro-subject-panel {
+        max-width: 400px;
+    }
 }
 
 .pomodoro-setting-group {

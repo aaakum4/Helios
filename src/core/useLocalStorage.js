@@ -15,6 +15,13 @@ export function useLocalStorage(key, initialValue) {
     try {
       setStoredValue((prev) => {
         const valueToStore = value instanceof Function ? value(prev) : value;
+        if (import.meta.env.DEV && key === 'focusSubjects') {
+          console.debug('[useLocalStorage] setValue', {
+            key,
+            prevLength: Array.isArray(prev) ? prev.length : undefined,
+            nextLength: Array.isArray(valueToStore) ? valueToStore.length : undefined,
+          });
+        }
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
 
         // Dispatch custom event to sync across components
@@ -33,6 +40,12 @@ export function useLocalStorage(key, initialValue) {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.detail?.key === key) {
+        if (import.meta.env.DEV && key === 'focusSubjects') {
+          console.debug('[useLocalStorage] localStorageChange', {
+            key,
+            nextLength: Array.isArray(e.detail.value) ? e.detail.value.length : undefined,
+          });
+        }
         setStoredValue(e.detail.value);
       }
     };

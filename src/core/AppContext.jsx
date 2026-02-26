@@ -50,6 +50,7 @@ export function AppProvider({ children }) {
 
     const [focusSubjects, setFocusSubjects] = useLocalStorage("focusSubjects", []);
     const [focusLogs, setFocusLogs] = useLocalStorage("focusLogs", []);
+    const [studySessions, setStudySessions] = useLocalStorage("studySessions", []);
 
     return (
         <AppContext.Provider value={{ 
@@ -67,6 +68,8 @@ export function AppProvider({ children }) {
             setFocusSubjects,
             focusLogs,
             setFocusLogs,
+            studySessions,
+            setStudySessions,
         }}>
         {children}
         </AppContext.Provider>
