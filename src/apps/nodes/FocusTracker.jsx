@@ -330,6 +330,15 @@ const todaySessionTotals = useMemo(() => {
 
         if (total === 0) return null;
 
+        // If only one subject, render a full circle
+        if (entries.length === 1) {
+            return (
+                <svg className="focus-tracker-pie" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill={entries[0].color} />
+                </svg>
+            );
+        }
+
         let currentAngle = -90;
         const paths = [];
 

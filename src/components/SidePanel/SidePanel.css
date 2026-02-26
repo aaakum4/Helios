@@ -109,20 +109,23 @@
 .side-panel__close {
     width: 32px;
     height: 32px;
-    border: none;
+    border-radius: 8px;
+    border: 1px solid var(--border);
     background: transparent;
-    color: var(--text);
-    font-size: 20px;
+    color: var(--muted);
     cursor: pointer;
-    border-radius: 6px;
+    font-size: 1.5rem;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .side-panel__close:hover {
-    background: var(--bg);
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
 }
 
 .side-panel__body {

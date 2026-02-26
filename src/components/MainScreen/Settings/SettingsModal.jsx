@@ -86,7 +86,7 @@ export default function SettingsModal({ onClose }) {
                 </div>
 
                 <div className="settings-actions">
-                    <button className="settings-close" onClick={onClose}>Close</button>
+                    <button className="settings-close" onClick={onClose}>✕</button>
                 </div>
             </div>
         </div>
