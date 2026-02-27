@@ -51,8 +51,11 @@ function useTodoState() {
   };
 
   const addTodo = (subheadingID, title, dueDate = '') => {
+    // Create the todo object OUTSIDE the updater so it is created exactly once.
+    // The updater may be invoked twice by React StrictMode (dry-run + real run),
+    // but both runs will close over the same object, making the updater idempotent.
     const newTodo = {
-      id: `todo-${Date.now()}`,
+      id: `todo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title,
       completed: false,
       dueDate,

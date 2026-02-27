@@ -369,7 +369,10 @@ export default function Timetable() {
                 >
                   <div className="timetable-hour-lines">
                     {HOURS.map((hour) => (
-                      <div key={hour} className="timetable-hour-line" />
+                      <div
+                        key={hour}
+                        className={`timetable-hour-line${hour === time.getHours() ? " is-current-hour" : ""}`}
+                      />
                     ))}
                   </div>
                     {(blocksByDay.get(dayIndex) || []).map((block) => {
@@ -391,9 +394,11 @@ export default function Timetable() {
                           type="button"
                         >
                           <div className="timetable-block-title">{block.title}</div>
-                          <div className="timetable-block-time">
-                            {minutesToTimeValue(block.startMinutes)} - {minutesToTimeValue(block.endMinutes)}
-                          </div>
+                          {blockHeight >= 30 && (
+                            <div className="timetable-block-time">
+                              {minutesToTimeValue(block.startMinutes)} - {minutesToTimeValue(block.endMinutes)}
+                            </div>
+                          )}
                         </button>
                       );
                     })}

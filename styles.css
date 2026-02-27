@@ -35,7 +35,9 @@ html[data-theme="dark"] {
 
 body {
     height: 100%;
-    
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
 }
 
 #root {

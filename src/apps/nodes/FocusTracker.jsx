@@ -381,7 +381,6 @@ const todaySessionTotals = useMemo(() => {
   return (
     <div className="focus-tracker-root">
       <div className="focus-tracker-header">
-        <h1 className="focus-tracker-title">Focus Tracker</h1>
         <div className="focus-tracker-actions">
           <button
             className="focus-tracker-btn focus-tracker-btn--secondary"

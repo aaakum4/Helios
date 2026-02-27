@@ -12,6 +12,7 @@ export default function TodoList({
     const [dueDate, setDueDate] = useState('');
     const [removingTodoIds, setRemovingTodoIds] = useState(() => new Set());
     const removalTimersRef = useRef(new Map());
+    const addingTodoRef = useRef(false);
 
     if (!currentSubheading) {
         return (
@@ -59,17 +60,28 @@ export default function TodoList({
     };
 
     const handleAdd = () => {
-        if (!title.trim()) {
+        if (!title.trim() || addingTodoRef.current) {
             return;
         }
+        addingTodoRef.current = true;
         onAddTodo(currentSubheading.id, title.trim(), dueDate.trim());
         setTitle('');
         setDueDate('');
+        // Use longer timeout to prevent any rapid re-submissions
+        setTimeout(() => {
+            addingTodoRef.current = false;
+        }, 300);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        handleAdd();
     };
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
+            event.stopPropagation();
             handleAdd();
         }
     };
@@ -81,7 +93,7 @@ export default function TodoList({
                 <span className="todo-count-badge">{currentSubheading.todos.length}</span>
             </div>
 
-            <div className="todo-inputs">
+            <form className="todo-inputs" onSubmit={handleSubmit}>
                 <input
                     type="text"
                     className="todo-input"
@@ -96,10 +108,10 @@ export default function TodoList({
                     value={dueDate}
                     onChange={(event) => setDueDate(event.target.value)}
                 />
-                <button className="todo-add-btn" onClick={handleAdd} disabled={!title.trim()}>
+                <button type="button" className="todo-add-btn" onClick={handleAdd} disabled={!title.trim()}>
                     Add
                 </button>
-            </div>
+            </form>
 
             {currentSubheading.todos.length === 0 ? (
                 <div className="todo-list-empty">No todos yet.</div>
@@ -139,7 +151,7 @@ export default function TodoList({
                                 aria-label={`Delete ${todo.title}`}
                                 title="Delete todo"
                             >
-                                x
+                                ×
                             </button>
                         </div>
                     ))}

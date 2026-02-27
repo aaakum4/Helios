@@ -295,6 +295,10 @@ html[data-theme="dark"] .timetable-day-column {
   border-bottom: 1px solid var(--tt-line);
 }
 
+.timetable-hour-line.is-current-hour {
+  background: rgba(59, 130, 246, 0.07);
+}
+
 .timetable-block {
   position: absolute;
   left: 10px;

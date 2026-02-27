@@ -104,27 +104,56 @@ export default function Reflection() {
         });
     }, [reflectionArchive]);
 
+    // --- Calendar range generation (independent of which days have logs) ---
+
     const availableYears = useMemo(() => {
-        const years = new Set(normalizedArchiveKeys.map(k => {
-            const p = parseYYYYMMDD(k);
-            return p ? p.year : null;
-        }).filter(Boolean));
-        if (years.size === 0) return [];
-        return Array.from(years).sort((a, b) => b - a);
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        // Start from the earliest log year, or current year if no logs yet.
+        const logYears = normalizedArchiveKeys
+            .map(k => parseYYYYMMDD(k)?.year)
+            .filter(Boolean);
+        const minYear = logYears.length > 0 ? Math.min(...logYears) : currentYear;
+        return Array.from({ length: currentYear - minYear + 1 }, (_, i) => currentYear - i);
     }, [normalizedArchiveKeys]);
 
     const availableMonths = useMemo(() => {
-        const months = new Set(normalizedArchiveKeys.map(k => parseYYYYMMDD(k)).filter(Boolean)
-            .filter(p => p.year === archiveYear)
-            .map(p => p.month));
-        return Array.from(months).sort((a, b) => a - b);
-    }, [normalizedArchiveKeys, archiveYear]);
+        const today = new Date();
+        // Cap at current month only when viewing the current year.
+        const maxMonth = archiveYear === today.getFullYear() ? today.getMonth() + 1 : 12;
+        return Array.from({ length: maxMonth }, (_, i) => i + 1);
+    }, [archiveYear]);
 
     const availableDays = useMemo(() => {
-        const days = new Set(normalizedArchiveKeys.map(k => parseYYYYMMDD(k)).filter(Boolean)
-            .filter(p => p.year === archiveYear && p.month === archiveMonth)
-            .map(p => p.day));
-        return Array.from(days).sort((a, b) => a - b);
+        // Use actual calendar days for the selected year+month.
+        // new Date(y, m, 0).getDate() gives the last day of month m in year y
+        // (JS months are 0-indexed, so month m here = calendar month m).
+        const today = new Date();
+        const rawMax = new Date(archiveYear, archiveMonth, 0).getDate();
+        // Cap at today when viewing the current year+month.
+        const isCurrentMonth =
+            archiveYear === today.getFullYear() && archiveMonth === today.getMonth() + 1;
+        const maxDay = isCurrentMonth ? today.getDate() : rawMax;
+        return Array.from({ length: maxDay }, (_, i) => i + 1);
+    }, [archiveYear, archiveMonth]);
+
+    // Sets of months/days that actually have log entries — used for tick indicators.
+    const logMonthsInYear = useMemo(() => {
+        return new Set(
+            normalizedArchiveKeys
+                .map(k => parseYYYYMMDD(k))
+                .filter(p => p && p.year === archiveYear)
+                .map(p => p.month)
+        );
+    }, [normalizedArchiveKeys, archiveYear]);
+
+    const logDaysInMonth = useMemo(() => {
+        return new Set(
+            normalizedArchiveKeys
+                .map(k => parseYYYYMMDD(k))
+                .filter(p => p && p.year === archiveYear && p.month === archiveMonth)
+                .map(p => p.day)
+        );
     }, [normalizedArchiveKeys, archiveYear, archiveMonth]);
 
     const handleQuestionNext = () => {
@@ -445,24 +474,23 @@ export default function Reflection() {
                         <div className="archive-selectors">
                             <div className="archive-selector-group">
                                 <label className="archive-label">Year</label>
-                                <select
+                            <select
                                     className="archive-select"
                                     value={archiveYear}
                                     onChange={(e) => {
-                                        setArchiveYear(parseInt(e.target.value))
+                                        const newYear = parseInt(e.target.value);
+                                        setArchiveYear(newYear);
+                                        // Reset to month 1 and clamp day within that month.
                                         setArchiveMonth(1);
-                                        setArchiveDay(1);
+                                        const daysInNewMonth = new Date(newYear, 1, 0).getDate();
+                                        setArchiveDay(d => Math.min(d, daysInNewMonth));
                                     }}
                                 >
-                                    {availableYears.length === 0 ? (
-                                        <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
-                                    ) : (
-                                        availableYears.map((year) => (
-                                            <option key={year} value={year}>
-                                                {year}
-                                            </option>
-                                        ))
-                                    )}
+                                    {availableYears.map((year) => (
+                                        <option key={year} value={year}>
+                                            {year}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -472,19 +500,18 @@ export default function Reflection() {
                                     className="archive-select"
                                     value={archiveMonth}
                                     onChange={(e) => {
-                                        setArchiveMonth(parseInt(e.target.value));
-                                        setArchiveDay(1);
+                                        const newMonth = parseInt(e.target.value);
+                                        setArchiveMonth(newMonth);
+                                        // Clamp the selected day within the new month's range.
+                                        const daysInNewMonth = new Date(archiveYear, newMonth, 0).getDate();
+                                        setArchiveDay(d => Math.min(d, daysInNewMonth));
                                     }}
                                 >
-                                    {availableMonths.length === 0 ? (
-                                        <option value={1}>Select a month</option>
-                                    ) : (
-                                        availableMonths.map((month) => (
-                                            <option key={month} value={month}>
-                                                {MONTHS[month - 1]}
-                                            </option>
-                                        ))
-                                    )}
+                                    {availableMonths.map((month) => (
+                                        <option key={month} value={month}>
+                                            {logMonthsInYear.has(month) ? '✓ ' : ''}{MONTHS[month - 1]}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -495,15 +522,11 @@ export default function Reflection() {
                                     value={archiveDay}
                                     onChange={(e) => setArchiveDay(parseInt(e.target.value))}
                                 >
-                                    {availableDays.length === 0 ? (
-                                        <option value={1}>Select a day</option>
-                                    ) : (
-                                        availableDays.map((day) => (
-                                            <option key={day} value={day}>
-                                                {day}
-                                            </option>
-                                        ))
-                                    )}
+                                    {availableDays.map((day) => (
+                                        <option key={day} value={day}>
+                                            {logDaysInMonth.has(day) ? '✓ ' : ''}{day}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
@@ -511,7 +534,7 @@ export default function Reflection() {
                         <div className="archive-view-container">
                             {!hasArchiveData ? (
                                 <div className="archive-empty">
-                                    <p>No entries yet.</p>
+                                    <p>No log for {formatDate(archiveYear, archiveMonth, archiveDay)}.</p>
                                 </div>
                             ) : (
                                 <div className='archive-entries'>
