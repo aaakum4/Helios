@@ -211,31 +211,31 @@ html[data-theme="dark"] .main-screen {
   color: var(--text);
 }
 
-.glow-none {
+html[data-glow="none"] .app-container {
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.glow-red {
+html[data-glow="red"] .app-container {
   box-shadow: 0 0 30px rgba(255, 59, 48, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.glow-blue {
+html[data-glow="blue"] .app-container {
   box-shadow: 0 0 30px rgba(10, 132, 255, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.glow-green {
+html[data-glow="green"] .app-container {
   box-shadow: 0 0 30px rgba(52, 211, 153, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.glow-orange {
+html[data-glow="orange"] .app-container {
   box-shadow: 0 0 30px rgba(255, 165, 0, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.glow-purple {
+html[data-glow="purple"] .app-container {
   box-shadow: 0 0 30px rgba(175, 82, 222, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.glow-pink {
+html[data-glow="pink"] .app-container {
   box-shadow: 0 0 30px rgba(255, 107, 214, 0.4), 0 4px 12px rgba(0,0,0,0.08);
 }
 

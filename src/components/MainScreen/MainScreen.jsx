@@ -27,7 +27,6 @@ export default function MainScreen({ onBack }) {
   const [draggedId, setDraggedId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const hideTimer = useRef(null);
-  const appContainerRef = useRef(null);
   const isDraggingRef = useRef(false);
 
   useEffect(() => {
@@ -35,15 +34,6 @@ export default function MainScreen({ onBack }) {
       localStorage.setItem("nodeOrder", JSON.stringify(nodeOrder));
     } catch (e) {}
   }, [nodeOrder]);
-
-  useEffect(() => {
-    try {
-      const savedGlow = localStorage.getItem("glow") || "none";
-      if (appContainerRef.current) {
-        appContainerRef.current.classList.add(`glow-${savedGlow}`);
-      }
-    } catch (e) {}
-  }, []);
 
   const handleNodeMouseDown = (e, nodeId) => {
     if (panelState === "expanded") {
@@ -210,7 +200,7 @@ export default function MainScreen({ onBack }) {
   };
 
   return (
-    <div className="app-container" ref={appContainerRef}>
+    <div className="app-container">
       <div className="main-screen">
         {!activeNodeId && (
             <button

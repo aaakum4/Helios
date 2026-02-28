@@ -14,11 +14,7 @@ export default function SettingsModal({ onClose }) {
 
   useEffect(() => {
     try {
-      const appContainer = document.querySelector(".app-container");
-      if (appContainer) {
-        appContainer.classList.remove("glow-none", "glow-blue", "glow-red", "glow-orange", "glow-purple", "glow-green", "glow-pink");
-        appContainer.classList.add(`glow-${glowColor}`);
-      }
+      document.documentElement.setAttribute("data-glow", glowColor);
     } catch (e) {}
   }, [glowColor]);
 
