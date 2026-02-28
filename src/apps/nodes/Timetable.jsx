@@ -102,6 +102,9 @@ export default function Timetable() {
   const [addMultiple, setAddMultiple] = useState(false);
   const [multipleDays, setMultipleDays] = useState([1]);
   const [saveError, setSaveError] = useState("");
+  const [syncModalOpen, setSyncModalOpen] = useState(false);
+  const [syncTarget, setSyncTarget] = useState(null);
+  const [syncStep, setSyncStep] = useState("pick");
 
   const visibleBlocks = useMemo(() => {
     return timetableBlocks.filter((block) => matchesRotation(block, rotationMode, activeWeekIndex, activeMonthWeek));
@@ -216,9 +219,73 @@ export default function Timetable() {
     setSheetOpen(false);
   };
 
+  const handleSyncOpen = () => {
+    setSyncStep("pick");
+    setSyncTarget(null);
+    setSyncModalOpen(true);
+  };
+
+  const handleSyncConfirm = () => {
+    const newBlocks = visibleBlocks.map((block) => {
+      const newBlock = { ...block, id: creatId(), rotation: syncTarget.rotation };
+      if (syncTarget.rotation === "fortnightly") {
+        newBlock.weekIndex = syncTarget.weekIndex;
+        newBlock.monthWeekIndex = undefined;
+      } else if (syncTarget.rotation === "monthly") {
+        newBlock.monthWeekIndex = syncTarget.monthWeekIndex;
+        newBlock.weekIndex = undefined;
+      } else {
+        newBlock.weekIndex = undefined;
+        newBlock.monthWeekIndex = undefined;
+      }
+      return newBlock;
+    });
+    setTimetableBlocks((prev) => [...prev, ...newBlocks]);
+    setSyncModalOpen(false);
+  };
+
+  const syncTargetGroups = useMemo(() => {
+    const groups = [];
+    if (rotationMode !== "weekly") {
+      groups.push({
+        label: "Weekly",
+        options: [{ rotation: "weekly", label: "Weekly" }],
+      });
+    }
+    const fortnightlyOptions = [0, 1]
+      .filter((w) => !(rotationMode === "fortnightly" && activeWeekIndex === w))
+      .map((w) => ({ rotation: "fortnightly", weekIndex: w, label: w === 0 ? "Week One" : "Week Two" }));
+    if (fortnightlyOptions.length > 0) {
+      groups.push({ label: "Fortnightly", options: fortnightlyOptions });
+    }
+    const monthlyOptions = [1, 2, 3, 4]
+      .filter((w) => !(rotationMode === "monthly" && activeMonthWeek === w))
+      .map((w) => ({ rotation: "monthly", monthWeekIndex: w, label: `Week ${w}` }));
+    if (monthlyOptions.length > 0) {
+      groups.push({ label: "Monthly", options: monthlyOptions });
+    }
+    return groups;
+  }, [rotationMode, activeWeekIndex, activeMonthWeek]);
+
+  const isSameTarget = (a, b) => {
+    if (!a || !b) return false;
+    if (a.rotation !== b.rotation) return false;
+    if (a.rotation === "fortnightly") return a.weekIndex === b.weekIndex;
+    if (a.rotation === "monthly") return a.monthWeekIndex === b.monthWeekIndex;
+    return true;
+  };
+
+  const syncTargetFullLabel = syncTarget
+    ? syncTarget.rotation === "weekly"
+      ? "Weekly"
+      : syncTarget.rotation === "fortnightly"
+      ? `Fortnightly · ${syncTarget.label}`
+      : `Monthly · ${syncTarget.label}`
+    : "";
+
   const rotationLabel = useMemo(() => {
     if (rotationMode === "fortnightly") {
-      return activeWeekIndex === 0 ? "Week One" : "Week Two";
+      return activeWeekIndex === 0 ? "Week 1" : "Week 2";
     }
     if (rotationMode === "monthly") {
       return `Week ${activeMonthWeek}`;
@@ -269,9 +336,16 @@ export default function Timetable() {
   return (
     <div className="timetable-root" ref={rootRef}>
       <div className="timetable-controls">
-        <button className="timetable-add-btn" type="button" onClick={handleQuickAdd} aria-label="Add block">
-          +
-        </button>
+        <div className="timetable-controls-left">
+          <button className="timetable-add-btn" type="button" onClick={handleQuickAdd} aria-label="Add block">
+            +
+          </button>
+          {syncTargetGroups.length > 0 && (
+            <button className="timetable-sync-btn" type="button" onClick={handleSyncOpen}>
+              Sync
+            </button>
+          )}
+        </div>
         <div className="timetable-rotation">
           <div className="timetable-segment" role="tablist" aria-label="Rotation mode">
             {["weekly", "fortnightly", "monthly"].map((mode) => (
@@ -597,6 +671,84 @@ export default function Timetable() {
         </div>
       </div>
     )}
+
+    {syncModalOpen && (
+      <div className="timetable-sheet-overlay" role="dialog" aria-modal="true">
+        <div className="timetable-sheet">
+          {syncStep === "pick" ? (
+            <>
+              <div className="timetable-sheet-header">
+                <button
+                  className="timetable-sheet-action"
+                  onClick={() => setSyncModalOpen(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <div className="timetable-sheet-title">Sync Blocks</div>
+                <button
+                  className="timetable-sheet-action is-primary"
+                  onClick={() => syncTarget !== null && setSyncStep("confirm")}
+                  type="button"
+                  disabled={syncTarget === null}
+                >
+                  Next
+                </button>
+              </div>
+              <div className="timetable-sheet-body">
+                <p className="timetable-sync-desc">
+                  Copy <strong>{rotationLabel}</strong>'s blocks to:
+                </p>
+                {syncTargetGroups.map((group) => (
+                  <div key={group.label} className="timetable-sync-group">
+                    <div className="timetable-sync-group-label">{group.label}</div>
+                    <div className="timetable-sync-week-options">
+                      {group.options.map((opt) => (
+                        <button
+                          key={`${opt.rotation}-${opt.weekIndex ?? opt.monthWeekIndex ?? "w"}`}
+                          type="button"
+                          className={`timetable-sync-week-btn ${isSameTarget(syncTarget, opt) ? "is-active" : ""}`}
+                          onClick={() => setSyncTarget(opt)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="timetable-sheet-header">
+                <button
+                  className="timetable-sheet-action"
+                  onClick={() => setSyncStep("pick")}
+                  type="button"
+                >
+                  Back
+                </button>
+                <div className="timetable-sheet-title">Confirm Sync</div>
+                <button
+                  className="timetable-sheet-action is-primary"
+                  onClick={handleSyncConfirm}
+                  type="button"
+                >
+                  Sync
+                </button>
+              </div>
+              <div className="timetable-sheet-body">
+                <p className="timetable-sync-desc">
+                  Copy <strong>{visibleBlocks.length} block{visibleBlocks.length !== 1 ? "s" : ""}</strong> from{" "}
+                  <strong>{rotationLabel}</strong> to <strong>{syncTargetFullLabel}</strong>?
+                </p>
+                <p className="timetable-sync-note">Your current blocks will not be deleted.</p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )}
   </div>
-);
+  );
 }

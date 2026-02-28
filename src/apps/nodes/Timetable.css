@@ -47,6 +47,12 @@ html[data-theme="dark"] .timetable-root {
   justify-content: space-between;
 }
 
+.timetable-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .timetable-add-btn {
   width: 52px;
   height: 52px;
@@ -344,7 +350,7 @@ html[data-theme="dark"] .timetable-day-column {
 .timetable-sheet-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 18, 24, 0.4);
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -353,14 +359,21 @@ html[data-theme="dark"] .timetable-day-column {
 }
 
 .timetable-sheet {
-  width: min(720px, 100%);
-  background: var(--tt-surface);
-  border-radius: var(--sheet-radius);
-  box-shadow: var(--tt-shadow);
-  max-height: 90vh;
+  width: min(420px, calc(100% - 2rem));
+  background: white;
+  border-radius: 22px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.25s ease;
+  animation: settingsPop 0.25s ease-out;
+  overflow: hidden;
+}
+
+html[data-theme="dark"] .timetable-sheet {
+  background: #3a3a3a;
+  border-color: #555555;
 }
 
 .timetable-sheet-header {
@@ -368,16 +381,27 @@ html[data-theme="dark"] .timetable-day-column {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--tt-line);
+  border-bottom: 1px solid #e5e5e5;
   position: sticky;
   top: 0;
-  background: var(--tt-surface);
+  background: white;
+  border-radius: 22px 22px 0 0;
   z-index: 2;
+}
+
+html[data-theme="dark"] .timetable-sheet-header {
+  background: #3a3a3a;
+  border-bottom-color: #555555;
 }
 
 .timetable-sheet-title {
   font-weight: 600;
   font-size: 1rem;
+  color: #111;
+}
+
+html[data-theme="dark"] .timetable-sheet-title {
+  color: #ffffff;
 }
 
 .timetable-sheet-action {
@@ -386,10 +410,21 @@ html[data-theme="dark"] .timetable-day-column {
   font-weight: 600;
   color: var(--tt-muted);
   cursor: pointer;
+  font-size: 0.9rem;
+  transition: opacity 0.15s ease;
+}
+
+.timetable-sheet-action:hover {
+  opacity: 0.7;
 }
 
 .timetable-sheet-action.is-primary {
-  color: var(--tt-accent);
+  color: #0a84ff;
+}
+
+.timetable-sheet-action:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .timetable-sheet-body {
@@ -408,10 +443,14 @@ html[data-theme="dark"] .timetable-day-column {
 
 .timetable-field-label {
   font-size: 0.8rem;
-  font-size: 600;
-  color: var(--tt-muted);
+  font-weight: 600;
+  color: #111;
   text-transform: uppercase;
-  letter-spacing: 0.08re;
+  letter-spacing: 0.06em;
+}
+
+html[data-theme="dark"] .timetable-field-label {
+  color: #ffffff;
 }
 
 .timetable-input, 
@@ -438,12 +477,16 @@ html[data-theme="dark"] .timetable-day-column {
 
 .timetable-card {
   background: var(--tt-surface);
-  border: 1px solid var(--tt-line);
+  border: 1px solid #e5e5e5;
   border-radius: 16px;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+}
+
+html[data-theme="dark"] .timetable-card {
+  border-color: #555555;
 }
 
 .timetable-card-row {
@@ -455,7 +498,11 @@ html[data-theme="dark"] .timetable-day-column {
 
 .timetable-card-label {
   font-weight: 600;
-  color: var(--tt-text);
+  color: #111;
+}
+
+html[data-theme="dark"] .timetable-card-label {
+  color: #ffffff;
 }
 
 .timetable-card-content {
@@ -593,7 +640,7 @@ html[data-theme="dark"] .timetable-day-column {
   background: rgba(240, 111, 92, 0.12);
   color: #c4493a;
   padding: 0.6rem 1rem;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -625,6 +672,17 @@ html[data-theme="dark"] .timetable-day-column {
   }
 }
 
+@keyframes settingsPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @media (max-width: 900px) {
   .timetable-root {
     padding: 1.25rem;
@@ -647,4 +705,120 @@ html[data-theme="dark"] .timetable-day-column {
     transition: none;
     animation: none;
   }
+}
+
+/* ── Sync feature ───────────────────────────────────────────────── */
+
+.timetable-sync-btn {
+  height: 52px;
+  padding: 0 1.25rem;
+  border-radius: 16px;
+  border: 1px solid #e5e5e5;
+  background: white;
+  color: #111;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+html[data-theme="dark"] .timetable-sync-btn {
+  background: #3a3a3a;
+  border-color: #555555;
+  color: #ffffff;
+}
+
+.timetable-sync-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+}
+
+.timetable-sync-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.timetable-sync-btn:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.4);
+  outline-offset: 3px;
+}
+
+.timetable-sync-desc {
+  font-size: 0.9rem;
+  color: #111;
+  margin: 0 0 1.25rem;
+  line-height: 1.55;
+}
+
+html[data-theme="dark"] .timetable-sync-desc {
+  color: #ffffff;
+}
+
+.timetable-sync-note {
+  font-size: 0.82rem;
+  color: var(--tt-muted);
+  margin: 0.75rem 0 0;
+}
+
+.timetable-sync-week-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.timetable-sync-group {
+  margin-bottom: 1rem;
+}
+
+.timetable-sync-group-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+html[data-theme="dark"] .timetable-sync-group-label {
+  color: #ffffff;
+}
+
+.timetable-sync-week-btn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  background: white;
+  color: #111;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+}
+
+.timetable-sync-week-btn.is-active {
+  border-color: #0a84ff;
+  background: rgba(10, 132, 255, 0.1);
+  color: #0a84ff;
+}
+
+.timetable-sync-week-btn:hover:not(.is-active) {
+  border-color: #0a84ff;
+  background: rgba(10, 132, 255, 0.05);
+}
+
+html[data-theme="dark"] .timetable-sync-week-btn {
+  background: #444444;
+  border-color: #555555;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .timetable-sync-week-btn.is-active {
+  background: rgba(10, 132, 255, 0.2);
+  border-color: #0a84ff;
+  color: #6ab4ff;
 }
