@@ -73,7 +73,7 @@ function getDateRangeForPeriod(period) {
 
 export default function FocusTracker() {
   const { focusSubjects, setFocusSubjects, studySessions, setStudySessions } = useAppContext();
-    const { hours, minutes, seconds } = useTime();
+    const { time } = useTime();
 
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newSubjectName, setNewSubjectName] = useState('');
@@ -91,7 +91,7 @@ export default function FocusTracker() {
     const createLockRef = useRef(false);
     const lastCreateRef = useRef({ name: '', ts: 0 });
 
-    const currentDateKey = useMemo(() => getTodayKey(), [hours, minutes, seconds]);
+    const currentDateKey = useMemo(() => getTodayKey(), [time]);
 
     useEffect(() => {
       if (sessionStartDate && sessionStartDate !== currentDateKey) {

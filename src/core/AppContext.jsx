@@ -1,15 +1,9 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useContext } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-    const [settings, setSettings] = useState({
-        soundEnabled: true,
-        theme: 'dark',
-        focusMode: false,
-    });
-
     const [timetableData, setTimetableData] = useLocalStorage("timetableData", {
         blocks: [],
         rotationMode: "weekly",
@@ -49,13 +43,10 @@ export function AppProvider({ children }) {
     };
 
     const [focusSubjects, setFocusSubjects] = useLocalStorage("focusSubjects", []);
-    const [focusLogs, setFocusLogs] = useLocalStorage("focusLogs", []);
     const [studySessions, setStudySessions] = useLocalStorage("studySessions", []);
 
     return (
         <AppContext.Provider value={{ 
-            settings,
-            setSettings,
             timetableBlocks: timetableData.blocks || [],
             rotationMode: timetableData.rotationMode || 'weekly',
             activeWeekIndex: typeof timetableData.activeWeekIndex === "number" ? timetableData.activeWeekIndex : 0,
@@ -66,8 +57,6 @@ export function AppProvider({ children }) {
             setActiveMonthWeek,
             focusSubjects,
             setFocusSubjects,
-            focusLogs,
-            setFocusLogs,
             studySessions,
             setStudySessions,
         }}>

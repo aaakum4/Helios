@@ -39,12 +39,6 @@ export function useLocalStorage(key, initialValue) {
       return;
     }
     try {
-      if (import.meta.env.DEV && key === 'focusSubjects') {
-        console.debug('[useLocalStorage] persisting', {
-          key,
-          length: Array.isArray(storedValue) ? storedValue.length : undefined,
-        });
-      }
       window.localStorage.setItem(key, JSON.stringify(storedValue));
 
       // Mark as an internal dispatch so our own listener skips it.
@@ -70,12 +64,6 @@ export function useLocalStorage(key, initialValue) {
         return;
       }
 
-      if (import.meta.env.DEV && key === 'focusSubjects') {
-        console.debug('[useLocalStorage] cross-component update', {
-          key,
-          length: Array.isArray(e.detail.value) ? e.detail.value.length : undefined,
-        });
-      }
       setStoredValue(e.detail.value);
     };
 

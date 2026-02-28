@@ -78,7 +78,6 @@ const createDraft = (dayIndex, startMinutes, endMinutes, rotationMode, weekIndex
 
 export default function Timetable() {
   const { time } = useTime();
-  const rootRef = useRef(null);
   const scrollRef = useRef(null);
   const headerRef = useRef(null);
   const timeLabelRef = useRef(null);
@@ -334,7 +333,7 @@ export default function Timetable() {
   }, [time]);
 
   return (
-    <div className="timetable-root" ref={rootRef}>
+    <div className="timetable-root">
       <div className="timetable-controls">
         <div className="timetable-controls-left">
           <button className="timetable-add-btn" type="button" onClick={handleQuickAdd} aria-label="Add block">
@@ -633,7 +632,7 @@ export default function Timetable() {
             <div className="timetable-card">
               <div className="timetable-card-row">
                 <span className="timetable-card-label">Attachments</span>
-                <label className="timetable-attachemnt">
+                <label className="timetable-attachment">
                   <input
                     type="file"
                     multiple
