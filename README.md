@@ -21,40 +21,32 @@ In my final year of school, juggling assessments, homework, deadlines, and study
 > [!NOTE]
 > Helios is in an early beta stage. If you encounter any issues, please report them too [our issue tracker](https://github.com/aaakum4/Helios/issues/new).
 
-## Download
+## Access
 
-Builds are generated automatically upon [release]().
-
--   [macOS (Intel)]()
--   [macOS (Apple Silicon)]()
--   [Windows]()
--   [Linux (rpm)]()
--   [Linux (tar.gz)]()
--   [Linux (deb)]()
+https://helios-sigma.vercel.app/
 
 ## Roadmap
 
 Before the first stable release, I would like the following features to be implemented:
 
 - [x] An app logo
-- [ ] An easy to use UI
-- [ ] Creation of timetables
-- [ ] Timetables sync to a calendar
-- [ ] To-do list
-- [ ] File access (for quick access to syllabus documents, and more...)
+- [x] An easy to use UI
+- [x] Creation of timetables
+- [x] To-do list
+- [x] All other nodes functional and operational
+- [x] User friendly
+- [x] Nodes work with each other
 - [ ] ...
 
 ## Buidling
 
 ### Prerequisites
 
-- ?
-- ?
-- ?
+None
 
 ### Instructions
 
-???
+Open the link to the app.
 
 ## Using Helios
 
@@ -63,4 +55,4 @@ Please refer to the [Getting Started]() tutorial.
 ## Licensing
 All files, unless otherwise stated, are licensed under the Lesser GPL v3.0 or later. A copy of the license can be found in the `LICENSE` file.
 
-All assets which contain [Helios brand images]() are property of the Rela organisation and may not be used without permission.
+All assets which contain [Helios brand images]() are property of the Helios organisation and may not be used without permission.
