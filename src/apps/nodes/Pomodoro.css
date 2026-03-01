@@ -46,6 +46,18 @@
     font-weight: bold;
     letter-spacing: 0.1em;
     font-variant-numeric: tabular-nums;
+    transition: color 0.2s ease;
+}
+
+@keyframes timerFlash {
+    0%   { transform: scale(1);    color: var(--text); }
+    30%  { transform: scale(1.07); color: #f59e0b; }
+    60%  { transform: scale(1.04); color: #f59e0b; }
+    100% { transform: scale(1);    color: var(--text); }
+}
+
+.pomodoro-timer--flash {
+    animation: timerFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .pomodoro-session-type {

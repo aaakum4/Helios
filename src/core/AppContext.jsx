@@ -45,6 +45,13 @@ export function AppProvider({ children }) {
     const [focusSubjects, setFocusSubjects] = useLocalStorage("focusSubjects", []);
     const [studySessions, setStudySessions] = useLocalStorage("studySessions", []);
 
+    // Shared FocusTracker active-session state — written by both FocusTracker and Pomodoro
+    const [ftActiveSubjectId, setFtActiveSubjectId] = useLocalStorage('focustracker:activeSubjectId', null);
+    const [ftSessionStartTime, setFtSessionStartTime] = useLocalStorage('focustracker:sessionStartTime', null);
+    const [ftSessionStartDate, setFtSessionStartDate] = useLocalStorage('focustracker:sessionStartDate', null);
+    // 'manual' = started by FocusTracker, 'pomodoro' = started by Pomodoro
+    const [ftSessionSource, setFtSessionSource] = useLocalStorage('focustracker:sessionSource', null);
+
     return (
         <AppContext.Provider value={{ 
             timetableBlocks: timetableData.blocks || [],
@@ -59,6 +66,10 @@ export function AppProvider({ children }) {
             setFocusSubjects,
             studySessions,
             setStudySessions,
+            ftActiveSubjectId, setFtActiveSubjectId,
+            ftSessionStartTime, setFtSessionStartTime,
+            ftSessionStartDate, setFtSessionStartDate,
+            ftSessionSource, setFtSessionSource,
         }}>
         {children}
         </AppContext.Provider>

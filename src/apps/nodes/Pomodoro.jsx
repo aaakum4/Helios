@@ -15,7 +15,13 @@ function createId() {
 }
 
 export default function Pomodoro() {
-    const { focusSubjects, setFocusSubjects, setStudySessions } = useAppContext();
+    const {
+        focusSubjects, setFocusSubjects, setStudySessions,
+        ftActiveSubjectId, setFtActiveSubjectId,
+        ftSessionStartTime, setFtSessionStartTime,
+        ftSessionStartDate, setFtSessionStartDate,
+        ftSessionSource, setFtSessionSource,
+    } = useAppContext();
     const [workTime, setWorkTime] = useLocalStorage('pomodoro:workTime', DEFAULT_WORK_TIME);
     const [breakTime, setBreakTime] = useLocalStorage('pomodoro:breakTime', DEFAULT_BREAK_TIME);
     const [sessionTime, setSessionTime] = useLocalStorage('pomodoro:sessionTime', workTime);
@@ -24,11 +30,85 @@ export default function Pomodoro() {
     const [sessionsCompleted, setSessionsCompleted] = useLocalStorage('pomodoro:sessionsCompleted', 0);
     const [selectedSubjectId, setSelectedSubjectId] = useLocalStorage('pomodoro:selectedSubjectId', '');
     const [activeStudySession, setActiveStudySession] = useLocalStorage('pomodoro:activeStudySession', null);
+    const [sessionStartTime, setSessionStartTime] = useLocalStorage('pomodoro:sessionStartTime', null);
+    const [pausedElapsed, setPausedElapsed] = useLocalStorage('pomodoro:pausedElapsed', 0);
     const [newSubjectName, setNewSubjectName] = useState('');
     const [subjectError, setSubjectError] = useState('');
-    const [elapsed, setElapsed] = useState(0);
+    // Initialise elapsed from stored start time (running) or stored paused value (paused).
+    const [elapsed, setElapsed] = useState(() => {
+        try {
+            const running = JSON.parse(localStorage.getItem('pomodoro:isRunning'));
+            const startTime = JSON.parse(localStorage.getItem('pomodoro:sessionStartTime'));
+            const paused = JSON.parse(localStorage.getItem('pomodoro:pausedElapsed') || '0');
+            if (running && startTime) return Math.floor((Date.now() - startTime) / 1000);
+            if (!running && paused) return paused;
+        } catch {}
+        return 0;
+    });
+    const [sessionFlash, setSessionFlash] = useState(false);
     const sessionStartTimeRef = useRef(null);
     const timerIntervalRef = useRef(null);
+
+    // Restore in-memory ref from persisted start time on mount.
+    // When paused, offset by pausedElapsed so the ref is correct if the user resumes.
+    useEffect(() => {
+        if (isRunning && sessionStartTime) {
+            sessionStartTimeRef.current = sessionStartTime;
+        } else if (!isRunning && pausedElapsed > 0) {
+            // Pre-compute what the ref would be so interval starts correctly on resume
+            sessionStartTimeRef.current = null; // will be set in handlePlayPause
+        }
+    }, []);
+
+    // ── FocusTracker sync helpers ──────────────────────────────────────────────
+
+    const getTodayKey = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    };
+
+    const startFocusTrackerSession = (startTimeMs) => {
+        if (!selectedSubjectId) return;
+        // If a different subject is being tracked manually, save and stop it first.
+        if (ftActiveSubjectId && ftActiveSubjectId !== selectedSubjectId && ftSessionStartTime && ftSessionSource === 'manual') {
+            const dur = Math.floor((Date.now() - ftSessionStartTime) / 1000);
+            if (dur > 0) {
+                setStudySessions((prev) => [...prev, {
+                    id: createId(),
+                    subjectId: ftActiveSubjectId,
+                    startTime: ftSessionStartTime,
+                    endTime: Date.now(),
+                    duration: dur,
+                    type: 'manual',
+                    completed: true,
+                }]);
+            }
+        }
+        setFtActiveSubjectId(selectedSubjectId);
+        setFtSessionStartTime(startTimeMs);
+        setFtSessionStartDate(getTodayKey());
+        setFtSessionSource('pomodoro');
+    };
+
+    const stopFocusTrackerSession = () => {
+        if (!ftActiveSubjectId || !ftSessionStartTime || ftSessionSource !== 'pomodoro') return;
+        const dur = Math.floor((Date.now() - ftSessionStartTime) / 1000);
+        if (dur > 0) {
+            setStudySessions((prev) => [...prev, {
+                id: createId(),
+                subjectId: ftActiveSubjectId,
+                startTime: ftSessionStartTime,
+                endTime: Date.now(),
+                duration: dur,
+                type: 'manual',
+                completed: true,
+            }]);
+        }
+        setFtActiveSubjectId(null);
+        setFtSessionStartTime(null);
+        setFtSessionStartDate(null);
+        setFtSessionSource(null);
+    };
 
     const createStudySession = () => {
         if (!selectedSubjectId || activeStudySession) return false;
@@ -101,11 +181,6 @@ export default function Pomodoro() {
             return;
         }
 
-        if (sessionStartTimeRef.current === null) {
-            sessionStartTimeRef.current = Date.now();
-            setElapsed(0);
-        }
-
         timerIntervalRef.current = setInterval(() => {
             const currentElapsed = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
             setElapsed(currentElapsed);
@@ -115,7 +190,10 @@ export default function Pomodoro() {
             if (remaining <= 0) {
                 clearInterval(timerIntervalRef.current);
                 timerIntervalRef.current = null;
-                
+
+                setSessionFlash(true);
+                setTimeout(() => setSessionFlash(false), 600);
+
                 if (isWorkSession) {
                     finalizeStudySession(true);
                     setSessionsCompleted((prev) => prev + 1);
@@ -125,7 +203,9 @@ export default function Pomodoro() {
                     setIsWorkSession(true);
                     setSessionTime(workTime);
                 }
-                sessionStartTimeRef.current = Date.now();
+                const newStart = Date.now();
+                sessionStartTimeRef.current = newStart;
+                setSessionStartTime(newStart);
                 setElapsed(0);
                 if (isRunning && !isWorkSession) {
                     createStudySession();
@@ -147,13 +227,34 @@ const handlePlayPause = () => {
             setSubjectError('Select a subject to start a focus session.');
             return;
         }
-        sessionStartTimeRef.current = Date.now();
-        setElapsed(0);
+        if (pausedElapsed > 0) {
+            // Resuming from pause — offset start time so elapsed continues from where it was
+            const resumeStart = Date.now() - pausedElapsed * 1000;
+            sessionStartTimeRef.current = resumeStart;
+            setSessionStartTime(resumeStart);
+            setPausedElapsed(0);
+            // elapsed state stays at pausedElapsed; interval will recalculate on next tick
+        } else {
+            // Fresh start
+            const now = Date.now();
+            sessionStartTimeRef.current = now;
+            setSessionStartTime(now);
+            setElapsed(0);
+        }
         if (isWorkSession) {
             createStudySession();
+            startFocusTrackerSession(Date.now());
         }
-    } else if (isWorkSession) {
-        finalizeStudySession(false);
+    } else {
+        // Pausing
+        const currentElapsed = sessionStartTimeRef.current
+            ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
+            : elapsed;
+        setPausedElapsed(currentElapsed);
+        if (isWorkSession) {
+            finalizeStudySession(false);
+            stopFocusTrackerSession();
+        }
     }
     setIsRunning(!isRunning);
     if (subjectError) setSubjectError('');
@@ -161,11 +262,14 @@ const handlePlayPause = () => {
 const handleReset = () => {
     if (isWorkSession) {
         finalizeStudySession(false);
+        stopFocusTrackerSession();
     }
     setIsRunning(false);
     setIsWorkSession(true);
     setSessionTime(workTime);
     sessionStartTimeRef.current = null;
+    setSessionStartTime(null);
+    setPausedElapsed(0);
     setElapsed(0);
 };
 
@@ -179,7 +283,7 @@ return (
         <div className="pomodoro-layout">
             <div className="pomodoro-main">
                 <div className="pomodoro-display">
-                    <div className="pomodoro-timer">
+                    <div className={`pomodoro-timer${sessionFlash ? ' pomodoro-timer--flash' : ''}`}>
                         {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                     </div>
                     <div className="pomodoro-session-type">

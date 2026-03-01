@@ -72,17 +72,31 @@ function getDateRangeForPeriod(period) {
 }
 
 export default function FocusTracker() {
-  const { focusSubjects, setFocusSubjects, studySessions, setStudySessions } = useAppContext();
+  const {
+    focusSubjects, setFocusSubjects, studySessions, setStudySessions,
+    ftActiveSubjectId: activeSubjectId, setFtActiveSubjectId: setActiveSubjectId,
+    ftSessionStartTime: sessionStartTime, setFtSessionStartTime: setSessionStartTime,
+    ftSessionStartDate: sessionStartDate, setFtSessionStartDate: setSessionStartDate,
+    ftSessionSource, setFtSessionSource,
+  } = useAppContext();
     const { time } = useTime();
 
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newSubjectName, setNewSubjectName] = useState('');
     const [newSubjectColor, setNewSubjectColor] = useState(COLORS[0]);
 
-    const [activeSubjectId, setActiveSubjectId] = useState(null);
-    const [sessionStartTime, setSessionStartTime] = useState(null);
-    const [sessionStartDate, setSessionStartDate] = useState(null);
-    const [todayElapsed, setTodayElapsed] = useState({});
+    // todayElapsed: live in-progress seconds for the active subject, initialised from
+    // stored start time so there's no flash when FocusTracker is re-opened mid-session.
+    const [todayElapsed, setTodayElapsed] = useState(() => {
+        try {
+            const activeId = JSON.parse(localStorage.getItem('focustracker:activeSubjectId'));
+            const startTime = JSON.parse(localStorage.getItem('focustracker:sessionStartTime'));
+            if (activeId && startTime) {
+                return { [activeId]: Math.floor((Date.now() - startTime) / 1000) };
+            }
+        } catch {}
+        return {};
+    });
 
     const [statPeriod, setStatPeriod] = useState('daily');
     const [showStats, setShowStats] = useState(false);
@@ -90,6 +104,14 @@ export default function FocusTracker() {
     const timerIntervalRef = useRef(null);
     const createLockRef = useRef(false);
     const lastCreateRef = useRef({ name: '', ts: 0 });
+
+    // Refs used by the unmount cleanup to avoid stale-closure problems.
+    const activeSubjectIdRef = useRef(activeSubjectId);
+    const sessionStartTimeRef = useRef(sessionStartTime);
+    const sessionSourceRef = useRef(ftSessionSource);
+    useEffect(() => { activeSubjectIdRef.current = activeSubjectId; }, [activeSubjectId]);
+    useEffect(() => { sessionStartTimeRef.current = sessionStartTime; }, [sessionStartTime]);
+    useEffect(() => { sessionSourceRef.current = ftSessionSource; }, [ftSessionSource]);
 
     const currentDateKey = useMemo(() => getTodayKey(), [time]);
 
@@ -118,6 +140,7 @@ export default function FocusTracker() {
                 clearInterval(timerIntervalRef.current);
                 timerIntervalRef.current = null;
             }
+            setTodayElapsed({});
         }
 
         return () => {
@@ -127,10 +150,23 @@ export default function FocusTracker() {
         };
     }, [activeSubjectId, sessionStartTime]);
 
+    // On unmount: only save if this session was started manually (not by Pomodoro —
+    // Pomodoro saves its own segment when it pauses / completes).
     useEffect(() => {
         return () => {
-            if (activeSubjectId) {
-                saveCurrentSession();
+            if (activeSubjectIdRef.current && sessionSourceRef.current === 'manual') {
+                const elapsed = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+                if (elapsed > 0) {
+                    setStudySessions((prev) => [...prev, {
+                        id: createId(),
+                        subjectId: activeSubjectIdRef.current,
+                        startTime: sessionStartTimeRef.current,
+                        endTime: Date.now(),
+                        duration: elapsed,
+                        type: 'manual',
+                        completed: true,
+                    }]);
+                }
             }
         };
     }, []);
@@ -173,13 +209,14 @@ export default function FocusTracker() {
           setActiveSubjectId(null);
           setSessionStartTime(null);
           setSessionStartDate(null);
+          setFtSessionSource(null);
           setTodayElapsed((prev) => {
             const updated = { ...prev };
             delete updated[subjectId];
             return updated;
           });
         } else {
-          if (activeSubjectId) {
+          if (activeSubjectId && ftSessionSource === 'manual') {
             const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
             saveCurrentSession(elapsed);
             setTodayElapsed((prev) => {
@@ -191,6 +228,7 @@ export default function FocusTracker() {
           setActiveSubjectId(subjectId);
           setSessionStartTime(Date.now());
           setSessionStartDate(currentDateKey);
+          setFtSessionSource('manual');
         }
     }
     
@@ -267,6 +305,7 @@ export default function FocusTracker() {
             setActiveSubjectId(null);
             setSessionStartTime(null);
             setSessionStartDate(null);
+            setFtSessionSource(null);
         }
 
         setFocusSubjects((prev) => prev.filter(sub => sub.id !== subjectId));
@@ -459,11 +498,19 @@ const todaySessionTotals = useMemo(() => {
                   style={{
                     borderColor: subject.color,
                     color: subject.color,
+                    opacity: isActive && ftSessionSource === 'pomodoro' ? 0.45 : 1,
                   }}
-                  onClick={() => handlePlayPause(subject.id)}
+                  onClick={() => {
+                    if (isActive && ftSessionSource === 'pomodoro') return;
+                    handlePlayPause(subject.id);
+                  }}
+                  title={isActive && ftSessionSource === 'pomodoro' ? 'Controlled by Pomodoro' : undefined}
                 >
                   {isActive ? '⏸' : '▶'}
                 </button>
+                {isActive && ftSessionSource === 'pomodoro' && (
+                  <span style={{ fontSize: '0.65rem', color: 'var(--muted)', marginLeft: '-6px', marginRight: '4px', whiteSpace: 'nowrap' }}>via Pomodoro</span>
+                )}
                 <div className="focus-tracker-subject-info">
                   <div className="focus-tracker-subject-name">{subject.name}</div>
                   <div className="focus-tracker-subject-time">{formatTime(totalToday)}</div>

@@ -29,6 +29,10 @@ export default function MainScreen({ onBack }) {
   const hideTimer = useRef(null);
   const isDraggingRef = useRef(false);
 
+  // Live state for card badges
+  const [pomodoroIsRunning] = useLocalStorage('pomodoro:isRunning', false);
+  const [pomodoroIsWorkSession] = useLocalStorage('pomodoro:isWorkSession', true);
+
   useEffect(() => {
     try {
       localStorage.setItem("nodeOrder", JSON.stringify(nodeOrder));
@@ -132,6 +136,20 @@ export default function MainScreen({ onBack }) {
 
   const activeNode = activeNodeId ? nodes.find((n) => n.id === activeNodeId) : null;
 
+  const getLiveState = (nodeId) => {
+    if (nodeId === 'pomodoro' && pomodoroIsRunning) {
+      return pomodoroIsWorkSession ? 'Focus · Running' : 'Break · Running';
+    }
+    if (nodeId === 'todo') {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const dueTodayCount = (todosData?.subheadings ?? [])
+        .flatMap((s) => s.todos ?? [])
+        .filter((t) => !t.completed && t.dueDate === todayStr).length;
+      if (dueTodayCount > 0) return `${dueTodayCount} due today`;
+    }
+    return null;
+  };
+
   const [todosData, setTodosData] = useLocalStorage("todosData", {
     subheadings: [
       {
@@ -229,9 +247,10 @@ export default function MainScreen({ onBack }) {
         <div className="main-screen-content" data-panel-state={panelState}>
           <div className="nodes-container">
             <div className="nodes-grid">
-              {sortedNodes.map((node) => (
+              {sortedNodes.map((node, index) => (
                 <div
                   key={node.id}
+                  style={{ '--card-index': index }}
                   className={
                     draggedId === node.id
                       ? "node-card-wrapper dragging"
@@ -251,6 +270,7 @@ export default function MainScreen({ onBack }) {
                     }}
                     onDragStart={(e) => handleNodeMouseDown(e, node.id)}
                     isDragging={draggedId === node.id}
+                    liveState={getLiveState(node.id)}
                   />
                 </div>
               ))}
