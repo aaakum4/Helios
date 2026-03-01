@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import './nodes.css';
 
 export default function NodeFullScreen({ node, onClose }) {
@@ -39,10 +38,8 @@ export default function NodeFullScreen({ node, onClose }) {
           </button>
         )}
         <div className="node-fullscreen-content">
-          <Suspense fallback={<div className="loading">Loading...</div>}>
             <node.component />
-          </Suspense>
-        </div>
+          </div>
       </div>
     </div>
   );
