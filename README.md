@@ -19,11 +19,12 @@ In my final year of school, juggling assessments, homework, deadlines, and study
 ---
 
 > [!NOTE]
-> Helios is in an early beta stage. If you encounter any issues, please report them too [our issue tracker](https://github.com/aaakum4/Helios/issues/new).
+> Helios is in an early beta stage. If you encounter any issues and something you think should be added/changed, please report them too [our issue tracker](https://github.com/aaakum4/Helios/issues/new).
 
 ## Access
 
-https://helios-sigma.vercel.app/
+Demo
+Live App: https://your-app.vercel.app
 
 ## Roadmap
 
@@ -38,15 +39,20 @@ Before the first stable release, I would like the following features to be imple
 - [x] Nodes work with each other
 - [ ] ...
 
-## Buidling
+### Known Limitations
+
+- No account system yet
+- Data stored locally in browser
+- Not optimised for mobile
+- Some features may reset
 
 ### Prerequisites
 
-None
+None — just:
+- A modern browser (Chrome, Edge, Safari, Firefox)
+- Internet connection
 
-### Instructions
-
-Open the link to the app.
+That’s it.
 
 ## Using Helios
 
