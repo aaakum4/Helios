@@ -165,11 +165,13 @@
   padding: 1.35rem 2.8rem;
   border-radius: 999px;
   font-size: clamp(2.4rem, 6vw, 4.8rem);
+  font-weight: 600;
   letter-spacing: 0.08em;
   color: inherit;
   cursor: pointer;
   backdrop-filter: blur(10px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
 }
 
 .clock-font-serif {
@@ -193,7 +195,8 @@
 
 .peaceful-display-settings {
   position: absolute;
-  top: calc(100% + 14px);
+  bottom: calc(100% + 14px);
+  top: auto;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
@@ -241,4 +244,193 @@
 .settings-options button.is-active {
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Pomodoro widget ─────────────────────────────────────────────────── */
+.pd-pom-wrap {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-pom {
+  background: rgba(8, 12, 18, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 1rem 1.4rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 200px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  color: #f0f0f0;
+  transition: box-shadow 0.3s ease;
+}
+
+@keyframes pd-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 200, 80, 0.7); }
+  50%  { box-shadow: 0 0 0 14px rgba(255, 200, 80, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 200, 80, 0); }
+}
+
+.pd-pom--flash {
+  animation: pd-flash 0.55s ease forwards;
+}
+
+.pd-pom-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.pd-pom-badge {
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pd-pom-badge--work {
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.pd-pom-badge--break {
+  background: rgba(52, 211, 153, 0.25);
+  color: #6ee7b7;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.pd-pom-subject {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.9;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pd-pom-timer {
+  font-size: 2.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pd-pom-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pd-pom-bar-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  transition: width 0.3s linear;
+}
+
+.pd-pom-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #f0f0f0;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.pd-pom-select option {
+  background: #1a1a2e;
+  color: #f0f0f0;
+}
+
+.pd-pom-error {
+  font-size: 0.75rem;
+  color: #fca5a5;
+  text-align: center;
+}
+
+.pd-pom-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pd-pom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f0f0f0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.15s ease;
+  backdrop-filter: blur(4px);
+}
+
+.pd-pom-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.pd-pom-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pd-pom-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pd-pom-btn--play {
+  padding: 0.55rem 1.1rem;
+}
+
+.pd-pom-btn--play.is-running {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.pd-pom-btn--reset {
+  padding: 0.55rem 0.7rem;
+  opacity: 0.7;
+}
+
+.pd-pom-btn--reset:hover {
+  opacity: 1;
+}
+
+.pd-pom-sessions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pd-pom-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  display: inline-block;
 }

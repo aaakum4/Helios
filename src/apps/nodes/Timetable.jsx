@@ -312,8 +312,11 @@ export default function Timetable() {
       return;
     }
 
-    const minutesFromStart = time.getHours() * 60 + time.getMinutes() - START_HOUR * 60;
-    const clampedMinutes = Math.max(0, Math.min(TOTAL_MINUTES, minutesFromStart));
+    const currentHour = time.getHours();
+    const isInRange = currentHour >= START_HOUR && currentHour < END_HOUR;
+    const targetHour = isInRange ? currentHour : 12;
+    const targetMinutes = isInRange ? time.getMinutes() : 0;
+    const clampedMinutes = (targetHour * 60 + targetMinutes) - START_HOUR * 60;
     const hourHeight = timeLabelRef.current.offsetHeight;
     if (!Number.isFinite(hourHeight) || hourHeight <= 0) {
       return;
@@ -337,7 +340,9 @@ export default function Timetable() {
       <div className="timetable-controls">
         <div className="timetable-controls-left">
           <button className="timetable-add-btn" type="button" onClick={handleQuickAdd} aria-label="Add block">
-            +
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </button>
           {syncTargetGroups.length > 0 && (
             <button className="timetable-sync-btn" type="button" onClick={handleSyncOpen}>

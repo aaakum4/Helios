@@ -30,7 +30,16 @@ function applyResolvedTheme(theme) {
     return;
   }
 
+  const style = document.createElement("style");
+  style.textContent = "* { transition: none !important; }";
+  document.head.appendChild(style);
+
   document.documentElement.setAttribute("data-theme", theme);
+
+  // Force a reflow so the suppression takes effect before transitions are restored
+  document.documentElement.offsetHeight; // eslint-disable-line no-unused-expressions
+
+  document.head.removeChild(style);
 }
 
 async function getNativeThemePayload() {

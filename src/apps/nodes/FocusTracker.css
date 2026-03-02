@@ -44,11 +44,17 @@
 .focus-tracker-btn--primary {
     background: var(--accent, #3b82f6);
     color: white;
+    display: inline-flex;
+    align-items: center;
 }
 
 .focus-tracker-btn--primary:hover {
     opacity: 0.9;
     transform: translateY(-1px);
+}
+
+html[data-theme="dark"] .focus-tracker-btn--primary {
+    color: var(--bg);
 }
 
 .focus-tracker-btn--secondary {
@@ -425,20 +431,3 @@
     border-top: 1px solid var(--border);
 }
 
-html[data-theme="dark"] .focus-tracker-root {
-    --bg: #0f1218;
-    --surface: #151a22;
-    --text: #eef1f6;
-    --muted: #9aa3b2;
-    --border: #2b3242;
-    --accent: #6aa7ff;
-}
-
-html[data-theme="light"] .focus-tracker-root {
-    --bg: #f6f7fb;
-    --surface: #ffffff;
-    --text: #1c2230;
-    --muted: #6a7285;
-    --border: #e0e5ef;
-    --accent: #3b82f6;
-}

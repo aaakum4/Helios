@@ -196,6 +196,7 @@ export default function Pomodoro() {
 
                 if (isWorkSession) {
                     finalizeStudySession(true);
+                    stopFocusTrackerSession();
                     setSessionsCompleted((prev) => prev + 1);
                     setIsWorkSession(false);
                     setSessionTime(breakTime);
@@ -251,19 +252,15 @@ const handlePlayPause = () => {
             ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
             : elapsed;
         setPausedElapsed(currentElapsed);
-        if (isWorkSession) {
-            finalizeStudySession(false);
-            stopFocusTrackerSession();
-        }
+        finalizeStudySession(false);
+        stopFocusTrackerSession();
     }
     setIsRunning(!isRunning);
     if (subjectError) setSubjectError('');
 };
 const handleReset = () => {
-    if (isWorkSession) {
-        finalizeStudySession(false);
-        stopFocusTrackerSession();
-    }
+    finalizeStudySession(false);
+    stopFocusTrackerSession();
     setIsRunning(false);
     setIsWorkSession(true);
     setSessionTime(workTime);

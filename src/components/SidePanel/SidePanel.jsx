@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { motion } from 'framer-motion';
 import { useTime } from "../../core/TimeProvider";
 import { useAppContext } from "../../core/AppContext";
 import "./SidePanel.css";
@@ -97,17 +98,20 @@ export default function SidePanel({ state, onToggle, onHover, onQuickAddTodo, su
 
 return (
     <div className={`side-panel side-panel--${state}`}>
-        <button
+        <motion.button
             className="side-panel__tab"
             onClick={onToggle}
             onMouseEnter={() => onHover(true)}
             onMouseLeave={() => onHover(false)}
             aria-label="Toggle side panel"
+            whileHover={{ scale: 1.18, x: state === 'expanded' ? 2 : -2 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 340, damping: 22 }}
         >
             <span className="side-panel__tab-icon">
                 {state === 'expanded' ? '«' : '»'}
             </span>
-        </button>
+        </motion.button>
 
                 <div className="side-panel__content">
             <div className="side-panel__header">
@@ -197,13 +201,16 @@ return (
                         </div>
                     </div>
 
-                    <button 
+                    <motion.button 
                         className={`side-panel__add-btn ${buttonState === "success" ? "side-panel__add-btn--success" : ""}`}
                         onClick={handleQuickSubmit}
                         disabled={buttonState === "success"}
+                        whileHover={buttonState !== "success" ? { scale: 1.03, y: -2 } : {}}
+                        whileTap={buttonState !== "success" ? { scale: 0.96 } : {}}
+                        transition={{ type: "spring", stiffness: 320, damping: 20 }}
                     >
                         {buttonState === "success" ? "Added! ✓" : "Add to Inbox"}
-                    </button>
+                    </motion.button>
                 </div>
             </div>
         </div>

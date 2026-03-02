@@ -1,6 +1,18 @@
 import { useState, useRef } from "react";
 import "./TodoList.css";
 
+const CONFETTI_COLORS = ['#f59e0b', '#22c55e', '#3b82f6', '#ec4899', '#a855f7', '#06b6d4', '#ef4444', '#84cc16'];
+const CONFETTI_DIRS = [
+    { dx: '-44px', dy: '-38px' },
+    { dx:  '44px', dy: '-38px' },
+    { dx: '-54px', dy:   '0px' },
+    { dx:  '54px', dy:   '0px' },
+    { dx: '-38px', dy:  '38px' },
+    { dx:  '38px', dy:  '38px' },
+    { dx:   '0px', dy: '-54px' },
+    { dx:   '0px', dy:  '48px' },
+];
+
 export default function TodoList({
     currentSubheading,
     onAddTodo,
@@ -11,6 +23,7 @@ export default function TodoList({
     const [title, setTitle] = useState('');
     const [dueDate, setDueDate] = useState('');
     const [removingTodoIds, setRemovingTodoIds] = useState(() => new Set());
+    const [confettiIds, setConfettiIds] = useState(() => new Set());
     const removalTimersRef = useRef(new Map());
     const addingTodoRef = useRef(false);
 
@@ -28,21 +41,23 @@ export default function TodoList({
         onToggleTodoCompletion(currentSubheading.id, todo.id);
 
         if (isCompleting) {
-            setRemovingTodoIds((prev) => {
-                const next = new Set(prev);
-                next.add(todo.id);
-                return next;
-            });
+            // Play confetti immediately
+            setConfettiIds((prev) => { const next = new Set(prev); next.add(todo.id); return next; });
 
+            // After confetti finishes (650ms), start the height-collapse
+            const confettiDone = setTimeout(() => {
+                setConfettiIds((prev) => { const next = new Set(prev); next.delete(todo.id); return next; });
+                setRemovingTodoIds((prev) => { const next = new Set(prev); next.add(todo.id); return next; });
+            }, 650);
+            removalTimersRef.current.set(todo.id + '-confetti', confettiDone);
+
+            // Delete from state after confetti (650ms) + collapse transition (550ms)
             const timerId = setTimeout(() => {
                 onDeleteTodo(currentSubheading.id, todo.id);
                 removalTimersRef.current.delete(todo.id);
-                setRemovingTodoIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(todo.id);
-                    return next;
-                });
-            }, 1500);
+                removalTimersRef.current.delete(todo.id + '-confetti');
+                setRemovingTodoIds((prev) => { const next = new Set(prev); next.delete(todo.id); return next; });
+            }, 1200);
 
             removalTimersRef.current.set(todo.id, timerId);
         } else {
@@ -51,6 +66,12 @@ export default function TodoList({
                 clearTimeout(timerId);
                 removalTimersRef.current.delete(todo.id);
             }
+            const confettiTimer = removalTimersRef.current.get(todo.id + '-confetti');
+            if (confettiTimer) {
+                clearTimeout(confettiTimer);
+                removalTimersRef.current.delete(todo.id + '-confetti');
+            }
+            setConfettiIds((prev) => { const next = new Set(prev); next.delete(todo.id); return next; });
             setRemovingTodoIds((prev) => {
                 const next = new Set(prev);
                 next.delete(todo.id);
@@ -109,7 +130,9 @@ export default function TodoList({
                     onChange={(event) => setDueDate(event.target.value)}
                 />
                 <button type="button" className="todo-add-btn" onClick={handleAdd} disabled={!title.trim()}>
-                    Add
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 1.5V12.5M1.5 7H12.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
                 </button>
             </form>
 
@@ -124,6 +147,22 @@ export default function TodoList({
                                 removingTodoIds.has(todo.id) ? 'removing' : ''
                             }`}
                         >
+                            {confettiIds.has(todo.id) && (
+                                <div className="confetti-burst" aria-hidden="true">
+                                    {CONFETTI_DIRS.map((dir, i) => (
+                                        <span
+                                            key={i}
+                                            className="confetti-dot"
+                                            style={{
+                                                '--dx': dir.dx,
+                                                '--dy': dir.dy,
+                                                background: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+                                                animationDelay: `${i * 25}ms`,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                             <input
                                 type="checkbox"
                                 checked={todo.completed}

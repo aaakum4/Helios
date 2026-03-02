@@ -14,6 +14,7 @@
 .main-screen-content {
   flex: 1;
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -275,8 +276,9 @@ html[data-glow="pink"] .app-container {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease;
   z-index: 50;
+  transform-origin: center center;
 }
 
 .back-button--hidden {
@@ -291,7 +293,7 @@ html[data-glow="pink"] .app-container {
 }
 
 .back-button:active {
-  transform: scale(0.95);
+  /* transform handled by Framer Motion whileTap */
 }
 
 .back-arrow {
@@ -326,4 +328,93 @@ html[data-theme="dark"] .back-button:hover {
 
 .nodes-container::-webkit-scrollbar-thumb:hover {
   background: var(--muted);
+}
+
+/* ── Time-of-day gradient tints ───────────────────────────────────── */
+.main-screen[data-tod="dawn"] {
+  --tod-a: rgba(100, 130, 220, 0.07);
+  --tod-b: rgba(160, 140, 255, 0.04);
+}
+.main-screen[data-tod="morning"] {
+  --tod-a: rgba(120, 160, 240, 0.05);
+  --tod-b: rgba(180, 210, 255, 0.03);
+}
+.main-screen[data-tod="midday"] {
+  --tod-a: rgba(200, 215, 255, 0.03);
+  --tod-b: transparent;
+}
+.main-screen[data-tod="evening"] {
+  --tod-a: rgba(255, 160, 70, 0.07);
+  --tod-b: rgba(255, 110, 50, 0.04);
+}
+.main-screen[data-tod="night"] {
+  --tod-a: rgba(60, 75, 150, 0.06);
+  --tod-b: rgba(30, 40, 100, 0.04);
+}
+
+/* ── Ambient layer: slow gradient drift + time-of-day tint ────────── */
+.ambient-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  background: linear-gradient(
+    135deg,
+    var(--tod-a, transparent) 0%,
+    transparent 45%,
+    var(--tod-b, transparent) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientDrift 90s ease-in-out infinite;
+  transition: background-color 120s ease;
+  border-radius: inherit;
+}
+
+@keyframes gradientDrift {
+  0%   { background-position: 0%   0%;   }
+  25%  { background-position: 100% 10%;  }
+  50%  { background-position: 90%  100%; }
+  75%  { background-position: 5%   90%;  }
+  100% { background-position: 0%   0%;   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-layer {
+    animation: none;
+  }
+}
+
+/* ── Vignette: soft darkening towards edges ───────────────────────── */
+.vignette-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 201;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
+}
+
+html[data-theme="dark"] .vignette-overlay {
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+}
+
+/* ── Grain overlay: subtle film-grain texture at 2% opacity ──────── */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 202;
+  opacity: 0.02;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
 }

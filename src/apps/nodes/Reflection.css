@@ -154,6 +154,10 @@
     transform: translateY(-1px);
 }
 
+html[data-theme="dark"] .reflection-btn--primary {
+    color: var(--bg);
+}
+
 .reflection-btn--primary:active {
     transform: translateY(0);
 }
@@ -168,6 +172,8 @@
     opacity: 1;
     transform: translateY(0);
 }
+
+
 
 .reflection-btn--secondary {
     background: var(--surface);

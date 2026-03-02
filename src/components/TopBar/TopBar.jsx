@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from 'framer-motion';
 import "./TopBar.css";
 
 export default function TopBar({ 
@@ -28,12 +29,15 @@ export default function TopBar({
       </div>
 
       <div className="right-area">
-        <button
+        <motion.button
           className="settings-cog"
           onClick={onSettingsClick}
+          whileHover={{ rotate: 55, scale: 1.15 }}
+          whileTap={{ scale: 0.88 }}
+          transition={{ type: "spring", stiffness: 900, damping: 28 }}
         >
           􀣋
-        </button>
+        </motion.button>
       </div>
     </div>
   );

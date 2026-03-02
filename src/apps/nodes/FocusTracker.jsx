@@ -431,7 +431,10 @@ const todaySessionTotals = useMemo(() => {
             className="focus-tracker-btn focus-tracker-btn--primary"
             onClick={() => setShowCreateModal(true)}
           >
-            + New Subject
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }}>
+              <path d="M6.5 1.5V11.5M1.5 6.5H11.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            New Subject
           </button>
         </div>
       </div>
@@ -592,6 +595,9 @@ const todaySessionTotals = useMemo(() => {
                   type="submit"
                   disabled={!newSubjectName.trim()}
                 >
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }}>
+                    <path d="M6.5 1.5V11.5M1.5 6.5H11.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
                   Create
                 </button>
               </div>

@@ -2,11 +2,18 @@ import React, { useEffect, useState } from "react";
 import "./SettingsModal.css";
 import { useLocalStorage } from "../../../core/useLocalStorage";
 import { getStoredThemeMode, setThemeMode as applyThemeMode } from "../../../core/theme";
+import { PALETTES, getStoredPalette, applyPalette } from "../../../core/palette";
 
 export default function SettingsModal({ onClose }) {
   const [themeMode, setThemeMode] = useLocalStorage("settings:themeMode", () => getStoredThemeMode());
   const [glowColor, setGlowColor] = useLocalStorage("settings:glowColor", "none");
   const [soundEnabled, setSoundEnabled] = useLocalStorage("settings:soundEnabled", true);
+  const [palette, setPaletteState] = useState(() => getStoredPalette());
+
+  const handlePaletteChange = (id) => {
+    setPaletteState(id);
+    applyPalette(id);
+  };
 
   useEffect(() => {
     applyThemeMode(themeMode);
@@ -62,6 +69,25 @@ export default function SettingsModal({ onClose }) {
                     </div>
                 </div>
                 
+                <div className="settings-section palette-label-section">
+                    <label>Color palette</label>
+                </div>
+
+                <div className="palette-options">
+                    {PALETTES.map(({ id, label, swatch }) => (
+                        <button
+                            key={id}
+                            title={label}
+                            className={`palette-swatch ${palette === id ? "is-active" : ""}`}
+                            style={swatch ? { "--swatch": swatch } : { "--swatch": "#888888" }}
+                            onClick={() => handlePaletteChange(id)}
+                        >
+                            <span className={`palette-swatch-dot${!swatch ? " palette-swatch-dot--default" : ""}`} />
+                            <span className="palette-swatch-label">{label}</span>
+                        </button>
+                    ))}
+                </div>
+
                 <div className="settings-section glow-label-section">
                     <label>Window glow</label>
                 </div>

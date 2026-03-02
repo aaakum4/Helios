@@ -457,7 +457,7 @@ export default function Reflection() {
                             <div className="journal-footer">
                                 <p className="journal-date">Today</p>
                                 <button
-                                    className={`reflection-btn reflection-btn--primary ${journalFeedback ? 'reflection-btn--success' : ''}`}
+                                    className={`reflection-btn reflection-btn--primary${journalFeedback ? ' reflection-btn--success' : ''}`}
                                     onClick={handleJournalSubmit}
                                     type="button"
                                 >

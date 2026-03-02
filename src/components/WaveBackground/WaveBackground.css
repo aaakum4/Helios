@@ -1,0 +1,66 @@
+/* ─────────────────────────────────────────────
+   WaveBackground
+   Three layered SVG waves at the bottom of the
+   screen. Fills inherit --accent so every palette
+   is supported automatically.
+───────────────────────────────────────────── */
+
+.wave-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* ── Shared SVG base ── */
+.wave-svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  /* Double-width: the 2880-unit viewBox tile repeats once, letting
+     translateX(-50%) animate seamlessly back to the start. */
+  width: 200%;
+  height: 100%;
+  will-change: transform;
+}
+
+/* ── Layer 1 – lowest / darkest ── */
+.wave-svg--1 {
+  opacity: 0.11;
+  animation: waveDrift 38s linear infinite;
+}
+
+/* ── Layer 2 – middle ── */
+.wave-svg--2 {
+  opacity: 0.07;
+  /* Drift in the opposite direction for gentle counter-motion */
+  animation: waveDriftReverse 28s linear infinite;
+}
+
+/* ── Layer 3 – highest / lightest ── */
+.wave-svg--3 {
+  opacity: 0.045;
+  animation: waveDrift 22s linear infinite;
+}
+
+/* ── Keyframes ── */
+@keyframes waveDrift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes waveDriftReverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Respect reduced-motion preference ── */
+@media (prefers-reduced-motion: reduce) {
+  .wave-svg {
+    animation: none;
+  }
+}

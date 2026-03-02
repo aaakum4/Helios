@@ -1,11 +1,26 @@
+import { motion } from 'framer-motion';
 import './nodes.css';
 
 export default function NodeFullScreen({ node, onClose }) {
   const isPeacefulDisplay = node.id === 'peacefulDisplay';
 
   return (
-    <div className="node-fullscreen-overlay" onClick={onClose}>
-      <div className="node-fullscreen-container" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="node-fullscreen-overlay"
+      onClick={onClose}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 1 }}
+      transition={{ duration: 0 }}
+    >
+      <motion.div
+        className="node-fullscreen-container"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 1, scale: 1, y: 0 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0 }}
+      >
         {!isPeacefulDisplay && (
           <div className="node-fullscreen-header">
             <div className="node-fullscreen-title-group">
@@ -40,7 +55,7 @@ export default function NodeFullScreen({ node, onClose }) {
         <div className="node-fullscreen-content">
             <node.component />
           </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

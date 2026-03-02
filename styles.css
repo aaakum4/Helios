@@ -7,30 +7,53 @@ html {
     height: 100vh;
     width: 100vw;
     overflow: clip;
-    --bg: #f5f5f5;
-    --text: #000000;
-    --border: #e0e0e0;
-    --surface: #ffffff;
-    --muted: #999999;
-    --top-bar-bg: #ffffff;
+
+    /* ── Neutral base (light) — palette rules override these ── */
+    --bg:           #f5f5f5;
+    --text:         #1a1a1a;
+    --border:       #e0e0e0;
+    --surface:      #ffffff;
+    --muted:        #888888;
+    --top-bar-bg:   #ffffff;
+
+    --accent:       #555555;
+    --accent-soft:  #eeeeee;
+    --accent-2:     #f5a76c;
+    --accent-2-soft:#fff1e6;
+    --success:      #5bbf8f;
+    --danger:       #e07070;
 }
 
 html[data-theme="light"] {
-    --bg: #f5f5f5;
-    --text: #000000;
-    --border: #e0e0e0;
-    --surface: #ffffff;
-    --muted: #999999;
-    --top-bar-bg: #ffffff;
+    --bg:           #f5f5f5;
+    --text:         #1a1a1a;
+    --border:       #e0e0e0;
+    --surface:      #ffffff;
+    --muted:        #888888;
+    --top-bar-bg:   #ffffff;
+
+    --accent:       #555555;
+    --accent-soft:  #eeeeee;
+    --accent-2:     #f5a76c;
+    --accent-2-soft:#fff1e6;
+    --success:      #5bbf8f;
+    --danger:       #e07070;
 }
 
 html[data-theme="dark"] {
-    --bg: #444444;
-    --text: #ffffff;
-    --border: #666666;
-    --surface: #4a4a4a;
-    --muted: #b0b0b0;
-    --top-bar-bg: #2a2a2a;
+    --bg:           #1a1a1a;
+    --text:         #f0f0f0;
+    --border:       #333333;
+    --surface:      #242424;
+    --muted:        #888888;
+    --top-bar-bg:   #111111;
+
+    --accent:       #aaaaaa;
+    --accent-soft:  #2a2a2a;
+    --accent-2:     #f5a76c;
+    --accent-2-soft:#2a2010;
+    --success:      #5bbf8f;
+    --danger:       #e07070;
 }
 
 body {
@@ -43,4 +66,165 @@ body {
 #root {
     width: 100%;
     height: 100%; 
+}
+
+/* ══════════════════════════════════════════
+   COLOR PALETTES  (data-palette on <html>)
+   "default" palette has no rules — neutral
+   gray base from data-theme shows through.
+   All other palettes override every var.
+══════════════════════════════════════════ */
+
+/* ── Purple ── */
+html[data-palette="purple"] {
+    --bg:           #f7f4ff;
+    --text:         #2d2640;
+    --border:       #e2d9f3;
+    --surface:      #ffffff;
+    --muted:        #9e8fb8;
+    --top-bar-bg:   #ffffff;
+    --accent:       #7c5cbf;
+    --accent-soft:  #ede8ff;
+}
+html[data-palette="purple"][data-theme="dark"] {
+    --bg:           #1e1b2e;
+    --text:         #f0ecff;
+    --border:       #3d3560;
+    --surface:      #2a2640;
+    --muted:        #8a7faa;
+    --top-bar-bg:   #16131f;
+    --accent:       #a07ee8;
+    --accent-soft:  #2e2550;
+}
+
+/* ── Blue ── */
+html[data-palette="blue"] {
+    --bg:           #f4f6ff;
+    --text:         #1a2040;
+    --border:       #d5dcf5;
+    --surface:      #ffffff;
+    --muted:        #7a8ab0;
+    --top-bar-bg:   #ffffff;
+    --accent:       #3b6fd4;
+    --accent-soft:  #deeaff;
+}
+html[data-palette="blue"][data-theme="dark"] {
+    --bg:           #181c2e;
+    --text:         #e8eeff;
+    --border:       #2a3050;
+    --surface:      #1e2438;
+    --muted:        #6878a8;
+    --top-bar-bg:   #12151f;
+    --accent:       #6b9fff;
+    --accent-soft:  #1a2a4a;
+}
+
+/* ── Sky Blue ── */
+html[data-palette="sky"] {
+    --bg:           #f2f9fd;
+    --text:         #1a3040;
+    --border:       #cce9f5;
+    --surface:      #ffffff;
+    --muted:        #6a9ab0;
+    --top-bar-bg:   #ffffff;
+    --accent:       #0ea5d0;
+    --accent-soft:  #d8f5ff;
+}
+html[data-palette="sky"][data-theme="dark"] {
+    --bg:           #141e26;
+    --text:         #e0f4ff;
+    --border:       #1e3445;
+    --surface:      #182230;
+    --muted:        #4a8aaa;
+    --top-bar-bg:   #0e161e;
+    --accent:       #38c6e8;
+    --accent-soft:  #0d2a38;
+}
+
+/* ── Orange ── */
+html[data-palette="orange"] {
+    --bg:           #fdf8f2;
+    --text:         #3a2010;
+    --border:       #f0dcc5;
+    --surface:      #ffffff;
+    --muted:        #b08060;
+    --top-bar-bg:   #ffffff;
+    --accent:       #e07b30;
+    --accent-soft:  #fff0de;
+}
+html[data-palette="orange"][data-theme="dark"] {
+    --bg:           #231810;
+    --text:         #fff0de;
+    --border:       #402810;
+    --surface:      #2e2015;
+    --muted:        #906040;
+    --top-bar-bg:   #180f08;
+    --accent:       #f5a050;
+    --accent-soft:  #3a1e00;
+}
+
+/* ── Pink ── */
+html[data-palette="pink"] {
+    --bg:           #fdf4f8;
+    --text:         #3a1028;
+    --border:       #f0cce0;
+    --surface:      #ffffff;
+    --muted:        #b07090;
+    --top-bar-bg:   #ffffff;
+    --accent:       #d44f8f;
+    --accent-soft:  #ffe0f2;
+}
+html[data-palette="pink"][data-theme="dark"] {
+    --bg:           #221018;
+    --text:         #ffe0f2;
+    --border:       #401030;
+    --surface:      #2c1520;
+    --muted:        #905070;
+    --top-bar-bg:   #160a10;
+    --accent:       #f080be;
+    --accent-soft:  #3a0a20;
+}
+
+/* ── Green ── */
+html[data-palette="green"] {
+    --bg:           #f3faf6;
+    --text:         #102818;
+    --border:       #c8e8d5;
+    --surface:      #ffffff;
+    --muted:        #5a9870;
+    --top-bar-bg:   #ffffff;
+    --accent:       #3a9e6c;
+    --accent-soft:  #ddf5eb;
+}
+html[data-palette="green"][data-theme="dark"] {
+    --bg:           #111e16;
+    --text:         #ddf5eb;
+    --border:       #1a3525;
+    --surface:      #162a1e;
+    --muted:        #4a7858;
+    --top-bar-bg:   #0c1610;
+    --accent:       #5fc48a;
+    --accent-soft:  #0d2e1c;
+}
+
+/* ── Red ── */
+html[data-palette="red"] {
+    --bg:           #fdf4f4;
+    --text:         #3a1010;
+    --border:       #f0cccc;
+    --surface:      #ffffff;
+    --muted:        #b07070;
+    --top-bar-bg:   #ffffff;
+    --accent:       #c94040;
+    --accent-soft:  #ffe0e0;
+}
+html[data-palette="red"][data-theme="dark"] {
+    --bg:           #221010;
+    --text:         #ffe0e0;
+    --border:       #401010;
+    --surface:      #2c1515;
+    --muted:        #905050;
+    --top-bar-bg:   #160808;
+    --accent:       #e87070;
+    --accent-soft:  #2e0a0a;
 }

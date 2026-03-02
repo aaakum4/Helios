@@ -41,7 +41,13 @@
   outline: none;
   font-size: 14px;
   background: #f8f8f8;
-  transition: background 250ms ease, border-color 250ms ease;
+  transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+.top-input:hover:not(:focus) {
+  border-color: #aaaaaa;
+  background: #f2f2f2;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .top-input:focus {
@@ -68,7 +74,7 @@ html[data-theme="dark"] .top-input:focus {
   user-select: none;
   opacity: 0.8;
   color: #222;
-  transition: transform 0.15s ease, opacity 0.15s ease, color 250ms ease;
+  transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.15s ease, color 250ms ease;
   padding: 0;
   font-family: 'SF Pro';
 }
@@ -78,7 +84,7 @@ html[data-theme="dark"] .settings-cog {
 }
 
 .settings-cog:hover {
-  transform: scale(1.1);
+  transform: rotate(180deg) scale(1.05);
   opacity: 1;
 }
 

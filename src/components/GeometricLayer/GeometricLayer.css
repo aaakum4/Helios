@@ -1,0 +1,70 @@
+/* ── Container ─────────────────────────────────────────────────────── */
+.geo-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
+
+  /* Default opacity — overridden per time-of-day below */
+  --geo-opacity: 0.055;
+  --geo-fill-opacity: 0.04;
+}
+
+/* ── Time-of-day opacity tuning ────────────────────────────────────── */
+.geo-layer[data-tod="dawn"]    { --geo-opacity: 0.06;  --geo-fill-opacity: 0.045; }
+.geo-layer[data-tod="morning"] { --geo-opacity: 0.05;  --geo-fill-opacity: 0.035; }
+.geo-layer[data-tod="midday"]  { --geo-opacity: 0.04;  --geo-fill-opacity: 0.03;  }
+.geo-layer[data-tod="evening"] { --geo-opacity: 0.07;  --geo-fill-opacity: 0.055; }
+.geo-layer[data-tod="night"]   { --geo-opacity: 0.08;  --geo-fill-opacity: 0.065; }
+
+/* ── Shared shape base ─────────────────────────────────────────────── */
+.geo-shape {
+  position: absolute;
+  overflow: visible;
+}
+
+/* ── Shape 1: Rounded hexagon — top-right ─────────────────────────── */
+.geo-shape--hex {
+  width: 340px;
+  height: 390px;
+  top: -80px;
+  right: -60px;
+  opacity: var(--geo-opacity);
+  animation: geoSlowSpin 60s linear infinite;
+  transform-origin: center center;
+}
+
+/* ── Shape 2: Soft square — top-middle-left ───────────────────────── */
+.geo-shape--square {
+  width: 260px;
+  height: 260px;
+  top: 18%;
+  left: -70px;
+  opacity: var(--geo-fill-opacity);
+  transform: rotate(22deg);
+  animation: geoDrift 28s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+
+/* ── Animations ────────────────────────────────────────────────────── */
+
+/* Very slow rotation — 1 full turn in 60s */
+@keyframes geoSlowSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Gentle vertical drift ±5px */
+@keyframes geoDrift {
+  from { transform: rotate(22deg) translateY(0px); }
+  to   { transform: rotate(22deg) translateY(-8px); }
+}
+
+/* ── Respect reduced-motion preference ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .geo-shape {
+    animation: none;
+  }
+}

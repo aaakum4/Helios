@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import TopBar from "../TopBar/TopBar";
 import SettingsModal from "./Settings/SettingsModal";
 import { nodes } from "../../apps/nodes/index";
@@ -6,6 +7,9 @@ import NodeCard from "../../apps/nodes/NodeCard";
 import NodeFullScreen from "../../apps/nodes/NodeFullScreen";
 import SidePanel from "../SidePanel/SidePanel";
 import { useLocalStorage } from "../../core/useLocalStorage";
+import { useTime } from "../../core/TimeProvider";
+import WaveBackground from "../WaveBackground/WaveBackground";
+import GeometricLayer from "../GeometricLayer/GeometricLayer";
 import "./MainScreen.css";
 
 const MAX_CHARS = 50;
@@ -150,6 +154,16 @@ export default function MainScreen({ onBack }) {
     return null;
   };
 
+  const { time } = useTime();
+  const timeOfDay = (() => {
+    const h = time.getHours();
+    if (h >= 4 && h < 8)  return 'dawn';
+    if (h >= 8 && h < 12) return 'morning';
+    if (h >= 12 && h < 16) return 'midday';
+    if (h >= 16 && h < 20) return 'evening';
+    return 'night';
+  })();
+
   const [todosData, setTodosData] = useLocalStorage("todosData", {
     subheadings: [
       {
@@ -219,19 +233,22 @@ export default function MainScreen({ onBack }) {
 
   return (
     <div className="app-container">
-      <div className="main-screen">
+      <div className="main-screen" data-tod={timeOfDay}>
         {!activeNodeId && (
-            <button
+            <motion.button
               className={
                 panelState === "expanded"
                   ? "back-button back-button--hidden"
                   : "back-button"
               }
               onClick={onBack}
+              whileHover={{ x: -3, scale: 1.05 }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 340, damping: 22 }}
             >
             <span className="back-arrow">←</span>
             Back
-          </button>
+          </motion.button>
         )}
 
         <TopBar
@@ -286,12 +303,26 @@ export default function MainScreen({ onBack }) {
           />
         </div>
 
-        {activeNode && (
-          <NodeFullScreen
-            node={activeNode}
-            onClose={() => setActiveNodeId(null)}
-          />
-        )}
+        <AnimatePresence>
+          {activeNode && (
+            <NodeFullScreen
+              key={activeNode.id}
+              node={activeNode}
+              onClose={() => setActiveNodeId(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Geometric depth layer — large shapes, very low opacity */}
+        <GeometricLayer tod={timeOfDay} />
+
+        {/* Wave background — sits at bottom, pointer-events: none */}
+        <WaveBackground />
+
+        {/* Atmospheric overlays — pointer-events: none so they never block interaction */}
+        <div className="ambient-layer" />
+        <div className="vignette-overlay" />
+        <div className="grain-overlay" />
       </div>
     </div>
   );

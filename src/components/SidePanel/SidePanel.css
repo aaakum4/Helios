@@ -201,7 +201,7 @@
 
 .side-panel__quick-input:focus {
     outline: none;
-    border-color: #4a90e2;
+    border-color: var(--accent);
 }
 
 .side-panel__add-btn {
@@ -210,7 +210,7 @@
     font-size: 0.9rem;
     font-weight: 600;
     color: white;
-    background: linear-gradient(135deg, #4a90e2, #357adb);
+    background: var(--accent);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -223,6 +223,10 @@
 
 .side-panel__add-btn:active {
     transform: scale(0.98);
+}
+
+html[data-theme="dark"] .side-panel__add-btn {
+    color: var(--bg);
 }
 
 html[data-theme="dark"] .side-panel__tab {
@@ -290,13 +294,13 @@ html[data-theme="dark"] .side-panel__content {
 .side-panel__date-input:focus,
 .side-panel__subheading-select:focus {
     outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .side-panel__date-input:hover,
 .side-panel__subheading-select:hover {
-    border-color: rgba(74, 144, 226, 0.4);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .side-panel__subheading-select {
