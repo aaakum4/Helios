@@ -4,9 +4,7 @@
      <p>The control room organising your future.</p>
      </div>
      <br>
-     <picture>
-     ...
-    </picture>
+     <img width="1486" height="1016" alt="Screenshot 2026-03-01 at 12 48 10 pm" src="https://github.com/user-attachments/assets/6bdc17be-81a2-4f20-a600-f3066e683df7" />
 </div>
 
 ---
@@ -19,48 +17,47 @@ In my final year of school, juggling assessments, homework, deadlines, and study
 ---
 
 > [!NOTE]
-> Helios is in an early beta stage. If you encounter any issues, please report them too [our issue tracker](https://github.com/aaakum4/Helios/issues/new).
+> Helios is in an early beta stage. If you encounter any issues and something you think should be added/changed, please report them too [our issue tracker](https://github.com/aaakum4/Helios/issues/new).
 
-## Download
+## Access
 
-Builds are generated automatically upon [release]().
-
--   [macOS (Intel)]()
--   [macOS (Apple Silicon)]()
--   [Windows]()
--   [Linux (rpm)]()
--   [Linux (tar.gz)]()
--   [Linux (deb)]()
+Demo
+Live App: https://helios-sigma.vercel.app/
 
 ## Roadmap
 
 Before the first stable release, I would like the following features to be implemented:
 
 - [x] An app logo
-- [ ] An easy to use UI
-- [ ] Creation of timetables
-- [ ] Timetables sync to a calendar
-- [ ] To-do list
-- [ ] File access (for quick access to syllabus documents, and more...)
+- [x] An easy to use UI
+- [x] Creation of timetables
+- [x] To-do list
+- [x] All other nodes functional and operational
+- [x] User friendly
+- [x] Nodes work with each other
 - [ ] ...
 
-## Buidling
+### Known Limitations
+
+- No account system yet
+- Data stored locally in browser
+- Not optimised for mobile
+- Some features may reset
 
 ### Prerequisites
 
-- ?
-- ?
-- ?
+None — just:
+- A modern browser (Chrome, Edge, Safari, Firefox)
+- Internet connection
 
-### Instructions
-
-???
+That’s it.
 
 ## Using Helios
 
 Please refer to the [Getting Started]() tutorial.
+NONE YET!
 
 ## Licensing
 All files, unless otherwise stated, are licensed under the Lesser GPL v3.0 or later. A copy of the license can be found in the `LICENSE` file.
 
-All assets which contain [Helios brand images]() are property of the Rela organisation and may not be used without permission.
+All assets which contain [Helios brand images]() are property of the Helios organisation and may not be used without permission.
