@@ -10,13 +10,13 @@ export default function UnsupportedScreen({ visible = false, minWidth = 1230, mi
       <div className="unsupported-content">
         <h1 className="unsupported-heading">Helios</h1>
         <p className="unsupported-message">
-          Helios needs at least {minWidth}px width and {minHeight}px height for this display.
+          Helios requires at least {minWidth}px and {minHeight}px for this display.
           <br />
           <br />
-          Increase the window size to continue.
+          Please increase the window size to continue, or use ⌘ - (Mac) / Ctrl - (Windows) to adjust the zoom temporarily.
           <br />
           <br />
-          Sorry for the inconvenience! We're working on improving this experience in a future update.
+          Sorry for the inconvenience — we're working on improving this in a future update.
         </p>
       </div>
     </div>
