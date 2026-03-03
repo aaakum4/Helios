@@ -9,14 +9,15 @@ import { initializePalette } from "./core/palette";
 import { useWindowWidth } from "./hooks/useWindowWidth";
 
 // Fallback for Electron environments without windowApi (e.g., web builds)
-const DEFAULT_MIN_WIDTH = 1320;
-const DEFAULT_MIN_HEIGHT = 850;
+const DEFAULT_MIN_WIDTH = 1230;
+const DEFAULT_MIN_HEIGHT = 815;
 
 export default function App() {
   const [launched, setLaunched] = useState(false);
   const [minWidth, setMinWidth] = useState(DEFAULT_MIN_WIDTH);
   const [minHeight, setMinHeight] = useState(DEFAULT_MIN_HEIGHT);
   const { width, height } = useWindowWidth();
+  const isUnsupportedSize = width < minWidth || height < minHeight;
 
   useEffect(() => {
     initializeTheme();
@@ -43,8 +44,13 @@ export default function App() {
     let unsubscribe;
     if (window.windowApi) {
       unsubscribe = window.windowApi.onMinSizeChanged(({ minWidth: mw, minHeight: mh }) => {
-        setMinWidth(mw);
-        setMinHeight(mh);
+        if (typeof mw === "number") {
+          setMinWidth(mw);
+        }
+
+        if (typeof mh === "number") {
+          setMinHeight(mh);
+        }
       });
     }
 
@@ -53,17 +59,20 @@ export default function App() {
     };
   }, []);
 
-  if (width < minWidth || height < minHeight) {
-    return <UnsupportedScreen minWidth={minWidth} minHeight={minHeight} />;
-  }
-
   return (
     <ErrorBoundary>
-      {!launched ? (
-        <StartupScreen onLaunch={() => setLaunched(true)} />
-      ) : (
-        <MainScreen onBack={() => setLaunched(false)} />
-      )}
+      <div className={`app-shell ${isUnsupportedSize ? "app-shell--unsupported" : ""}`}>
+        {!launched ? (
+          <StartupScreen onLaunch={() => setLaunched(true)} />
+        ) : (
+          <MainScreen onBack={() => setLaunched(false)} />
+        )}
+        <UnsupportedScreen
+          visible={isUnsupportedSize}
+          minWidth={minWidth}
+          minHeight={minHeight}
+        />
+      </div>
     </ErrorBoundary>
   );
 }

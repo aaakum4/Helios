@@ -32,7 +32,15 @@ contextBridge.exposeInMainWorld("windowApi", {
 			return () => {};
 		}
 
-		const handler = (_event, payload) => callback(payload);
+		const handler = (_event, payload) => {
+			callback({
+				minWidth: payload?.minWidth,
+				minHeight: payload?.minHeight,
+				displayId: payload?.displayId,
+				displayWidth: payload?.displayWidth,
+				displayHeight: payload?.displayHeight,
+			});
+		};
 		ipcRenderer.on("window:min-size-changed", handler);
 
 		return () => {
