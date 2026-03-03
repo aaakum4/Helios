@@ -233,7 +233,7 @@
   min-height: 750px;
   margin: 0;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 0px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   background: var(--surface);
   overflow: hidden;
