@@ -9,8 +9,8 @@ import { initializePalette } from "./core/palette";
 import { useWindowWidth } from "./hooks/useWindowWidth";
 
 // Fallback for Electron environments without windowApi (e.g., web builds)
-const DEFAULT_MIN_WIDTH = 1230;
-const DEFAULT_MIN_HEIGHT = 815;
+const DEFAULT_MIN_WIDTH = 1024;
+const DEFAULT_MIN_HEIGHT = 700;
 
 export default function App() {
   const [launched, setLaunched] = useState(false);

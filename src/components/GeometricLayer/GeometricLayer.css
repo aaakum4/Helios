@@ -8,16 +8,16 @@
   overflow: hidden;
 
   /* Default opacity — overridden per time-of-day below */
-  --geo-opacity: 0.055;
-  --geo-fill-opacity: 0.04;
+  --geo-opacity: 0.12;
+  --geo-fill-opacity: 0.09;
 }
 
 /* ── Time-of-day opacity tuning ────────────────────────────────────── */
-.geo-layer[data-tod="dawn"]    { --geo-opacity: 0.06;  --geo-fill-opacity: 0.045; }
-.geo-layer[data-tod="morning"] { --geo-opacity: 0.05;  --geo-fill-opacity: 0.035; }
-.geo-layer[data-tod="midday"]  { --geo-opacity: 0.04;  --geo-fill-opacity: 0.03;  }
-.geo-layer[data-tod="evening"] { --geo-opacity: 0.07;  --geo-fill-opacity: 0.055; }
-.geo-layer[data-tod="night"]   { --geo-opacity: 0.08;  --geo-fill-opacity: 0.065; }
+.geo-layer[data-tod="dawn"]    { --geo-opacity: 0.13;  --geo-fill-opacity: 0.1;  }
+.geo-layer[data-tod="morning"] { --geo-opacity: 0.11;  --geo-fill-opacity: 0.08; }
+.geo-layer[data-tod="midday"]  { --geo-opacity: 0.1;   --geo-fill-opacity: 0.07; }
+.geo-layer[data-tod="evening"] { --geo-opacity: 0.14;  --geo-fill-opacity: 0.11; }
+.geo-layer[data-tod="night"]   { --geo-opacity: 0.16;  --geo-fill-opacity: 0.13; }
 
 /* ── Shared shape base ─────────────────────────────────────────────── */
 .geo-shape {

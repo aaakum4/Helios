@@ -125,14 +125,6 @@ export default function MainScreen({ onBack }) {
   const handlePanelToggle = () => {
     setPanelState((prev) => (prev === 'expanded' ? 'hidden' : 'expanded'));
   };
-  
-  const handlePanelHover = (isHovering) => {
-    if (panelState === 'hidden' && isHovering) {
-      setPanelState('peek');
-    } else if (panelState === 'peek' && !isHovering) {
-      setPanelState('hidden');
-    }
-  };
 
   const sortedNodes = nodeOrder
     .map((id) => nodes.find((n) => n.id === id))
@@ -297,7 +289,6 @@ export default function MainScreen({ onBack }) {
           <SidePanel
             state={panelState}
             onToggle={handlePanelToggle}
-            onHover={handlePanelHover}
             onQuickAddTodo={handleQuickAddTodo}
             subheadings={todosData.subheadings}
           />

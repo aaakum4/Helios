@@ -7,16 +7,16 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 // Soft linear scaling model baseline.
 const BASE_DISPLAY_WIDTH = 1800;
 const BASE_DISPLAY_HEIGHT = 1169;
-const BASE_MIN_WIDTH = 1300;
-const BASE_MIN_HEIGHT = 840;
+const BASE_MIN_WIDTH = 1100;
+const BASE_MIN_HEIGHT = 740;
 const WIDTH_SCALE_FACTOR = 70 / 288;
 const HEIGHT_SCALE_FACTOR = 25 / 187;
 
 // Clamps for computed minimum window size.
-const MIN_WIDTH_CLAMP = 1230;
-const MAX_WIDTH_CLAMP = 1320;
-const MIN_HEIGHT_CLAMP = 815;
-const MAX_HEIGHT_CLAMP = 860;
+const MIN_WIDTH_CLAMP = 1024;
+const MAX_WIDTH_CLAMP = 1180;
+const MIN_HEIGHT_CLAMP = 700;
+const MAX_HEIGHT_CLAMP = 800;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(value, max));
@@ -116,8 +116,8 @@ function createWindow() {
   const minHeight = BASE_MIN_HEIGHT;
   
   // Ensure initial dimensions are at least the computed minimum
-  const initialWidth = Math.max(1200, minWidth);
-  const initialHeight = Math.max(800, minHeight);
+  const initialWidth = Math.max(1024, minWidth);
+  const initialHeight = Math.max(700, minHeight);
   
   const win = new BrowserWindow({
     width: initialWidth,

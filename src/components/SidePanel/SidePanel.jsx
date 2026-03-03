@@ -4,7 +4,7 @@ import { useTime } from "../../core/TimeProvider";
 import { useAppContext } from "../../core/AppContext";
 import "./SidePanel.css";
 
-export default function SidePanel({ state, onToggle, onHover, onQuickAddTodo, subheadings }) {
+export default function SidePanel({ state, onToggle, onQuickAddTodo, subheadings }) {
     const [quickInput, setQuickInput] = useState("");
     const [selectedSubheadingId, setSelectedSubheadingId] = useState("inbox-default");
     const [dueDate, setDueDate] = useState("");
@@ -101,16 +101,35 @@ return (
         <motion.button
             className="side-panel__tab"
             onClick={onToggle}
-            onMouseEnter={() => onHover(true)}
-            onMouseLeave={() => onHover(false)}
             aria-label="Toggle side panel"
-            whileHover={{ scale: 1.18, x: state === 'expanded' ? 2 : -2 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 340, damping: 22 }}
+            whileHover={{ 
+                scale: 1.15, 
+                x: state === 'expanded' ? 6 : 0, 
+                y: -3,
+                rotate: state === 'expanded' ? -3 : 2
+            }}
+            whileTap={{ 
+                scale: 0.92, 
+                x: state === 'expanded' ? 2 : 0,
+                y: 0,
+                rotate: 0
+            }}
+            transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 20,
+                mass: 0.8
+            }}
         >
             <span className="side-panel__tab-icon">
                 {state === 'expanded' ? '«' : '»'}
             </span>
+            <div className="side-panel__tab-glow"></div>
+            <div className="side-panel__tab-particles">
+                <span className="particle particle-1"></span>
+                <span className="particle particle-2"></span>
+                <span className="particle particle-3"></span>
+            </div>
         </motion.button>
 
                 <div className="side-panel__content">
@@ -205,9 +224,9 @@ return (
                         className={`side-panel__add-btn ${buttonState === "success" ? "side-panel__add-btn--success" : ""}`}
                         onClick={handleQuickSubmit}
                         disabled={buttonState === "success"}
-                        whileHover={buttonState !== "success" ? { scale: 1.03, y: -2 } : {}}
-                        whileTap={buttonState !== "success" ? { scale: 0.96 } : {}}
-                        transition={{ type: "spring", stiffness: 320, damping: 20 }}
+                        whileHover={buttonState !== "success" ? { y: -2, scale: 1.01 } : {}}
+                        whileTap={buttonState !== "success" ? { scale: 0.97, y: 0 } : {}}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
                         {buttonState === "success" ? "Added! ✓" : "Add to Inbox"}
                     </motion.button>

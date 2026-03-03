@@ -165,7 +165,7 @@
 /* 3-column default layout (≥900px) */
 .nodes-grid > .node-card-wrapper:nth-child(1):hover { rotate: -2deg; }   /* top-left  → lean left  */
 .nodes-grid > .node-card-wrapper:nth-child(2):hover { rotate: -1.2deg; } /* top-centre → bottom-right moves up */
-.nodes-grid > .node-card-wrapper:nth-child(3):hover { rotate: 2deg; }    /* top-right → left side goes up */
+.nodes-grid > .node-card-wrapper:nth-child(3):hover { rotate: 1deg; }    /* top-right → left side goes up */
 .nodes-grid > .node-card-wrapper:nth-child(4):hover { rotate: -1.5deg; } /* bottom-left → lean left */
 .nodes-grid > .node-card-wrapper:nth-child(5):hover { rotate: 1.2deg; }  /* bottom-centre → opposite of top-centre */
 .nodes-grid > .node-card-wrapper:nth-child(6):hover { rotate: 1.5deg; }  /* bottom-right → lean right */
@@ -227,11 +227,11 @@
 }
 
 .app-container {
-  width: 90vw;
-  height: 90vh;
-  min-width: 1215px;
-  min-height: 765px;
-  margin: 5vh auto;
+  width: 100%;
+  height: 100%;
+  min-width: 1200px;
+  min-height: 750px;
+  margin: 0;
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
