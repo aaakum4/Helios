@@ -22,7 +22,7 @@ In my final year of school, juggling assessments, homework, deadlines, and study
 ## Access
 
 Demo
-Live App: https://helios-sigma.vercel.app/
+Live App: [https://helios-sigma.vercel.app/](https://helios-app-ui.vercel.app/)
 
 ## Roadmap
 
