@@ -50,7 +50,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 1350,
+    minWidth: 1320,
     minHeight: 850,
     show: false,
     vibrancy: "sidebar",
