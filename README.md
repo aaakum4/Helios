@@ -4,7 +4,7 @@
      <p>The control room organising your future.</p>
      </div>
      <br>
-     <img width="1486" height="1016" alt="Screenshot 2026-03-01 at 12 48 10 pm" src="https://github.com/user-attachments/assets/6bdc17be-81a2-4f20-a600-f3066e683df7" />
+     <img width="1423" height="970" alt="Screenshot 2026-03-03 at 6 50 02 pm" src="https://github.com/user-attachments/assets/49e456fd-c738-41aa-8d2d-3bb5872252ee" />
 </div>
 
 ---
