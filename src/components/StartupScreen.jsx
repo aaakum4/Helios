@@ -19,8 +19,12 @@ export default function StartupScreen({ onLaunch }) {
 
   const handleClick = () => {
     setAnimate(false);
-    void document.getElementById("helios-icon").offsetWidth; 
+    void document.getElementById("helios-icon").offsetWidth;
     setAnimate(true);
+
+    window.posthog?.capture("app_launched", {
+      sound_enabled: getSoundEnabled(),
+    });
 
     setTimeout(() => {
       if (audioRef.current && getSoundEnabled()) {

@@ -215,6 +215,12 @@ export default function FocusTracker() {
             delete updated[subjectId];
             return updated;
           });
+          const subjectName = focusSubjects.find((s) => s.id === subjectId)?.name;
+          window.posthog?.capture("focus_tracker_session_stopped", {
+            subject_id: subjectId,
+            subject_name: subjectName || null,
+            elapsed_seconds: elapsed,
+          });
         } else {
           if (activeSubjectId && ftSessionSource === 'manual') {
             const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
@@ -229,6 +235,12 @@ export default function FocusTracker() {
           setSessionStartTime(Date.now());
           setSessionStartDate(currentDateKey);
           setFtSessionSource('manual');
+          const subjectName = focusSubjects.find((s) => s.id === subjectId)?.name;
+          window.posthog?.capture("focus_tracker_session_started", {
+            subject_id: subjectId,
+            subject_name: subjectName || null,
+            total_subjects: focusSubjects.length,
+          });
         }
     }
     
@@ -285,6 +297,11 @@ export default function FocusTracker() {
       setNewSubjectName('');
       setNewSubjectColor(COLORS[0]);
       setShowCreateModal(false);
+      window.posthog?.capture("focus_tracker_subject_created", {
+        subject_name: trimmedName,
+        color: newSubjectColor,
+        total_subjects: focusSubjects.length + 1,
+      });
       setTimeout(() => {
         createLockRef.current = false;
       }, 300);
@@ -308,6 +325,13 @@ export default function FocusTracker() {
             setFtSessionSource(null);
         }
 
+        const subjectName = focusSubjects.find((s) => s.id === subjectId)?.name;
+        window.posthog?.capture("focus_tracker_subject_deleted", {
+            subject_id: subjectId,
+            subject_name: subjectName || null,
+            had_historical_data: hasLogs,
+            remaining_subjects: focusSubjects.length - 1,
+        });
         setFocusSubjects((prev) => prev.filter(sub => sub.id !== subjectId));
     }
 

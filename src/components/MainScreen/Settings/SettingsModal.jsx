@@ -13,6 +13,16 @@ export default function SettingsModal({ onClose }) {
   const handlePaletteChange = (id) => {
     setPaletteState(id);
     applyPalette(id);
+    window.posthog?.capture("settings_palette_changed", {
+      palette: id,
+    });
+  };
+
+  const handleThemeChange = (value) => {
+    setThemeMode(value);
+    window.posthog?.capture("settings_theme_changed", {
+      theme: value,
+    });
   };
 
   useEffect(() => {
@@ -47,7 +57,7 @@ export default function SettingsModal({ onClose }) {
                                     name="theme-mode"
                                     value={option.value}
                                     checked={themeMode === option.value}
-                                    onChange={() => setThemeMode(option.value)}
+                                    onChange={() => handleThemeChange(option.value)}
                                 />
                                 <span className="theme-option-label">{option.label}</span>
                             </label>

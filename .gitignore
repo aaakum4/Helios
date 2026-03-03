@@ -17,3 +17,7 @@ yarn-error.log*
 
 # Optional: Electron cache / build
 out/
+.env
+
+# AI tools
+.claude

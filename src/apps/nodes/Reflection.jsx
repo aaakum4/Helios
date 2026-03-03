@@ -239,16 +239,24 @@ export default function Reflection() {
             // Get or create the entry for this date
             const key = currentDayKey;
             const entry = next[key] || {};
-            
+
             // Update only the reflection part, preserve journal
             entry.reflection = {
                 answers: answers,
                 submittedAt: new Date().toISOString(),
             };
-            
+
             next[key] = entry;
             return next;
         });
+
+        const answeredCount = answers.filter((a) => a.trim().length > 0).length;
+        window.posthog?.capture("reflection_submitted", {
+            questions_answered: answeredCount,
+            total_questions: QUESTIONS.length,
+            date: currentDayKey,
+        });
+
         setCurrentQuestion(0);
         setAnswers(Array(QUESTIONS.length).fill(''));
     };
@@ -283,6 +291,13 @@ export default function Reflection() {
             
             next[key] = entry;
             return next;
+        });
+
+        window.posthog?.capture("journal_entry_saved", {
+            is_edit: isEdited,
+            has_title: !!journalTitle.trim(),
+            body_length: journalBody.trim().length,
+            date: currentDayKey,
         });
 
         const nextFeedback = isEdited ? 'Edited!' : 'Saved!';

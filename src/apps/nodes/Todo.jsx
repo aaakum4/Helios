@@ -68,6 +68,11 @@ function useTodoState() {
       ),
     }));
 
+    window.posthog?.capture("todo_added", {
+      subheading_id: subheadingID,
+      has_due_date: !!dueDate,
+    });
+
     return newTodo.id;
   };
 
@@ -99,6 +104,12 @@ function useTodoState() {
   };
 
   const toggleTodoCompletion = (subheadingID, todoID) => {
+    // Capture the current completion state before toggling
+    const currentTodo = todosData.subheadings
+      .find((s) => s.id === subheadingID)
+      ?.todos.find((t) => t.id === todoID);
+    const wasCompleted = currentTodo?.completed ?? false;
+
     setTodosData((prev) => ({
       ...prev,
       subheadings: prev.subheadings.map((s) =>
@@ -112,6 +123,14 @@ function useTodoState() {
           : s
       ),
     }));
+
+    if (!wasCompleted) {
+      window.posthog?.capture("todo_completed", {
+        subheading_id: subheadingID,
+        todo_id: todoID,
+        had_due_date: !!currentTodo?.dueDate,
+      });
+    }
   };
 
   const getCurrentSubheading = () => {

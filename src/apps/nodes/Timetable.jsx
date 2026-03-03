@@ -205,8 +205,15 @@ export default function Timetable() {
       id: creatId(),
       dayIndex
     }));
-    
+
     setTimetableBlocks((prev) => [...prev, ...newBlocks]);
+    window.posthog?.capture("timetable_block_created", {
+      title: draft.title,
+      rotation: draft.rotation,
+      duration_minutes: draft.endMinutes - draft.startMinutes,
+      days_count: targetDays.length,
+      has_info: !!draft.info?.trim(),
+    });
     setSheetOpen(false);
   };
 
@@ -214,6 +221,11 @@ export default function Timetable() {
     if (sheetMode !== "edit" || !draft.id) {
       return;
     }
+    window.posthog?.capture("timetable_block_deleted", {
+      title: draft.title,
+      rotation: draft.rotation,
+      duration_minutes: draft.endMinutes - draft.startMinutes,
+    });
     setTimetableBlocks((prev) => prev.filter((block) => block.id !== draft.id));
     setSheetOpen(false);
   };

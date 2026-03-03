@@ -15,3 +15,11 @@ contextBridge.exposeInMainWorld("nativeTheme", {
 		};
 	},
 });
+
+// PostHog bridge — lets the renderer send events to the main process (posthog-node)
+contextBridge.exposeInMainWorld("posthog", {
+	capture: (eventName, properties) => {
+		ipcRenderer.send("posthog:capture", { eventName, properties });
+	},
+	getDistinctId: () => ipcRenderer.invoke("posthog:get-distinct-id"),
+});

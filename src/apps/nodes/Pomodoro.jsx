@@ -170,6 +170,9 @@ export default function Pomodoro() {
         setSelectedSubjectId(newSubject.id);
         setNewSubjectName('');
         setSubjectError('');
+        window.posthog?.capture("pomodoro_subject_added", {
+            total_subjects: focusSubjects.length + 1,
+        });
     };
 
     useEffect(() => {
@@ -200,6 +203,13 @@ export default function Pomodoro() {
                     setSessionsCompleted((prev) => prev + 1);
                     setIsWorkSession(false);
                     setSessionTime(breakTime);
+                    const subjectName = focusSubjects.find((s) => s.id === selectedSubjectId)?.name;
+                    window.posthog?.capture("pomodoro_session_completed", {
+                        subject_id: selectedSubjectId || null,
+                        subject_name: subjectName || null,
+                        work_duration_minutes: Math.floor(workTime / 60),
+                        sessions_completed: sessionsCompleted + 1,
+                    });
                 } else {
                     setIsWorkSession(true);
                     setSessionTime(workTime);
@@ -246,6 +256,15 @@ const handlePlayPause = () => {
             createStudySession();
             startFocusTrackerSession(Date.now());
         }
+        const subjectName = focusSubjects.find((s) => s.id === selectedSubjectId)?.name;
+        window.posthog?.capture("pomodoro_session_started", {
+            session_type: isWorkSession ? "work" : "break",
+            subject_id: selectedSubjectId || null,
+            subject_name: subjectName || null,
+            work_duration_minutes: Math.floor(workTime / 60),
+            break_duration_minutes: Math.floor(breakTime / 60),
+            is_resume: pausedElapsed > 0,
+        });
     } else {
         // Pausing
         const currentElapsed = sessionStartTimeRef.current
@@ -254,11 +273,26 @@ const handlePlayPause = () => {
         setPausedElapsed(currentElapsed);
         finalizeStudySession(false);
         stopFocusTrackerSession();
+        window.posthog?.capture("pomodoro_session_paused", {
+            session_type: isWorkSession ? "work" : "break",
+            elapsed_seconds: currentElapsed,
+            subject_id: selectedSubjectId || null,
+        });
     }
     setIsRunning(!isRunning);
     if (subjectError) setSubjectError('');
 };
 const handleReset = () => {
+    if (isRunning || pausedElapsed > 0) {
+        window.posthog?.capture("pomodoro_session_reset", {
+            session_type: isWorkSession ? "work" : "break",
+            was_running: isRunning,
+            elapsed_seconds: sessionStartTimeRef.current
+                ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
+                : pausedElapsed,
+            subject_id: selectedSubjectId || null,
+        });
+    }
     finalizeStudySession(false);
     stopFocusTrackerSession();
     setIsRunning(false);
