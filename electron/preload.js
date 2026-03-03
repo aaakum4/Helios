@@ -23,3 +23,20 @@ contextBridge.exposeInMainWorld("posthog", {
 	},
 	getDistinctId: () => ipcRenderer.invoke("posthog:get-distinct-id"),
 });
+
+// Window bridge — expose min size getter and listener
+contextBridge.exposeInMainWorld("windowApi", {
+	getMinSize: () => ipcRenderer.invoke("window:get-min-size"),
+	onMinSizeChanged: (callback) => {
+		if (typeof callback !== "function") {
+			return () => {};
+		}
+
+		const handler = (_event, payload) => callback(payload);
+		ipcRenderer.on("window:min-size-changed", handler);
+
+		return () => {
+			ipcRenderer.removeListener("window:min-size-changed", handler);
+		};
+	},
+});

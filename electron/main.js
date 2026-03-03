@@ -1,8 +1,32 @@
-const { app, BrowserWindow, ipcMain, nativeTheme } = require("electron");
+const { app, BrowserWindow, ipcMain, nativeTheme, screen } = require("electron");
 const path = require("path");
 const { PostHog } = require("posthog-node");
 
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
+
+// Dynamic minimum window size scaling
+// Baseline ratios from 1800x1169 screen → 1320x850 min size
+const WIDTH_RATIO = 1320 / 1800;  // ~73.33%
+const HEIGHT_RATIO = 850 / 1169;  // ~72.71%
+const MIN_WIDTH_CLAMP = 800;       // absolute minimum
+const MAX_WIDTH_CLAMP = 2560;      // absolute maximum
+const MIN_HEIGHT_CLAMP = 600;      // absolute minimum
+const MAX_HEIGHT_CLAMP = 1600;     // absolute maximum
+
+function computeMinimumWindowSize() {
+  const display = screen.getPrimaryDisplay();
+  const { width: workWidth, height: workHeight } = display.workAreaSize;
+  
+  // Calculate proportional minimums from work area
+  let minWidth = Math.round(workWidth * WIDTH_RATIO);
+  let minHeight = Math.round(workHeight * HEIGHT_RATIO);
+  
+  // Apply safety clamps to prevent extreme values
+  minWidth = Math.max(MIN_WIDTH_CLAMP, Math.min(minWidth, MAX_WIDTH_CLAMP));
+  minHeight = Math.max(MIN_HEIGHT_CLAMP, Math.min(minHeight, MAX_HEIGHT_CLAMP));
+  
+  return { minWidth, minHeight, workWidth, workHeight };
+}
 
 // PostHog client — uses env vars so keys are never hardcoded
 const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
@@ -47,11 +71,17 @@ function broadcastNativeTheme() {
 }
 
 function createWindow() {
+  const { minWidth, minHeight } = computeMinimumWindowSize();
+  
+  // Ensure initial dimensions are at least the computed minimum
+  const initialWidth = Math.max(1200, minWidth);
+  const initialHeight = Math.max(800, minHeight);
+  
   const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 1320,
-    minHeight: 850,
+    width: initialWidth,
+    height: initialHeight,
+    minWidth: minWidth,
+    minHeight: minHeight,
     show: false,
     vibrancy: "sidebar",
     titleBarStyle: "hiddenInset",
@@ -67,9 +97,18 @@ function createWindow() {
   });
 
   win.loadURL("http://localhost:5173");
+  
+  // Store current min size for IPC queries
+  win.minSizeData = { minWidth, minHeight };
 }
 
 ipcMain.handle("native-theme:get", () => getNativeThemePayload());
+
+// Expose current minimum window size to renderer
+ipcMain.handle("window:get-min-size", () => {
+  const { minWidth, minHeight } = computeMinimumWindowSize();
+  return { minWidth, minHeight };
+});
 
 // PostHog IPC bridge — renderer sends events to the main process for capture
 ipcMain.on("posthog:capture", (_event, { eventName, properties }) => {
@@ -89,6 +128,18 @@ ipcMain.handle("posthog:get-distinct-id", () => DISTINCT_ID);
 
 nativeTheme.on("updated", () => {
   broadcastNativeTheme();
+});
+
+// Recalculate minimum window size when display configuration changes
+screen.on("display-metrics-changed", () => {
+  const allWindows = BrowserWindow.getAllWindows();
+  allWindows.forEach((win) => {
+    const { minWidth, minHeight } = computeMinimumWindowSize();
+    win.setMinimumSize(minWidth, minHeight);
+    win.minSizeData = { minWidth, minHeight };
+    // Notify renderer that min size changed
+    win.webContents.send("window:min-size-changed", { minWidth, minHeight });
+  });
 });
 
 app.whenReady().then(() => {
