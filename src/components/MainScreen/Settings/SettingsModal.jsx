@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import "./SettingsModal.css";
 import { useLocalStorage } from "../../../core/useLocalStorage";
 import { getStoredThemeMode, setThemeMode as applyThemeMode } from "../../../core/theme";
@@ -118,7 +119,7 @@ export default function SettingsModal({ onClose }) {
                 </div>
 
                 <div className="settings-actions">
-                    <button className="settings-close" onClick={onClose}>✕</button>
+                    <button className="settings-close" onClick={onClose}><X size={18} strokeWidth={2.5} /></button>
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { X, Plus } from 'lucide-react';
 import { useAppContext } from '../../core/AppContext';
 import { useTime } from '../../core/TimeProvider';
 import './FocusTracker.css';
@@ -455,9 +456,7 @@ const todaySessionTotals = useMemo(() => {
             className="focus-tracker-btn focus-tracker-btn--primary"
             onClick={() => setShowCreateModal(true)}
           >
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }}>
-              <path d="M6.5 1.5V11.5M1.5 6.5H11.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
+            <Plus size={13} style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }} />
             New Subject
           </button>
         </div>
@@ -546,7 +545,7 @@ const todaySessionTotals = useMemo(() => {
                   className="focus-tracker-delete-btn"
                   onClick={() => handleDeleteSubject(subject.id)}
                 >
-                  ×
+                  <X size={18} strokeWidth={2.5} />
                 </button>
               </div>
             );
@@ -563,7 +562,7 @@ const todaySessionTotals = useMemo(() => {
                 className="focus-tracker-modal-close"
                 onClick={() => setShowCreateModal(false)}
               >
-                ×
+                <X size={18} strokeWidth={2.5} />
               </button>
             </div>
             

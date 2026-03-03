@@ -1,3 +1,4 @@
+import { Plus, X } from 'lucide-react';
 import './TodoSidebar.css';
 
 export default function TodoSidebar({
@@ -17,7 +18,7 @@ export default function TodoSidebar({
     return (
         <div className="todo-sidebar">
             <button className="sidebar-add-btn" onClick={onAddSubheadingClick} title="Add new subheading">
-                +
+                <Plus size={20} />
             </button>
 
             <div className="sidebar-divider"></div>
@@ -40,7 +41,7 @@ export default function TodoSidebar({
                             title="Delete subheading"
                             aria-label={`Delete ${subheading.title}`}
                         >
-                            x
+                            <X size={18} strokeWidth={2.5} />
                         </button>
                     </div>
                 ))}

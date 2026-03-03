@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 import './nodes.css';
 
 export default function NodeFullScreen({ node, onClose }) {
@@ -39,7 +40,7 @@ export default function NodeFullScreen({ node, onClose }) {
               )}
             </div>
             <button className="node-fullscreen-close" onClick={onClose}>
-              ✕
+              <X size={18} strokeWidth={2.5} />
             </button>
           </div>
         )}
@@ -49,7 +50,7 @@ export default function NodeFullScreen({ node, onClose }) {
             onClick={onClose}
             aria-label="Close"
           >
-            ✕
+            <X size={18} strokeWidth={2.5} />
           </button>
         )}
         <div className="node-fullscreen-content">
