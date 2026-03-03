@@ -30,14 +30,14 @@ export const nodes = [
   {
     id: 'todo',
     title: 'Todo',
-    description: 'Clear your head — get it out of your mind and onto the page.',
+    description: 'Clear your head — get it out of your mind.',
     icon: '􀷾',
     component: TodoComponent,
   },
   {
     id: 'focusTracker',
     title: 'Focus Tracker',
-    description: 'Check in with yourself and see how you\'re really doing.',
+    description: 'Check in with yourself and see how you\'re doing.',
     icon: '􁃑',
     component: FocusTrackerComponent,
   },

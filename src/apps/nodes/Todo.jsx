@@ -55,7 +55,7 @@ function useTodoState() {
     // The updater may be invoked twice by React StrictMode (dry-run + real run),
     // but both runs will close over the same object, making the updater idempotent.
     const newTodo = {
-      id: `todo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `todo-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
       title,
       completed: false,
       dueDate,

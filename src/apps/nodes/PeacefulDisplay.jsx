@@ -8,7 +8,7 @@ const DEFAULT_WORK_TIME = 25 * 60;
 const DEFAULT_BREAK_TIME = 5 * 60;
 
 function createId() {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 export default function PeacefulDisplay() {
@@ -172,14 +172,16 @@ export default function PeacefulDisplay() {
     } else {
       const currentElapsed = sessionStartTimeRef.current ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000) : elapsed;
       setPausedElapsed(currentElapsed);
-      if (isWorkSession) { finalizeStudySession(false); stopFocusTrackerSession(); }
+      finalizeStudySession(false);
+      if (isWorkSession) { stopFocusTrackerSession(); }
     }
     setIsRunning(!isRunning);
     if (subjectError) setSubjectError('');
   };
 
   const handleReset = () => {
-    if (isWorkSession) { finalizeStudySession(false); stopFocusTrackerSession(); }
+    finalizeStudySession(false);
+    if (isWorkSession) { stopFocusTrackerSession(); }
     setIsRunning(false);
     setIsWorkSession(true);
     setSessionTime(workTime);

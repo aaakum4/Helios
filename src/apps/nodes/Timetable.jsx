@@ -20,7 +20,7 @@ const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60;
 
 const BLOCK_COLORS = ["#4f86f7", "#2bb673", "#f2b632", "#f06c5c", "#3fb6d3", "#f2844b"];
 
-const creatId = () => `tt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+const createId = () => `tt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
 const minutesToTimeValue = (minutes) => {
   const h = Math.floor(minutes / 60);
@@ -202,7 +202,7 @@ export default function Timetable() {
 
     const newBlocks = targetDays.map((dayIndex) => ({
       ...draft,
-      id: creatId(),
+      id: createId(),
       dayIndex
     }));
 
@@ -238,7 +238,7 @@ export default function Timetable() {
 
   const handleSyncConfirm = () => {
     const newBlocks = visibleBlocks.map((block) => {
-      const newBlock = { ...block, id: creatId(), rotation: syncTarget.rotation };
+      const newBlock = { ...block, id: createId(), rotation: syncTarget.rotation };
       if (syncTarget.rotation === "fortnightly") {
         newBlock.weekIndex = syncTarget.weekIndex;
         newBlock.monthWeekIndex = undefined;

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./TodoList.css";
 
 const CONFETTI_COLORS = ['#f59e0b', '#22c55e', '#3b82f6', '#ec4899', '#a855f7', '#06b6d4', '#ef4444', '#84cc16'];
@@ -106,6 +106,14 @@ export default function TodoList({
             handleAdd();
         }
     };
+
+    // Cleanup: Clear all pending timers on unmount to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            removalTimersRef.current.forEach((timerId) => clearTimeout(timerId));
+            removalTimersRef.current.clear();
+        };
+    }, []);
 
     return (
         <div className="todo-list">

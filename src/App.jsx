@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import StartupScreen from "./components/StartupScreen";
 import MainScreen from "./components/MainScreen/MainScreen";
 import UnsupportedScreen from "./components/UnsupportedScreen";
+import ErrorBoundary from "./components/ErrorBoundary";
 import './App.css'
 import { initializeTheme } from "./core/theme";
 import { initializePalette } from "./core/palette";
@@ -24,12 +25,12 @@ export default function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       {!launched ? (
         <StartupScreen onLaunch={() => setLaunched(true)} />
       ) : (
         <MainScreen onBack={() => setLaunched(false)} />
       )}
-    </>
+    </ErrorBoundary>
   );
 }

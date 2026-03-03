@@ -11,7 +11,7 @@ const SUBJECT_COLORS = [
 ];
 
 function createId() {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 export default function Pomodoro() {
