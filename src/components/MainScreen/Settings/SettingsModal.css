@@ -10,7 +10,7 @@
 
 .settings-modal {
     width: 360px;
-    height: 680px;
+    height: 720px;
     max-height: 90%;
 
     background: white;
@@ -38,13 +38,59 @@
     }
 }
 
+.settings-modal h2 {
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+    flex-shrink: 0;
+}
+
+html[data-theme="dark"] .settings-modal h2 {
+    color: #ffffff;
+}
+
+.settings-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    margin-right: -4px;
+}
+
+.settings-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 .settings-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 12px 6px;
-    color: #111;
+    gap: 10px;
+    padding: 10px 5px;
+    color: #18;
 }
 
 .settings-section label {
@@ -54,7 +100,8 @@
 
 .settings-section.glow-label-section {
     justify-content: flex-start;
-    margin-top: 12px;
+    margin-top: 4px;
+    padding-top: 4px;
 }
 
 .theme-switch {
@@ -166,13 +213,14 @@
 .settings-section.palette-label-section {
     justify-content: flex-start;
     padding-bottom: 4px;
+    margin-top: 4px;
 }
 
 .palette-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 6px 12px;
+    gap: 7px;
+    padding: 0 5px 8px;
 }
 
 .palette-swatch {
@@ -249,7 +297,7 @@ html[data-theme="dark"] .palette-swatch:hover {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    padding: 8px 6px;
+    padding: 8px 6px 12px;
 }
 
 .glow-option {
@@ -279,10 +327,9 @@ html[data-theme="dark"] .palette-swatch:hover {
 }
 
 .settings-close {
-    margin-top: auto;
     width: 100%;
-    height: 32px;
-    border-radius: 8px;
+    height: 36px;
+    border-radius: 10px;
     border: 1px solid var(--border);
     background: transparent;
     color: var(--muted);
@@ -293,7 +340,6 @@ html[data-theme="dark"] .palette-swatch:hover {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    margin-bottom: 4px;
 }
 
 .settings-close:hover {
@@ -306,6 +352,37 @@ html[data-theme="dark"] .palette-swatch:hover {
     display: flex;
     gap: 8px;
     margin-top: 12px;
+    padding-top: 0;
+    flex-shrink: 0;
+}
+
+.reset-tutorials-btn {
+    width: 100%;
+    height: 32px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    margin: 4px 0;
+}
+
+.reset-tutorials-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #111;
+}
+
+html[data-theme="dark"] .reset-tutorials-btn {
+    border-color: var(--border);
+    color: var(--muted);
+}
+
+html[data-theme="dark"] .reset-tutorials-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 }
 
 .settings-apply {

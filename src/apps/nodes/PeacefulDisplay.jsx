@@ -20,6 +20,7 @@ export default function PeacefulDisplay() {
   const [clockColor, setClockColor] = useLocalStorage('peacefulDisplay:clockColor', 'white');
   const [clockFormat, setClockFormat] = useLocalStorage('peacefulDisplay:clockFormat', 24);
   const [showClockSettings, setShowClockSettings] = useState(false);
+  const [hasSeenClockTutorial, setHasSeenClockTutorial] = useLocalStorage('peacefulDisplay:hasSeenClockTutorial', false);
 
   // ── Pomodoro state (same keys as Pomodoro node — shared) ──────────────────
   const {
@@ -210,6 +211,13 @@ export default function PeacefulDisplay() {
   const isWarmSeason = mode === 'summer';
   const handleModeCycle = () => { const modes = ['summer', 'winter']; setMode(modes[(modes.indexOf(mode) + 1) % modes.length]); };
 
+  const handleClockClick = () => {
+    if (!hasSeenClockTutorial) {
+      setHasSeenClockTutorial(true);
+    }
+    setShowClockSettings(!showClockSettings);
+  };
+
 return (
     <><div className={`peaceful-display-container mode-${mode}`}>
       <div className="peaceful-display-scene">
@@ -251,18 +259,27 @@ return (
     </div>
     
     {/* Clock */}
+    {showClockSettings && (
+      <div className="peaceful-clock-backdrop" onClick={() => setShowClockSettings(false)} />
+    )}
     <div className="peaceful-display-clock-wrap">
+      {!hasSeenClockTutorial && (
+        <div className="clock-tutorial">
+          <div className="clock-tutorial-arrow" />
+          <div className="clock-tutorial-text">Try pressing the clock...</div>
+        </div>
+      )}
       <button
         type="button"
         className={`peaceful-display-clock clock-font-${clockFont} clock-color-${clockColor}`}
-        onClick={() => setShowClockSettings(!showClockSettings)}
+        onClick={handleClockClick}
         aria-expanded={showClockSettings}
       >
         {formattedTime}
       </button>
 
       {showClockSettings && (
-        <div className="peaceful-display-settings" role="dialog" aria-label="Clock Settings">
+        <div className="peaceful-display-settings" role="dialog" aria-label="Clock Settings" onClick={(e) => e.stopPropagation()}>
           <div className="setting-row">
             <span className="settings-label">Font:</span>
             <div className="settings-options">

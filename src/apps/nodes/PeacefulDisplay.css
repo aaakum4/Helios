@@ -159,6 +159,81 @@
   justify-content: center;
 }
 
+.clock-tutorial {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  animation: tutorial-fade-in 0.6s ease-out forwards;
+}
+
+@keyframes tutorial-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.clock-tutorial-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.clock-tutorial-arrow {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  animation: arrow-bounce 1.5s ease-in-out infinite;
+}
+
+.clock-tutorial-arrow::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.clock-tutorial-arrow::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-top: none;
+  border-left: none;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes arrow-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
 .peaceful-display-clock {
   background: rgba(8, 12, 18, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -193,6 +268,14 @@
 .clock-color-orange { color: #f39c12; }
 .clock-color-green { color: #2ecc71; }
 
+.peaceful-clock-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  background: transparent;
+  cursor: default;
+}
+
 .peaceful-display-settings {
   position: absolute;
   bottom: calc(100% + 14px);
@@ -200,7 +283,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
-  background: rgba(14, 18, 24, 0.82);
+  background: rgba(8, 12, 18, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 1rem 1.1rem;
   border-radius: 16px;
@@ -219,7 +302,8 @@
 
 .settings-label {
   font-size: 0.82rem;
-  opacity: 0.7;
+  color: white;
+  opacity: 1;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -234,7 +318,7 @@
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 0.35rem 0.7rem;
-  color: inherit;
+  color: white;
   border-radius: 999px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -249,7 +333,7 @@
 /* ── Pomodoro widget ─────────────────────────────────────────────────── */
 .pd-pom-wrap {
   position: absolute;
-  bottom: 10%;
+  bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
@@ -352,7 +436,7 @@
   border-radius: 8px;
   color: #f0f0f0;
   font-size: 0.82rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.6rem 0.8rem;
   cursor: pointer;
   outline: none;
 }
