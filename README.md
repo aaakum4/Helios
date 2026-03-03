@@ -4,7 +4,7 @@
      <p>The control room organising your future.</p>
      </div>
      <br>
-     <img width="1486" height="1016" alt="Screenshot 2026-03-01 at 12 48 10 pm" src="https://github.com/user-attachments/assets/6bdc17be-81a2-4f20-a600-f3066e683df7" />
+     <img width="1423" height="970" alt="Screenshot 2026-03-03 at 6 50 02 pm" src="https://github.com/user-attachments/assets/49e456fd-c738-41aa-8d2d-3bb5872252ee" />
 </div>
 
 ---
@@ -37,14 +37,21 @@ Before the first stable release, I would like the following features to be imple
 - [x] Nodes work with each other
 - [ ] ...
 
-### Known Limitations
+## Known Limitations
 
 - No account system yet
 - Data stored locally in browser
 - Not optimised for mobile
 - Some features may reset
 
-### Prerequisites
+**IMPORTANT!**
+This app must remain above a dynamically calculated minimum window size to function correctly.
+
+If the window is resized below the supported threshold, an “Unsupported Screen Size” screen will appear. Resize the window back above the minimum size to continue using the app normally.
+
+**Alternatively**, you can reduce your browser zoom level using ⌘ − (Mac) or Ctrl − (Windows) to fit the interface within the supported size range.
+
+## Prerequisites
 
 None — just:
 - A modern browser (Chrome, Edge, Safari, Firefox)
