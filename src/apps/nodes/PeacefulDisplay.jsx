@@ -22,6 +22,41 @@ export default function PeacefulDisplay() {
   const [showClockSettings, setShowClockSettings] = useState(false);
   const [hasSeenClockTutorial, setHasSeenClockTutorial] = useLocalStorage('peacefulDisplay:hasSeenClockTutorial', false);
 
+  // ── Particles (respawning) ─────────────────────────────────────────────────
+  const [particles, setParticles] = useState([]);
+
+  // Spawn particles individually at staggered intervals
+  useEffect(() => {
+    const spawnInterval = setInterval(() => {
+      const particleType = mode === 'winter' ? 'snow' : mode === 'autumn' ? 'leaf' : null;
+      if (!particleType) return; // Don't spawn in summer
+      
+      const newParticle = {
+        id: `${Date.now()}-${Math.random()}`,
+        left: Math.random() * 100,
+        type: particleType,
+      };
+      setParticles(prev => [...prev, newParticle]);
+    }, 1200); // spawn ~13-14 particles over 16 seconds for smoother flow
+    
+    return () => clearInterval(spawnInterval);
+  }, [mode]);
+
+  // Clean up particles after animation completes
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      setParticles(prev => {
+        const now = Date.now();
+        return prev.filter(p => {
+          const timestamp = parseInt(p.id.split('-')[0]);
+          return (now - timestamp) < 16000;
+        });
+      });
+    }, 500);
+    
+    return () => clearInterval(cleanup);
+  }, []);
+
   // ── Pomodoro state (same keys as Pomodoro node — shared) ──────────────────
   const {
     focusSubjects, setStudySessions,
@@ -157,7 +192,6 @@ export default function PeacefulDisplay() {
 
   const handlePlayPause = () => {
     if (!isRunning) {
-      if (isWorkSession && !selectedSubjectId) { setSubjectError('Select a subject to start.'); return; }
       if (pausedElapsed > 0) {
         const resumeStart = Date.now() - pausedElapsed * 1000;
         sessionStartTimeRef.current = resumeStart;
@@ -209,7 +243,7 @@ export default function PeacefulDisplay() {
       : `${String(((hours24 + 11) % 12) + 1).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${hours24 >= 12 ? 'PM' : 'AM'}`;
 
   const isWarmSeason = mode === 'summer';
-  const handleModeCycle = () => { const modes = ['summer', 'winter']; setMode(modes[(modes.indexOf(mode) + 1) % modes.length]); };
+  const handleModeCycle = () => { const modes = ['summer', 'autumn', 'winter']; setMode(modes[(modes.indexOf(mode) + 1) % modes.length]); };
 
   const handleClockClick = () => {
     if (!hasSeenClockTutorial) {
@@ -228,33 +262,16 @@ return (
         <div className="peaceful-display-hill hill-mid" />
         <div className="peaceful-display-hill hill-front" />
       </div>
-      <div
-        className={`peaceful-display-particles ${mode === 'winter' ? 'particles-snow' : 'particles-leaves'}`}
-      >
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
-        <span className="particle" />
+      <div className="peaceful-display-particles">
+        {particles.map((particle) => (
+          <span 
+            key={particle.id} 
+            className={`particle particle-${particle.type}`}
+            style={{ 
+              left: `${particle.left}%`
+            }}
+          />
+        ))}
       </div>
     </div>
     
@@ -365,7 +382,6 @@ return (
           <button
             className={`pd-pom-btn pd-pom-btn--play${isRunning ? ' is-running' : ''}`}
             onClick={handlePlayPause}
-            disabled={isWorkSession && !selectedSubjectId && !isRunning}
             aria-label={isRunning ? 'Pause' : 'Start'}
           >
             {isRunning ? (

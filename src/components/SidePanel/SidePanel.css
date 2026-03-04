@@ -391,7 +391,7 @@ html[data-theme="dark"] .side-panel__tab:hover .side-panel__tab-glow {
     opacity: 0.6;
 }
 
-html[data-theme="dark"] .particle {
+html[data-theme="dark"] .side-panel .particle {
     background: var(--accent);
     box-shadow: 0 0 8px var(--accent);
 }
