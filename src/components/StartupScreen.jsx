@@ -28,9 +28,12 @@ export default function StartupScreen({ onLaunch }) {
 
     setTimeout(() => {
       if (audioRef.current && getSoundEnabled()) {
-        audioRef.current.play().catch(err => {
-          console.log("Audio playback failed:", err);
-        });
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            console.warn("Audio playback failed:", err?.message || String(err));
+          });
+        }
       }
     }, 300);
   };

@@ -7,6 +7,7 @@ import NodeCard from "../../apps/nodes/NodeCard";
 import NodeFullScreen from "../../apps/nodes/NodeFullScreen";
 import SidePanel from "../SidePanel/SidePanel";
 import { useLocalStorage } from "../../core/useLocalStorage";
+import { createId } from "../../core/idGenerator";
 import { useTime } from "../../core/TimeProvider";
 import WaveBackground from "../WaveBackground/WaveBackground";
 import GeometricLayer from "../GeometricLayer/GeometricLayer";
@@ -36,6 +37,17 @@ export default function MainScreen({ onBack }) {
   // Live state for card badges
   const [pomodoroIsRunning] = useLocalStorage('pomodoro:isRunning', false);
   const [pomodoroIsWorkSession] = useLocalStorage('pomodoro:isWorkSession', true);
+
+  // Must declare todosData before getLiveState uses it
+  const [todosData, setTodosData] = useLocalStorage("todosData", {
+    subheadings: [
+      {
+        id: "inbox-default",
+        title: "Inbox",
+        todos: [],
+      },
+    ],
+  });
 
   useEffect(() => {
     try {
@@ -156,16 +168,6 @@ export default function MainScreen({ onBack }) {
     return 'night';
   })();
 
-  const [todosData, setTodosData] = useLocalStorage("todosData", {
-    subheadings: [
-      {
-        id: "inbox-default",
-        title: "Inbox",
-        todos: [],
-      },
-    ],
-  });
-
   const handleQuickAddTodo = (title, subheadingId = "inbox-default", dueDate = "") => {
     const trimmed = title.trim();
     if (!trimmed) {
@@ -173,7 +175,7 @@ export default function MainScreen({ onBack }) {
     }
 
     const newTodo = {
-      id: `todo-${Date.now()}`,
+      id: `todo-${createId()}`,
       title: trimmed,
       completed: false,
       dueDate: dueDate || "",

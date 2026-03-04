@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useLocalStorage } from "../../core/useLocalStorage";
 import { useAppContext } from "../../core/AppContext";
+import { createId } from "../../core/idGenerator";
 import './Pomodoro.css'
 
 const DEFAULT_WORK_TIME = 25 * 60;
@@ -9,10 +10,6 @@ const SUBJECT_COLORS = [
     '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
     '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
 ];
-
-function createId() {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-}
 
 export default function Pomodoro() {
     const {

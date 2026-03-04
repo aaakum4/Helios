@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocalStorage } from '../../core/useLocalStorage';
+import { createId } from '../../core/idGenerator';
 import TodoSidebar from '../../components/TodoSidebar';
 import AddSubheadingModal from '../../components/AddSubheadingModal';
 import TodoList from '../../components/TodoList';
@@ -25,7 +26,7 @@ function useTodoState() {
 
   const addSubheading = (title) => {
     const newSubheading = {
-      id: `subheading-${Date.now()}`,
+      id: `subheading-${createId()}`,
       title,
       todos: [],
     };
@@ -55,7 +56,7 @@ function useTodoState() {
     // The updater may be invoked twice by React StrictMode (dry-run + real run),
     // but both runs will close over the same object, making the updater idempotent.
     const newTodo = {
-      id: `todo-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+      id: `todo-${createId()}`,
       title,
       completed: false,
       dueDate,
