@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 2rem;
+    padding: clamp(1.8rem, 2.2vw, 2.5rem);
     background: var(--bg);
     color: var(--text);
     font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
@@ -11,18 +11,20 @@
 
 .reflection-nav {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
+    gap: clamp(0.6rem, 0.7vw, 0.75rem);
+    height: clamp(66px, 5vw, 82px);
+    align-items: center;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 1rem;
+    flex-shrink: 0;
 }
 
 .reflection-nav-btn {
-    padding: 0.5rem 1rem;
+    padding: 0 clamp(0.8rem, 0.94vw, 1rem);
+    height: 100%;
     border: none;
     background: transparent;
     color: var(--muted);
-    font-size: 0.95rem;
+    font-size: clamp(1.05rem, 1.15vw, 1.2rem);
     font-weight: 500;
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -48,13 +50,13 @@
 .reflection-view {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    max-width: 600px;
+    gap: clamp(1.5rem, 1.875vw, 2rem);
+    max-width: 700px;
     margin: 0 auto;
 }
 
 .reflection-view-title {
-  font-size: 1.8rem;
+    font-size: clamp(2rem, 2.35vw, 2.7rem);
   font-weight: 600;
   margin: 0;
   color: var(--text);
@@ -63,16 +65,16 @@
 .reflection-question-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: clamp(1.2rem, 1.41vw, 1.5rem);
 }
 
 .reflection-question {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
+    border-radius: clamp(10px, 1.125vw, 12px);
+    padding: clamp(1.5rem, 1.875vw, 2rem);
     text-align: center;
-    min-height: 100px;
+    min-height: clamp(80px, 9.38vw, 100px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -80,7 +82,7 @@
 
 .reflection-question p {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: clamp(1.1rem, 1.2vw, 1.25rem);
     color: var(--text);
     line-height: 1.6;
     font-weight: 500;
@@ -88,13 +90,13 @@
 
 .reflection-answer-input {
     width: 100%;
-    padding: 1rem;
+    padding: clamp(0.8rem, 0.94vw, 1rem);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: clamp(6px, 0.75vw, 8px);
     background: var(--surface);
     color: var(--text);
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: clamp(1rem, 1.05vw, 1.1rem);
     line-height: 1.6;
     resize: none;
     transition: border-color 0.2s ease;
@@ -108,36 +110,36 @@
 
 .reflection-controls {
     display: flex;
-    gap: 1rem;
+    gap: clamp(0.8rem, 0.94vw, 1rem);
     justify-content: flex-end;
 }
 
 .reflection-complete {
-    padding: 2rem;
-    border-radius: 12px;
+    padding: clamp(1.5rem, 1.875vw, 2rem);
+    border-radius: clamp(10px, 1.125vw, 12px);
     border: 1px solid var(--border);
     background: var(--surface);
     text-align: center;
 }
 
 .reflection-complete-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
+    margin: 0 0 clamp(0.4rem, 0.47vw, 0.5rem) 0;
+    font-size: clamp(1.15rem, 1.25vw, 1.35rem);
     font-weight: 600;
     color: var(--text);
 }
 
 .reflection-complete-subtitle {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: clamp(1rem, 1.05vw, 1.1rem);
     color: var(--muted);
 }
 
 .reflection-btn {
-    padding: 0.7rem 1.5rem;
+    padding: clamp(0.75rem, 0.85vw, 0.95rem) clamp(1.35rem, 1.6vw, 1.8rem);
     border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    border-radius: clamp(6px, 0.75vw, 8px);
+    font-size: clamp(1rem, 1.05vw, 1.1rem);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -189,34 +191,34 @@ html[data-theme="dark"] .reflection-btn--primary {
 .journal-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: clamp(1.2rem, 1.41vw, 1.5rem);
     border: 1px solid var(--border);
     background: var(--surface);
-    border-radius: 12px;
-    padding: 2rem;
+    border-radius: clamp(10px, 1.125vw, 12px);
+    padding: clamp(1.5rem, 1.875vw, 2rem);
 }
 
 .journal-title-input {
     width: 100%;
-    padding: 1rem;
+    padding: clamp(0.8rem, 0.94vw, 1rem);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: clamp(6px, 0.75vw, 8px);
     background: var(--bg);
     color: var(--text);
     font-family: inherit;
-    font-size: 1rem;
+    font-size: clamp(1rem, 1.05vw, 1.1rem);
     font-weight: 500;
     transition: border-color 0.2s ease;
 }
 .journal-body-input {
     width: 100%;
-    padding: 1rem;
+    padding: clamp(0.8rem, 0.94vw, 1rem);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: clamp(6px, 0.75vw, 8px);
     background: var(--bg);
     color: var(--text);
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: clamp(1rem, 1.05vw, 1.1rem);
     line-height: 1.6;
     resize: none;
     transition: border-color 0.2s ease;
@@ -236,21 +238,21 @@ html[data-theme="dark"] .reflection-btn--primary {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 1rem;
+    padding-top: clamp(0.8rem, 0.94vw, 1rem);
     border-top: 1px solid var(--border);
 }
 
 .journal-date {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: clamp(0.95rem, 1vw, 1.05rem);
     color: var(--muted);
 }
 
 .archive-selectors {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: clamp(0.8rem, 0.94vw, 1rem);
+    margin-bottom: clamp(1.5rem, 1.875vw, 2rem);
 }
 
 .archive-selector-group {
@@ -260,7 +262,7 @@ html[data-theme="dark"] .reflection-btn--primary {
 }
 
 .archive-label {
-    font-size: 0.8rem;
+    font-size: clamp(0.82rem, 0.9vw, 0.95rem);
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
@@ -268,13 +270,13 @@ html[data-theme="dark"] .reflection-btn--primary {
 }
 
 .archive-select {
-    padding: 0.75rem;
+    padding: clamp(0.6rem, 0.7vw, 0.75rem);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: clamp(6px, 0.75vw, 8px);
     background: var(--surface);
     color: var(--text);
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: clamp(1rem, 1.05vw, 1.1rem);
     transition: border-color 0.2s ease;
     cursor: pointer;
 }
@@ -288,9 +290,9 @@ html[data-theme="dark"] .reflection-btn--primary {
 .archive-view-container {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    min-height: 240px;
+    border-radius: clamp(10px, 1.125vw, 12px);
+    padding: clamp(1.5rem, 1.875vw, 2rem);
+    min-height: clamp(200px, 22.5vw, 240px);
 }
 
 .archive-empty {
@@ -311,7 +313,7 @@ html[data-theme="dark"] .reflection-btn--primary {
 .archive-entries {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: clamp(1.5rem, 1.875vw, 2rem);
 }
 
 .archive-date-row {
@@ -352,10 +354,10 @@ html[data-theme="dark"] .reflection-btn--primary {
 }
 
 .archive-entry {
-    padding: 1.5rem;
+    padding: clamp(1.2rem, 1.41vw, 1.5rem);
     background: var(--bg);
-    border-left: 4px solid var(--accent, #3b82f6);
-    border-radius: 8px;
+    border-left: clamp(3px, 0.38vw, 4px) solid var(--accent, #3b82f6);
+    border-radius: clamp(6px, 0.75vw, 8px);
 }
 
 .archive-entry--journal {
@@ -367,8 +369,8 @@ html[data-theme="dark"] .reflection-btn--primary {
 }
 
 .archive-entry-title {
-    margin: 0 0 1rem 0;
-    font-size: 1rem;
+    margin: 0 0 clamp(0.8rem, 0.94vw, 1rem) 0;
+    font-size: clamp(0.9rem, 0.94vw, 1rem);
     font-weight: 600;
     color: var(--text);
 }

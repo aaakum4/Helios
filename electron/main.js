@@ -7,16 +7,22 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 // Soft linear scaling model baseline.
 const BASE_DISPLAY_WIDTH = 1800;
 const BASE_DISPLAY_HEIGHT = 1169;
-const BASE_MIN_WIDTH = 1100;
-const BASE_MIN_HEIGHT = 740;
+const BASE_MIN_WIDTH = 980;
+const BASE_MIN_HEIGHT = 620;
 const WIDTH_SCALE_FACTOR = 70 / 288;
 const HEIGHT_SCALE_FACTOR = 25 / 187;
 
 // Clamps for computed minimum window size.
-const MIN_WIDTH_CLAMP = 1024;
-const MAX_WIDTH_CLAMP = 1180;
-const MIN_HEIGHT_CLAMP = 700;
-const MAX_HEIGHT_CLAMP = 800;
+const MIN_WIDTH_CLAMP = 900;
+const MAX_WIDTH_CLAMP = 1320;
+const MIN_HEIGHT_CLAMP = 560;
+const MAX_HEIGHT_CLAMP = 860;
+
+// Zoom scaling baseline (proportional app scaling instead of layout squish).
+const BASE_SCALE_WIDTH = 1600;
+const BASE_SCALE_HEIGHT = 1169;
+const MIN_ZOOM_FACTOR = 0.75;
+const MAX_ZOOM_FACTOR = 1;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(value, max));
@@ -68,6 +74,20 @@ function applyDynamicMinimumSize(win) {
   }
 }
 
+function applyWindowZoom(win) {
+  if (win.isDestroyed()) {
+    return;
+  }
+
+  const [contentWidth, contentHeight] = win.getContentSize();
+  const fitScale = Math.min(contentWidth / BASE_SCALE_WIDTH, contentHeight / BASE_SCALE_HEIGHT);
+  const zoomFactor = clamp(fitScale, MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
+
+  if (Math.abs(win.webContents.getZoomFactor() - zoomFactor) > 0.001) {
+    win.webContents.setZoomFactor(zoomFactor);
+  }
+}
+
 // PostHog client — uses env vars so keys are never hardcoded
 const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
   host: process.env.POSTHOG_HOST || "https://us.i.posthog.com",
@@ -111,19 +131,18 @@ function broadcastNativeTheme() {
 }
 
 function createWindow() {
-  // Create with baseline minimums first, then immediately sync to active display.
-  const minWidth = BASE_MIN_WIDTH;
-  const minHeight = BASE_MIN_HEIGHT;
-  
-  // Ensure initial dimensions are at least the computed minimum
-  const initialWidth = Math.max(1024, minWidth);
-  const initialHeight = Math.max(700, minHeight);
-  
+  // Create with requested default minimums first, then sync to active display.
+  const minWidth = 900;
+  const minHeight = 560;
+
+  const initialWidth = Math.max(900, minWidth);
+  const initialHeight = Math.max(560, minHeight);
+
   const win = new BrowserWindow({
     width: initialWidth,
     height: initialHeight,
-    minWidth: minWidth,
-    minHeight: minHeight,
+    minWidth,
+    minHeight,
     show: false,
     vibrancy: "sidebar",
     titleBarStyle: "hiddenInset",
@@ -135,6 +154,7 @@ function createWindow() {
   });
 
   win.once("ready-to-show", () => {
+    applyWindowZoom(win);
     win.show();
   });
 
@@ -143,10 +163,16 @@ function createWindow() {
   // Track monitor changes while dragging between displays.
   win.on("move", () => {
     applyDynamicMinimumSize(win);
+    applyWindowZoom(win);
+  });
+
+  win.on("resize", () => {
+    applyWindowZoom(win);
   });
 
   // Initial sync after the window has been created and placed.
   applyDynamicMinimumSize(win);
+  applyWindowZoom(win);
 }
 
 ipcMain.handle("native-theme:get", () => getNativeThemePayload());
@@ -191,6 +217,7 @@ app.whenReady().then(() => {
   screen.on("display-metrics-changed", () => {
     BrowserWindow.getAllWindows().forEach((win) => {
       applyDynamicMinimumSize(win);
+      applyWindowZoom(win);
     });
   });
 
@@ -198,15 +225,17 @@ app.whenReady().then(() => {
   screen.on("display-added", () => {
     BrowserWindow.getAllWindows().forEach((win) => {
       applyDynamicMinimumSize(win);
+      applyWindowZoom(win);
     });
   });
 
   screen.on("display-removed", () => {
     BrowserWindow.getAllWindows().forEach((win) => {
       applyDynamicMinimumSize(win);
+      applyWindowZoom(win);
     });
   });
-  
+
   posthog.capture({
     distinctId: DISTINCT_ID,
     event: "app_launched",

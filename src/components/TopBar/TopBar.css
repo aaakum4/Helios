@@ -1,11 +1,11 @@
 .top-bar {
-  height: 56px;
+  height: clamp(64px, 4.9vw, 78px);
   width: 100%;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 12px;
+  padding: 0 clamp(15px, 1.45vw, 25px);
+  gap: clamp(12px, 1.15vw, 19px);
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   background: var(--top-bar-bg);
@@ -34,12 +34,12 @@
   width: 100%;
   max-width: 420px;
   min-width: 220px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 18px;
+  height: clamp(38px, 2.8vw, 46px);
+  padding: 0 clamp(15px, 1.25vw, 19px);
+  border-radius: clamp(18px, 1.5vw, 24px);
   border: 1px solid #d0d0d0;
   outline: none;
-  font-size: 14px;
+  font-size: clamp(15px, 1.15vw, 18px);
   background: #f8f8f8;
   transition: background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
 }
@@ -69,7 +69,7 @@ html[data-theme="dark"] .top-input:focus {
 .settings-cog {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: clamp(25px, 2.5vw, 40px);
   cursor: pointer;
   user-select: none;
   opacity: 0.8;
@@ -79,6 +79,11 @@ html[data-theme="dark"] .top-input:focus {
   font-family: 'SF Pro';
   display: grid;
   place-items: center;
+}
+
+.settings-cog svg {
+  width: 1em;
+  height: 1em;
 }
 
 html[data-theme="dark"] .settings-cog {
@@ -111,9 +116,9 @@ html[data-theme="dark"] .settings-cog {
 }
 
 .char-counter {
-  margin-left: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
+  margin-left: clamp(8px, 0.7vw, 12px);
+  padding: clamp(4px, 0.45vw, 6px) clamp(8px, 0.75vw, 12px);
+  font-size: clamp(13px, 1vw, 16px);
   color: #555;
   background: #777777;
   border-radius: 6px;
@@ -124,4 +129,26 @@ html[data-theme="dark"] .settings-cog {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-2px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-height: 760px) {
+  .top-bar {
+    height: clamp(54px, 8vh, 62px);
+    padding: 0 clamp(12px, 1.2vw, 18px);
+  }
+
+  .top-input {
+    height: clamp(32px, 4.8vh, 38px);
+    font-size: clamp(13px, 1.8vh, 15px);
+    border-radius: clamp(14px, 2.2vh, 18px);
+  }
+
+  .settings-cog {
+    font-size: clamp(20px, 3.2vh, 26px);
+  }
+
+  .char-counter {
+    font-size: clamp(11px, 1.6vh, 13px);
+    padding: clamp(3px, 0.4vh, 4px) clamp(7px, 0.8vh, 9px);
+  }
 }

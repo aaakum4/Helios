@@ -234,10 +234,6 @@ export default function Pomodoro() {
 
 const handlePlayPause = () => {
     if (!isRunning) {
-        if (isWorkSession && !selectedSubjectId) {
-            setSubjectError('Select a subject to start a focus session.');
-            return;
-        }
         if (pausedElapsed > 0) {
             // Resuming from pause — offset start time so elapsed continues from where it was
             const resumeStart = Date.now() - pausedElapsed * 1000;
@@ -332,7 +328,6 @@ return (
                     <button
                         className="pomodoro-button"
                         onClick={handlePlayPause}
-                        disabled={isWorkSession && !selectedSubjectId}
                     >
                         {isRunning ? 'Pause' : 'Start'}
                     </button>

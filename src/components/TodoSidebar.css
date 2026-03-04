@@ -1,18 +1,18 @@
 .todo-sidebar {
-    flex: 0 0 210px;
+    flex: 0 0 240px;
     background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 12px;
+    padding: 14px;
 }
 
 .sidebar-add-btn {
     background: transparent;
     border: none;
     color: var(--text);
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 300;
     cursor: pointer;
     padding: 8px 0;
@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 40px;
+    min-height: 48px;
 }
 
 .sidebar-add-btn:hover {
@@ -61,10 +61,10 @@
     background: transparent;
     border: 1px solid transparent;
     color: var(--text);
-    padding: 12px 14px;
-    border-radius: 6px;
+    padding: 14px 16px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -90,7 +90,7 @@
 }
 
 .todo-count {
-    font-size: 12px;
+    font-size: 13px;
     opacity: 0.7;
 }
 
@@ -102,8 +102,8 @@
     cursor: pointer;
     padding: 8px;
     border-radius: 4px;
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 36px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;

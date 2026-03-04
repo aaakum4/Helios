@@ -3,8 +3,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
-    padding: 2rem;
+    gap: clamp(1.8rem, 2.2vw, 2.5rem);
+    padding: clamp(1.8rem, 2.2vw, 2.5rem);
     height: 100%;
     background: var(--bg);
     color: var(--text);
@@ -13,8 +13,8 @@
 
 .pomodoro-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    gap: clamp(1.8rem, 2.2vw, 2.5rem);
     width: 100%;
     max-width: 960px;
     align-items: start;
@@ -23,7 +23,7 @@
 .pomodoro-main {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: clamp(1.5rem, 1.875vw, 2rem);
     align-items: center;
 }
 
@@ -36,13 +36,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: clamp(1.2rem, 1.41vw, 1.5rem);
     width: 100%;
     max-width: 400px;
 }
 
 .pomodoro-timer {
-    font-size: 4.5rem;
+    font-size: clamp(4.6rem, 6vw, 6.4rem);
     font-weight: bold;
     letter-spacing: 0.1em;
     font-variant-numeric: tabular-nums;
@@ -63,7 +63,7 @@
 
 
 .pomodoro-session-type {
-    font-size: 1.25rem;
+    font-size: clamp(1.2rem, 1.35vw, 1.4rem);
     color: var(--muted);
     font-weight: 500;
     text-transform: uppercase;
@@ -72,9 +72,9 @@
 
 .pomodoro-progress-bar {
     width: 100%;
-    height: 8px;
+    height: clamp(8px, 0.95vw, 10px);
     background: var(--border);
-    border-radius: 10px;
+    border-radius: clamp(8px, 0.94vw, 10px);
     overflow: hidden;
 }
 
@@ -87,7 +87,7 @@
 
 .pomodoro-controls {
     display: flex;
-    gap: 1rem;
+    gap: clamp(0.8rem, 0.94vw, 1rem);
     width: 100%;
     justify-content: center;
     max-width: 400px;
@@ -95,13 +95,13 @@
 
 .pomodoro-button {
     flex: 1;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
+    padding: clamp(0.75rem, 0.9vw, 0.95rem) clamp(1rem, 1.1vw, 1.25rem);
+    font-size: clamp(1rem, 1.05vw, 1.15rem);
     font-weight: 600;
     color: #fff;
     background: #1f1f1f;
     border: none;
-    border-radius: 8px;
+    border-radius: clamp(6px, 0.75vw, 8px);
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease;
 }
@@ -126,10 +126,10 @@ html[data-theme="dark"] .pomodoro-button:hover {
 
 .pomodoro-stats {
     display: flex;
-    gap: 2rem;
-    padding: 1.5rem;
+    gap: clamp(1.5rem, 1.875vw, 2rem);
+    padding: clamp(1.2rem, 1.41vw, 1.5rem);
     background: var(--surface);
-    border-radius: 10px;
+    border-radius: clamp(8px, 0.94vw, 10px);
     border: 1px solid var(--border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -140,16 +140,16 @@ html[data-theme="dark"] .pomodoro-button:hover {
 
 .pomodoro-stat label {
     display: block;
-    font-size: 0.9rem;
+    font-size: clamp(0.9rem, 0.95vw, 1rem);
     color: var(--muted);
-    margin-bottom: 0.5rem;
+    margin-bottom: clamp(0.4rem, 0.47vw, 0.5rem);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .pomodoro-stat span {
     display: block;
-    font-size: 1.75rem;
+    font-size: clamp(1.6rem, 1.9vw, 2rem);
     font-weight: bold;
     color: #d97706;
 }
@@ -164,11 +164,11 @@ html[data-theme="dark"] .pomodoro-button:hover {
 .pomodoro-subject-panel {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: clamp(0.6rem, 0.7vw, 0.75rem);
     width: 100%;
-    max-width: 320px;
-    padding: 1rem;
-    border-radius: 12px;
+    max-width: 360px;
+    padding: clamp(1rem, 1.15vw, 1.25rem);
+    border-radius: clamp(10px, 1.125vw, 12px);
     background: var(--surface);
     border: 1px solid var(--border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -180,7 +180,7 @@ html[data-theme="dark"] .pomodoro-button:hover {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: clamp(0.85rem, 0.95vw, 1rem);
 }
 
 .pomodoro-subject-status {
@@ -188,12 +188,12 @@ html[data-theme="dark"] .pomodoro-button:hover {
 }
 
 .pomodoro-subject-select {
-    padding: 0.6rem 0.75rem;
-    border-radius: 8px;
+    padding: clamp(0.65rem, 0.75vw, 0.8rem) clamp(0.75rem, 0.85vw, 0.9rem);
+    border-radius: clamp(6px, 0.75vw, 8px);
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: clamp(0.95rem, 1vw, 1.05rem);
 }
 
 .pomodoro-subject-select:disabled {
@@ -202,7 +202,7 @@ html[data-theme="dark"] .pomodoro-button:hover {
 }
 
 .pomodoro-active-subject {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--text-secondary, #b0b0b0);
 }
 
@@ -218,7 +218,7 @@ html[data-theme="dark"] .pomodoro-button:hover {
 
 .pomodoro-subject-input {
     flex: 1;
-    padding: 0.55rem 0.7rem;
+    padding: 0.7rem 0.85rem;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--bg);
@@ -231,7 +231,7 @@ html[data-theme="dark"] .pomodoro-button:hover {
 }
 
 .pomodoro-subject-add-btn {
-    padding: 0.55rem 0.9rem;
+    padding: 0.7rem 1rem;
     border-radius: 8px;
     border: none;
     background: #1f1f1f;

@@ -11,7 +11,7 @@
   --tt-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
   --hour-height: clamp(72px, 10vh, 120px);
   --minute-height: calc(var(--hour-height) / 60);
-  --time-axis-width: clamp(64px, 9vw, 96px);
+  --time-axis-width: clamp(72px, 10vw, 112px);
   --day-min-width: 160px;
   --grid-height: calc(var(--hour-height) * 16);
   --sheet-radius: 22px;
@@ -19,8 +19,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.25rem 2rem 1.5rem;
+  gap: clamp(0.7rem, 0.8vw, 0.9rem);
+  padding: clamp(1.25rem, 1.5vw, 1.6rem) clamp(1.8rem, 2.2vw, 2.5rem) clamp(1.5rem, 1.8vw, 2rem);
   background: var(--bg);
   color: var(--tt-text);
   font-family: "Manrope", "Space Grotesk", sans-serif;
@@ -29,7 +29,7 @@
 .timetable-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: clamp(1.2rem, 1.41vw, 1.5rem);
   align-items: flex-start;
   justify-content: space-between;
 }
@@ -37,13 +37,13 @@
 .timetable-controls-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: clamp(0.6rem, 0.7vw, 0.75rem);
 }
 
 .timetable-add-btn {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: clamp(56px, 6.3vw, 70px);
+  height: clamp(56px, 6.3vw, 70px);
+  border-radius: clamp(12px, 1.5vw, 16px);
   border: 1px solid var(--tt-line);
   background: var(--tt-surface);
   color: var(--tt-text);
@@ -72,18 +72,18 @@
 .timetable-title-group {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: clamp(0.3rem, 0.33vw, 0.35rem);
 }
 
 .timetable-subtitle {
   margin: 0;
   color: var(--tt-muted);
-  font-size: 0.95rem;
+  font-size: clamp(0.9rem, 1vw, 1.05rem);
 }
 
 .timetable-title {
   font-family: "Space Grotesk", "Manrope", sans-serif;
-  font-size: clamp(1.6rem, 2vw, 2.2rem);
+  font-size: clamp(1.85rem, 2.3vw, 2.6rem);
   margin: 0;
 }
 
@@ -116,8 +116,8 @@ html[data-theme="dark"] .timetable-segment {
   background: transparent;
   color: var(--tt-muted);
   font-weight: 600;
-  font-size: 0.86rem;
-  padding: 0.5rem 0.95rem;
+  font-size: clamp(0.85rem, 0.95vw, 1rem);
+  padding: clamp(0.5rem, 0.58vw, 0.6rem) clamp(0.95rem, 1.05vw, 1.1rem);
   border-radius: 999px;
   cursor: pointer;
   letter-spacing: 0.01em;
@@ -162,7 +162,7 @@ html[data-theme="dark"] .timetable-segment-button.is-active {
   gap: 0.6rem;
   flex-wrap: wrap;
   justify-content: flex-end;
-  min-height: 34px;
+  min-height: 42px;
 }
 
 .timetable-cycle-toggle {
@@ -175,8 +175,8 @@ html[data-theme="dark"] .timetable-segment-button.is-active {
   border: 1px solid var(--tt-line);
   background: var(--tt-surface);
   color: var(--tt-muted);
-  font-size: 0.8rem;
-  padding: 0.23rem 0.75rem;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.9rem;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -224,8 +224,8 @@ html[data-theme="dark"] .timetable-scroll {
   position: sticky;
   left: 0;
   z-index: 5;
-  padding: 1rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 1.1rem 0.85rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--tt-muted);
@@ -234,9 +234,9 @@ html[data-theme="dark"] .timetable-scroll {
 }
 
 .timetable-day-header {
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.35rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   border-right: 1px solid var(--tt-line);
   color: var(--tt-text);
   background: var(--tt-surface);
@@ -260,8 +260,8 @@ html[data-theme="dark"] .timetable-scroll {
 }
 
 .timetable-time-label {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.9rem;
   color: var(--tt-muted);
   border-bottom: 1px solid var(--tt-line);
   display: flex;
@@ -337,7 +337,7 @@ html[data-theme="dark"] .timetable-day-column {
 }
 
 .timetable-block-title {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -346,7 +346,7 @@ html[data-theme="dark"] .timetable-day-column {
 }
 
 .timetable-block-time {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   opacity: 0.85;
 }
 
@@ -362,7 +362,7 @@ html[data-theme="dark"] .timetable-day-column {
 }
 
 .timetable-sheet {
-  width: min(420px, calc(100% - 2rem));
+  width: min(500px, calc(100% - 2rem));
   background: white;
   border-radius: 22px;
   border: 1px solid #e5e5e5;
@@ -383,7 +383,7 @@ html[data-theme="dark"] .timetable-sheet {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 1.15rem 1.75rem;
   border-bottom: 1px solid #e5e5e5;
   position: sticky;
   top: 0;
@@ -399,7 +399,7 @@ html[data-theme="dark"] .timetable-sheet-header {
 
 .timetable-sheet-title {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: #111;
 }
 
@@ -413,7 +413,7 @@ html[data-theme="dark"] .timetable-sheet-title {
   font-weight: 600;
   color: var(--tt-muted);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   transition: opacity 0.15s ease;
 }
 
@@ -431,7 +431,7 @@ html[data-theme="dark"] .timetable-sheet-title {
 }
 
 .timetable-sheet-body {
-  padding: 1.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -445,7 +445,7 @@ html[data-theme="dark"] .timetable-sheet-title {
 }
 
 .timetable-field-label {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #111;
   text-transform: uppercase;
@@ -462,8 +462,8 @@ html[data-theme="dark"] .timetable-field-label {
   width: 100%;
   border: 1px solid var(--tt-line);
   border-radius: 14px;
-  padding: 0.75rem 0.9rem;
-  font-size: 0.95rem;
+  padding: 0.9rem 1.05rem;
+  font-size: 1.05rem;
   background: var(--tt-surface-elevated);
   color: var(--tt-text);
   font-family: inherit;
@@ -520,13 +520,13 @@ html[data-theme="dark"] .timetable-card-label {
   color: var(--tt-text);
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
 .timetable-time-divider {
   color: var(--tt-muted);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 
 .timetable-toggle {
@@ -595,7 +595,7 @@ html[data-theme="dark"] .timetable-card-label {
   padding: 0.35rem 0.8rem;
   background: var(--tt-surface-elevated);
   color: var(--tt-text);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -620,7 +620,7 @@ html[data-theme="dark"] .timetable-card-label {
   color: var(--tt-text);
   border-radius: 999px;
   padding: 0.25rem 0.7rem;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 .timetable-error {
@@ -629,11 +629,11 @@ html[data-theme="dark"] .timetable-card-label {
   background: rgba(240, 111, 92, 0.12);
   color: #c4493a;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 
 .timetable-sheet-footer {
-  padding: 0 1.5rem 1.5rem;
+  padding: 0 1.75rem 1.75rem;
   display: flex;
   justify-content: flex-end;
 }
@@ -642,7 +642,7 @@ html[data-theme="dark"] .timetable-card-label {
   border: 1px solid rgba(240, 111, 92, 0.4);
   background: rgba(240, 111, 92, 0.12);
   color: #c4493a;
-  padding: 0.6rem 1rem;
+  padding: 0.75rem 1.15rem;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
@@ -713,13 +713,13 @@ html[data-theme="dark"] .timetable-card-label {
 /* ── Sync feature ───────────────────────────────────────────────── */
 
 .timetable-sync-btn {
-  height: 52px;
-  padding: 0 1.25rem;
+  height: 58px;
+  padding: 0 1.4rem;
   border-radius: 16px;
   border: 1px solid #e5e5e5;
   background: white;
   color: #111;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -751,7 +751,7 @@ html[data-theme="dark"] .timetable-sync-btn {
 }
 
 .timetable-sync-desc {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #111;
   margin: 0 0 1.25rem;
   line-height: 1.55;
@@ -762,7 +762,7 @@ html[data-theme="dark"] .timetable-sync-desc {
 }
 
 .timetable-sync-note {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--tt-muted);
   margin: 0.75rem 0 0;
 }
@@ -778,7 +778,7 @@ html[data-theme="dark"] .timetable-sync-desc {
 }
 
 .timetable-sync-group-label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -791,12 +791,12 @@ html[data-theme="dark"] .timetable-sync-group-label {
 }
 
 .timetable-sync-week-btn {
-  padding: 0.5rem 1.1rem;
+  padding: 0.6rem 1.25rem;
   border-radius: 10px;
   border: 1px solid #e5e5e5;
   background: white;
   color: #111;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;

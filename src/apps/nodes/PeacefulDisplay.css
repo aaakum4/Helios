@@ -47,8 +47,8 @@
   position: absolute;
   top: 5%;
   right: 10%;
-  width: 120px;
-  height: 120px;
+  width: clamp(90px, 11.25vw, 120px);
+  height: clamp(90px, 11.25vw, 120px);
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #fff6b7 0%, #f7d06b 60%, #f0b04a 100%);
   box-shadow: 0 0 40px rgba(247, 208, 107, 0.55);
@@ -184,7 +184,7 @@
 }
 
 .clock-tutorial-text {
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 0.89vw, 0.95rem);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -237,7 +237,7 @@
 .peaceful-display-clock {
   background: rgba(8, 12, 18, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.28);
-  padding: 1.35rem 2.8rem;
+  padding: clamp(1rem, 1.27vw, 1.35rem) clamp(2rem, 2.63vw, 2.8rem);
   border-radius: 999px;
   font-size: clamp(2.4rem, 6vw, 4.8rem);
   font-weight: 600;
