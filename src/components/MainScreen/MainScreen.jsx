@@ -33,6 +33,7 @@ export default function MainScreen({ onBack }) {
   const [dragOverId, setDragOverId] = useState(null);
   const hideTimer = useRef(null);
   const isDraggingRef = useRef(false);
+  const lastSwapTargetRef = useRef(null);
 
   // Live state for card badges
   const [pomodoroIsRunning] = useLocalStorage('pomodoro:isRunning', false);
@@ -64,6 +65,7 @@ export default function MainScreen({ onBack }) {
     e.stopPropagation();
     setDraggedId(nodeId);
     isDraggingRef.current = false;
+    lastSwapTargetRef.current = null;
 
     const startY = e.clientY || e.touches?.[0]?.clientY;
     const startX = e.clientX || e.touches?.[0]?.clientX;
@@ -74,7 +76,38 @@ export default function MainScreen({ onBack }) {
 
       if (Math.abs(currentY - startY) > 5 || Math.abs(currentX - startX) > 5) {
         isDraggingRef.current = true;
-        setDragOverId(nodeId);
+
+        const targetElement = document
+          .elementFromPoint(currentX, currentY)
+          ?.closest("[data-node-id]");
+        const targetNodeId = targetElement?.getAttribute("data-node-id");
+
+        if (!targetNodeId || targetNodeId === nodeId) {
+          setDragOverId(null);
+          lastSwapTargetRef.current = null;
+          return;
+        }
+
+        setDragOverId(targetNodeId);
+
+        if (lastSwapTargetRef.current === targetNodeId) {
+          return;
+        }
+
+        setNodeOrder((prevOrder) => {
+          const fromIndex = prevOrder.indexOf(nodeId);
+          const toIndex = prevOrder.indexOf(targetNodeId);
+
+          if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) {
+            return prevOrder;
+          }
+
+          const nextOrder = [...prevOrder];
+          [nextOrder[fromIndex], nextOrder[toIndex]] = [nextOrder[toIndex], nextOrder[fromIndex]];
+          return nextOrder;
+        });
+
+        lastSwapTargetRef.current = targetNodeId;
       }
     };
 
@@ -85,6 +118,7 @@ export default function MainScreen({ onBack }) {
       window.removeEventListener("touchend", handleMouseUpDrag);
       setDraggedId(null);
       setDragOverId(null);
+      lastSwapTargetRef.current = null;
       
       setTimeout(() => {
         isDraggingRef.current = false;
@@ -95,32 +129,6 @@ export default function MainScreen({ onBack }) {
     window.addEventListener("mouseup", handleMouseUpDrag);
     window.addEventListener("touchmove", handleMouseMoveDrag);
     window.addEventListener("touchend", handleMouseUpDrag);
-  };
-
-  const handleNodeMouseEnter = (nodeId) => {
-    if (panelState === "expanded") {
-      return;
-    }
-
-    if (!draggedId || draggedId === nodeId) {
-      return;
-    }
-
-    setNodeOrder((prevOrder) => {
-      const fromIndex = prevOrder.indexOf(draggedId);
-      const toIndex = prevOrder.indexOf(nodeId);
-
-      if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) {
-        return prevOrder;
-      }
-
-      const nextOrder = [...prevOrder];
-      nextOrder.splice(fromIndex, 1);
-      nextOrder.splice(toIndex, 0, draggedId);
-      return nextOrder;
-    });
-
-    setDragOverId(nodeId);
   };
 
   const handleChange = (e) => {
@@ -271,11 +279,32 @@ export default function MainScreen({ onBack }) {
 
         <div className="main-screen-content" data-panel-state={panelState}>
           <div className="nodes-container">
-            <div className="nodes-grid">
+            <motion.div
+              className="nodes-grid"
+              data-dragging={draggedId ? "true" : "false"}
+              layout
+              transition={{
+                layout: {
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 24,
+                  mass: 0.9,
+                },
+              }}
+            >
               {sortedNodes.map((node, index) => (
-                <div
+                <motion.div
                   key={node.id}
-                  style={{ '--card-index': index }}
+                  layout="position"
+                  transition={{
+                    layout: {
+                      type: "spring",
+                      stiffness: 280,
+                      damping: 25,
+                      mass: 0.85,
+                    },
+                  }}
+                  data-node-id={node.id}
                   className={
                     draggedId === node.id
                       ? "node-card-wrapper dragging"
@@ -283,8 +312,6 @@ export default function MainScreen({ onBack }) {
                       ? "node-card-wrapper drag-over"
                       : "node-card-wrapper"
                   }
-                  onMouseEnter={() => handleNodeMouseEnter(node.id)}
-                  onTouchMove={() => handleNodeMouseEnter(node.id)}
                 >
                   <NodeCard
                     node={node}
@@ -297,9 +324,9 @@ export default function MainScreen({ onBack }) {
                     isDragging={draggedId === node.id}
                     liveState={getLiveState(node.id)}
                   />
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           <SidePanel
