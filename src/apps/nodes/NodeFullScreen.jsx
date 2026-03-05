@@ -35,7 +35,7 @@ export default function NodeFullScreen({ node, onClose }) {
                 >
                   <span className="node-fullscreen-info-icon" aria-hidden="true">i</span>
                   <span className="node-fullscreen-info-tooltip">
-                    If you are suffering from mental health issues, do not suffer in silence and seek help, for your own good. About 720,000 people die by suicide each year.
+                    If you are struggling with your mental health, please reach out to someone you trust or a local support service. You do not have to carry it alone.
                   </span>
                 </button>
               )}

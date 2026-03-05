@@ -33,7 +33,11 @@ export default function SettingsModal({ onClose }) {
   useEffect(() => {
     try {
       document.documentElement.setAttribute("data-glow", glowColor);
-    } catch (e) {}
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.warn("[settings] Unable to apply glow setting.", error);
+            }
+        }
   }, [glowColor]);
 
   const handleResetTutorials = () => {

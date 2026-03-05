@@ -5,6 +5,12 @@ let currentMode = null;
 let unsubscribeNativeTheme = null;
 let unsubscribeMediaTheme = null;
 
+function reportThemeWarning(context, error) {
+  if (import.meta.env.DEV) {
+    console.warn(`[theme] ${context}`, error);
+  }
+}
+
 function getSystemThemeFromMedia() {
   if (typeof window === "undefined") {
     return "light";
@@ -120,7 +126,9 @@ export function getStoredThemeMode() {
     if (VALID_MODES.has(stored)) {
       return stored;
     }
-  } catch (e) {}
+  } catch (error) {
+    reportThemeWarning("Unable to read stored theme mode.", error);
+  }
 
   return "system";
 }
@@ -132,7 +140,9 @@ export async function setThemeMode(mode, options = {}) {
   if (options.persist !== false) {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, nextMode);
-    } catch (e) {}
+    } catch (error) {
+      reportThemeWarning("Unable to persist theme mode.", error);
+    }
   }
 
   if (nextMode === "system") {

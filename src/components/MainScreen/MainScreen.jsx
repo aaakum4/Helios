@@ -53,7 +53,11 @@ export default function MainScreen({ onBack }) {
   useEffect(() => {
     try {
       localStorage.setItem("nodeOrder", JSON.stringify(nodeOrder));
-    } catch (e) {}
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.warn("[main-screen] Unable to persist node order.", error);
+      }
+    }
   }, [nodeOrder]);
 
   const handleNodeMouseDown = useCallback((e, nodeId) => {

@@ -13,11 +13,19 @@ export const PALETTES = [
 
 const VALID_PALETTES = new Set(PALETTES.map((p) => p.id));
 
+function reportPaletteWarning(context, error) {
+  if (import.meta.env.DEV) {
+    console.warn(`[palette] ${context}`, error);
+  }
+}
+
 export function getStoredPalette() {
   try {
     const stored = localStorage.getItem(PALETTE_STORAGE_KEY);
     if (VALID_PALETTES.has(stored)) return stored;
-  } catch (e) {}
+  } catch (error) {
+    reportPaletteWarning("Unable to read stored palette.", error);
+  }
   return "default";
 }
 
@@ -28,7 +36,9 @@ export function applyPalette(id) {
     // "default" sets the attribute too — CSS simply has no rules for it,
     // so the neutral base theme vars show through unchanged.
     document.documentElement.setAttribute("data-palette", next);
-  } catch (e) {}
+  } catch (error) {
+    reportPaletteWarning("Unable to apply palette.", error);
+  }
 }
 
 export function initializePalette() {

@@ -1,7 +1,7 @@
 {
   "name": "helios",
   "version": "1.0.0",
-  "description": "** Insert image here~",
+  "description": "A focused desktop productivity app with modular tools for planning, reflection, and deep work.",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
