@@ -1,3 +1,4 @@
+import { memo } from "react";
 import "./GeometricLayer.css";
 
 /**
@@ -11,8 +12,10 @@ import "./GeometricLayer.css";
  *  1. Large rounded hexagon — top-right corner
  *  2. Rotated soft square   — bottom-left, behind cards
  *  3. Oversized circle      — bottom-right, bleeds off-screen
+ *
+ * Memoized to prevent re-renders.
  */
-export default function GeometricLayer({ tod }) {
+function GeometricLayer({ tod }) {
   return (
     <div className="geo-layer" data-tod={tod} aria-hidden="true">
       {/* ── Shape 1: rounded hexagon, top-right ── */}
@@ -50,3 +53,5 @@ export default function GeometricLayer({ tod }) {
     </div>
   );
 }
+
+export default memo(GeometricLayer);

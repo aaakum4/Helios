@@ -1,9 +1,11 @@
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import './nodes.css';
 
 const cardSpring = { type: "spring", stiffness: 300, damping: 20 };
 
-export default function NodeCard({ node, onClick, onDragStart, isDragging, liveState }) {
+// Memoized to prevent unnecessary re-renders when parent updates
+function NodeCard({ node, onClick, onDragStart, isDragging, liveState }) {
   return (
     <motion.div
       className="node-card"
@@ -18,7 +20,7 @@ export default function NodeCard({ node, onClick, onDragStart, isDragging, liveS
         onTouchStart={onDragStart}
         title="Drag to reorder"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-icon lucide-move"><path d="M12 2v20"/><path d="m15 19-3 3-3-3"/><path d="m19 9 3 3-3 3"/><path d="M2 12h20"/><path d="m5 9-3 3 3 3"/><path d="m9 5 3-3 3 3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-move-icon lucide-move"><path d="M12 2v20"/><path d="m15 19-3 3-3-3"/><path d="m19 9 3 3-3 3"/><path d="M2 12h20"/><path d="m5 9-3 3 3 3"/><path d="m9 5 3-3 3 3"/></svg>
       </button>
       {liveState && (
         <span className="card-status-badge">{liveState}</span>
@@ -30,3 +32,5 @@ export default function NodeCard({ node, onClick, onDragStart, isDragging, liveS
     </motion.div>
   );
 }
+
+export default memo(NodeCard);

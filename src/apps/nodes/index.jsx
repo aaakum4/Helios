@@ -1,9 +1,12 @@
-import PomodoroComponent from './Pomodoro';
-import TimetableComponent from './Timetable';
-import PeacefulDisplayComponent from './PeacefulDisplay';
-import TodoComponent from './Todo';
-import FocusTrackerComponent from './FocusTracker';
-import ReflectionComponent from './Reflection';
+import { lazy } from 'react';
+
+// Lazy load node components for better performance
+const PomodoroComponent = lazy(() => import('./Pomodoro'));
+const TimetableComponent = lazy(() => import('./Timetable'));
+const PeacefulDisplayComponent = lazy(() => import('./PeacefulDisplay'));
+const TodoComponent = lazy(() => import('./Todo'));
+const FocusTrackerComponent = lazy(() => import('./FocusTracker'));
+const ReflectionComponent = lazy(() => import('./Reflection'));
 
 export const nodes = [
   {

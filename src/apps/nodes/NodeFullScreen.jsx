@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import './nodes.css';
@@ -54,7 +55,9 @@ export default function NodeFullScreen({ node, onClose }) {
           </button>
         )}
         <div className="node-fullscreen-content">
+          <Suspense fallback={<div className="node-loading-spinner">Loading...</div>}>
             <node.component />
+          </Suspense>
           </div>
       </motion.div>
     </motion.div>

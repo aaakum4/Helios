@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 const TimeContext = createContext();
 
@@ -12,8 +12,11 @@ export function TimeProvider({ children }) {
         return () => clearInterval(timer);
     }, []);
 
+    // Memoize the context value to prevent unnecessary re-renders
+    const value = useMemo(() => ({ time }), [time]);
+
     return (
-        <TimeContext.Provider value={{ time }}>
+        <TimeContext.Provider value={value}>
             {children}
         </TimeContext.Provider>
     );
@@ -21,4 +24,17 @@ export function TimeProvider({ children }) {
 
 export function useTime() {
     return useContext(TimeContext);
+}
+
+// Hook to get only the hours for time-of-day, updates less frequently
+export function useTimeOfDay() {
+    const { time } = useTime();
+    return useMemo(() => {
+        const h = time.getHours();
+        if (h >= 4 && h < 8)  return 'dawn';
+        if (h >= 8 && h < 12) return 'morning';
+        if (h >= 12 && h < 16) return 'midday';
+        if (h >= 16 && h < 20) return 'evening';
+        return 'night';
+    }, [time.getHours()]);
 }

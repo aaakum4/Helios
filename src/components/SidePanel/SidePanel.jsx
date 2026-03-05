@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, memo } from "react";
 import { motion } from 'framer-motion';
 import { useTime } from "../../core/TimeProvider";
 import { useAppContext } from "../../core/AppContext";
 import "./SidePanel.css";
 
-export default function SidePanel({ state, onToggle, onQuickAddTodo, subheadings }) {
+function SidePanel({ state, onToggle, onQuickAddTodo, subheadings }) {
     const [quickInput, setQuickInput] = useState("");
     const [selectedSubheadingId, setSelectedSubheadingId] = useState("inbox-default");
     const [dueDate, setDueDate] = useState("");
@@ -236,3 +236,5 @@ return (
     </div>
     );
 }
+
+export default memo(SidePanel);

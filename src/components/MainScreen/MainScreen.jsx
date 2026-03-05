@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TopBar from "../TopBar/TopBar";
 import SettingsModal from "./Settings/SettingsModal";
@@ -8,7 +8,7 @@ import NodeFullScreen from "../../apps/nodes/NodeFullScreen";
 import SidePanel from "../SidePanel/SidePanel";
 import { useLocalStorage } from "../../core/useLocalStorage";
 import { createId } from "../../core/idGenerator";
-import { useTime } from "../../core/TimeProvider";
+import { useTimeOfDay } from "../../core/TimeProvider";
 import WaveBackground from "../WaveBackground/WaveBackground";
 import GeometricLayer from "../GeometricLayer/GeometricLayer";
 import "./MainScreen.css";
@@ -56,7 +56,7 @@ export default function MainScreen({ onBack }) {
     } catch (e) {}
   }, [nodeOrder]);
 
-  const handleNodeMouseDown = (e, nodeId) => {
+  const handleNodeMouseDown = useCallback((e, nodeId) => {
     if (panelState === "expanded") {
       return;
     }
@@ -129,9 +129,9 @@ export default function MainScreen({ onBack }) {
     window.addEventListener("mouseup", handleMouseUpDrag);
     window.addEventListener("touchmove", handleMouseMoveDrag);
     window.addEventListener("touchend", handleMouseUpDrag);
-  };
+  }, [panelState]);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const value = e.target.value;
     if (value.length <= MAX_CHARS) {
       setText(value);
@@ -140,19 +140,24 @@ export default function MainScreen({ onBack }) {
     setShowCounter(true);
     if (hideTimer.current) clearTimeout(hideTimer.current);
     hideTimer.current = setTimeout(() => setShowCounter(false), 1000);
-  };
+  }, []);
 
-  const handlePanelToggle = () => {
+  const handlePanelToggle = useCallback(() => {
     setPanelState((prev) => (prev === 'expanded' ? 'hidden' : 'expanded'));
-  };
+  }, []);
 
-  const sortedNodes = nodeOrder
-    .map((id) => nodes.find((n) => n.id === id))
-    .filter(Boolean);
+  // Memoize sorted nodes to prevent recalculation on every render
+  const sortedNodes = useMemo(() => 
+    nodeOrder.map((id) => nodes.find((n) => n.id === id)).filter(Boolean),
+    [nodeOrder]
+  );
 
-  const activeNode = activeNodeId ? nodes.find((n) => n.id === activeNodeId) : null;
+  const activeNode = useMemo(() => 
+    activeNodeId ? nodes.find((n) => n.id === activeNodeId) : null,
+    [activeNodeId]
+  );
 
-  const getLiveState = (nodeId) => {
+  const getLiveState = useCallback((nodeId) => {
     if (nodeId === 'pomodoro' && pomodoroIsRunning) {
       return pomodoroIsWorkSession ? 'Focus · Running' : 'Break · Running';
     }
@@ -164,19 +169,12 @@ export default function MainScreen({ onBack }) {
       if (dueTodayCount > 0) return `${dueTodayCount} due today`;
     }
     return null;
-  };
+  }, [pomodoroIsRunning, pomodoroIsWorkSession, todosData]);
 
-  const { time } = useTime();
-  const timeOfDay = (() => {
-    const h = time.getHours();
-    if (h >= 4 && h < 8)  return 'dawn';
-    if (h >= 8 && h < 12) return 'morning';
-    if (h >= 12 && h < 16) return 'midday';
-    if (h >= 16 && h < 20) return 'evening';
-    return 'night';
-  })();
+  // Use optimized time-of-day hook that only updates when hour changes
+  const timeOfDay = useTimeOfDay();
 
-  const handleQuickAddTodo = (title, subheadingId = "inbox-default", dueDate = "") => {
+  const handleQuickAddTodo = useCallback((title, subheadingId = "inbox-default", dueDate = "") => {
     const trimmed = title.trim();
     if (!trimmed) {
       return;
@@ -231,7 +229,7 @@ export default function MainScreen({ onBack }) {
         subheadings: nextSubheadings,
       };
     });
-  };
+  }, [setTodosData]);
 
   return (
     <div className="app-container">
@@ -282,15 +280,6 @@ export default function MainScreen({ onBack }) {
             <motion.div
               className="nodes-grid"
               data-dragging={draggedId ? "true" : "false"}
-              layout
-              transition={{
-                layout: {
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 24,
-                  mass: 0.9,
-                },
-              }}
             >
               {sortedNodes.map((node, index) => (
                 <motion.div

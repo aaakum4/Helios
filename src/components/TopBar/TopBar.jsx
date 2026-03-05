@@ -1,8 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import { motion } from 'framer-motion';
 import "./TopBar.css";
 
-export default function TopBar({ 
+function TopBar({ 
   text, 
   onChange, 
   showCounter, 
@@ -42,3 +42,5 @@ export default function TopBar({
     </div>
   );
 }
+
+export default memo(TopBar);

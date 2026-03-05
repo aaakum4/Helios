@@ -1,3 +1,4 @@
+import { memo } from "react";
 import "./WaveBackground.css";
 
 /**
@@ -11,8 +12,10 @@ import "./WaveBackground.css";
  * The SVG is 200 % wide (2880 viewBox units, period = 720 units × 4).
  * Animating translateX(0 → -50 %) shifts exactly one full tile and
  * loops with no seam.
+ *
+ * Memoized to prevent re-renders.
  */
-export default function WaveBackground() {
+function WaveBackground() {
   return (
     <div className="wave-bg" aria-hidden="true">
       {/* ── Layer 1 – bottom / darkest ── */}
@@ -77,3 +80,5 @@ export default function WaveBackground() {
     </div>
   );
 }
+
+export default memo(WaveBackground);
