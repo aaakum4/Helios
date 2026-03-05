@@ -411,10 +411,14 @@ html[data-theme="dark"] .timetable-sheet-title {
   border: none;
   background: transparent;
   font-weight: 600;
-  color: var(--tt-muted);
+  color: #666;
   cursor: pointer;
   font-size: 1rem;
   transition: opacity 0.15s ease;
+}
+
+html[data-theme="dark"] .timetable-sheet-action {
+  color: #aaa;
 }
 
 .timetable-sheet-action:hover {
@@ -713,7 +717,7 @@ html[data-theme="dark"] .timetable-card-label {
 /* ── Sync feature ───────────────────────────────────────────────── */
 
 .timetable-sync-btn {
-  height: 58px;
+  height: clamp(56px, 6.3vw, 70px);
   padding: 0 1.4rem;
   border-radius: 16px;
   border: 1px solid #e5e5e5;

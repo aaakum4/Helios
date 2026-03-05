@@ -88,32 +88,38 @@ export default function Pomodoro() {
     };
 
     const stopFocusTrackerSession = () => {
-        if (!ftActiveSubjectId || !ftSessionStartTime || ftSessionSource !== 'pomodoro') return;
-        const dur = Math.floor((Date.now() - ftSessionStartTime) / 1000);
-        if (dur > 0) {
-            setStudySessions((prev) => [...prev, {
-                id: createId(),
-                subjectId: ftActiveSubjectId,
-                startTime: ftSessionStartTime,
-                endTime: Date.now(),
-                duration: dur,
-                type: 'manual',
-                completed: true,
-            }]);
+        if (!ftActiveSubjectId || !ftSessionStartTime) return;
+        
+        // Only create a session if this was started manually (not by Pomodoro)
+        // Pomodoro manages its own study sessions via finalizeStudySession
+        if (ftSessionSource === 'manual') {
+            const dur = Math.floor((Date.now() - ftSessionStartTime) / 1000);
+            if (dur > 0) {
+                setStudySessions((prev) => [...prev, {
+                    id: createId(),
+                    subjectId: ftActiveSubjectId,
+                    startTime: ftSessionStartTime,
+                    endTime: Date.now(),
+                    duration: dur,
+                    type: 'manual',
+                    completed: true,
+                }]);
+            }
         }
+        
         setFtActiveSubjectId(null);
         setFtSessionStartTime(null);
         setFtSessionStartDate(null);
         setFtSessionSource(null);
     };
 
-    const createStudySession = () => {
+    const createStudySession = (startTime = null) => {
         if (!selectedSubjectId || activeStudySession) return false;
-        const startTime = Date.now();
+        const sessionStartTime = startTime || sessionStartTimeRef.current || Date.now();
         const session = {
             id: createId(),
             subjectId: selectedSubjectId,
-            startTime,
+            startTime: sessionStartTime,
             endTime: null,
             duration: 0,
             type: 'pomodoro',
@@ -231,12 +237,26 @@ export default function Pomodoro() {
 
 const handlePlayPause = () => {
     if (!isRunning) {
+        let sessionStart;
         if (pausedElapsed > 0) {
             // Resuming from pause — offset start time so elapsed continues from where it was
             const resumeStart = Date.now() - pausedElapsed * 1000;
             sessionStartTimeRef.current = resumeStart;
             setSessionStartTime(resumeStart);
             setPausedElapsed(0);
+            sessionStart = resumeStart;
+            // Update the existing session's start time to account for the pause
+            if (activeStudySession) {
+                setActiveStudySession({
+                    ...activeStudySession,
+                    startTime: resumeStart,
+                });
+                setStudySessions((prev) => prev.map((entry) =>
+                    entry.id === activeStudySession.id
+                        ? { ...entry, startTime: resumeStart }
+                        : entry
+                ));
+            }
             // elapsed state stays at pausedElapsed; interval will recalculate on next tick
         } else {
             // Fresh start
@@ -244,10 +264,14 @@ const handlePlayPause = () => {
             sessionStartTimeRef.current = now;
             setSessionStartTime(now);
             setElapsed(0);
+            sessionStart = now;
         }
         if (isWorkSession) {
-            createStudySession();
-            startFocusTrackerSession(Date.now());
+            // Only create a new session if one doesn't exist (fresh start, not resume)
+            if (!activeStudySession) {
+                createStudySession(sessionStart);
+            }
+            startFocusTrackerSession(sessionStart);
         }
         const subjectName = focusSubjects.find((s) => s.id === selectedSubjectId)?.name;
         window.posthog?.capture("pomodoro_session_started", {
@@ -264,7 +288,8 @@ const handlePlayPause = () => {
             ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
             : elapsed;
         setPausedElapsed(currentElapsed);
-        finalizeStudySession(false);
+        // Don't finalize the session when pausing - keep it active so we can resume it
+        // Only finalize when actually completing or resetting
         stopFocusTrackerSession();
         window.posthog?.capture("pomodoro_session_paused", {
             session_type: isWorkSession ? "work" : "break",

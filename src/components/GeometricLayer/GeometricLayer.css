@@ -8,16 +8,28 @@
   overflow: hidden;
 
   /* Default opacity — overridden per time-of-day below */
+  --geo-opacity: 0.18;
+  --geo-fill-opacity: 0.14;
+}
+
+/* ── Time-of-day opacity tuning ────────────────────────────────────── */
+.geo-layer[data-tod="dawn"]    { --geo-opacity: 0.2;   --geo-fill-opacity: 0.15; }
+.geo-layer[data-tod="morning"] { --geo-opacity: 0.17;  --geo-fill-opacity: 0.13; }
+.geo-layer[data-tod="midday"]  { --geo-opacity: 0.15;  --geo-fill-opacity: 0.11; }
+.geo-layer[data-tod="evening"] { --geo-opacity: 0.21;  --geo-fill-opacity: 0.16; }
+.geo-layer[data-tod="night"]   { --geo-opacity: 0.24;  --geo-fill-opacity: 0.19; }
+
+/* ── Dark mode: reduce to original values ────────────────────────────── */
+html[data-theme="dark"] .geo-layer {
   --geo-opacity: 0.12;
   --geo-fill-opacity: 0.09;
 }
 
-/* ── Time-of-day opacity tuning ────────────────────────────────────── */
-.geo-layer[data-tod="dawn"]    { --geo-opacity: 0.13;  --geo-fill-opacity: 0.1;  }
-.geo-layer[data-tod="morning"] { --geo-opacity: 0.11;  --geo-fill-opacity: 0.08; }
-.geo-layer[data-tod="midday"]  { --geo-opacity: 0.1;   --geo-fill-opacity: 0.07; }
-.geo-layer[data-tod="evening"] { --geo-opacity: 0.14;  --geo-fill-opacity: 0.11; }
-.geo-layer[data-tod="night"]   { --geo-opacity: 0.16;  --geo-fill-opacity: 0.13; }
+html[data-theme="dark"] .geo-layer[data-tod="dawn"]    { --geo-opacity: 0.13;  --geo-fill-opacity: 0.1;  }
+html[data-theme="dark"] .geo-layer[data-tod="morning"] { --geo-opacity: 0.11;  --geo-fill-opacity: 0.08; }
+html[data-theme="dark"] .geo-layer[data-tod="midday"]  { --geo-opacity: 0.1;   --geo-fill-opacity: 0.07; }
+html[data-theme="dark"] .geo-layer[data-tod="evening"] { --geo-opacity: 0.14;  --geo-fill-opacity: 0.11; }
+html[data-theme="dark"] .geo-layer[data-tod="night"]   { --geo-opacity: 0.16;  --geo-fill-opacity: 0.13; }
 
 /* ── Shared shape base ─────────────────────────────────────────────── */
 .geo-shape {

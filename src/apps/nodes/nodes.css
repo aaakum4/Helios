@@ -261,7 +261,7 @@ html[data-theme="dark"] .node-move-button:hover {
     border-radius: 8px;
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--muted);
+    color: #666;
     cursor: pointer;
     font-size: 1.5rem;
     line-height: 1;
@@ -270,6 +270,10 @@ html[data-theme="dark"] .node-move-button:hover {
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
+}
+
+html[data-theme="dark"] .node-fullscreen-close {
+    color: #aaa;
 }
 
 .node-fullscreen-close:hover {

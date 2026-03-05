@@ -70,6 +70,14 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     border-color: var(--text);
 }
 
+html[data-theme="dark"] .focus-tracker-btn--secondary {
+    color: #ddd;
+}
+
+html[data-theme="dark"] .focus-tracker-btn--secondary:hover {
+    border-color: #ddd;
+}
+
 .focus-tracker-stats {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -105,7 +113,7 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
 .focus-tracker-period-btn {
     border: none;
     background: transparent;
-    color: var(--muted);
+    color: #888;
     font-weight: 600;
     font-size: clamp(0.85rem, 0.95vw, 0.95rem);
     padding: clamp(0.45rem, 0.52vw, 0.55rem) clamp(0.9rem, 1vw, 1.1rem);
@@ -124,13 +132,29 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+html[data-theme="dark"] .focus-tracker-period-btn {
+    color: #aaa;
+}
+
+html[data-theme="dark"] .focus-tracker-period-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .focus-tracker-period-btn.is-active {
+    color: #fff;
+}
+
 .focus-tracker-stats-empty {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 3rem 1rem;
-    color: var(--muted);
+    color: #888;
     text-align: center;
+}
+
+html[data-theme="dark"] .focus-tracker-stats-empty {
+    color: #aaa;
 }
 
 .focus-tracker-stats-content {
@@ -187,8 +211,12 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
 
 .focus-tracker-legend-time {
     font-size: clamp(0.85rem, 0.9vw, 0.95rem);
-    color: var(--muted);
+    color: #888;
     font-variant-numeric: tabular-nums;
+}
+
+html[data-theme="dark"] .focus-tracker-legend-time {
+    color: #aaa;
 }
 
 .focus-tracker-subjects {
@@ -273,7 +301,7 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     border-radius: clamp(6px, 0.75vw, 8px);
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--muted);
+    color: #666;
     cursor: pointer;
     font-size: clamp(1.3rem, 1.41vw, 1.5rem);
     line-height: 1;
@@ -282,6 +310,10 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
+}
+
+html[data-theme="dark"] .focus-tracker-delete-btn {
+    color: #aaa;
 }
 
 .focus-tracker-delete-btn:hover {
@@ -348,7 +380,7 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     border-radius: clamp(6px, 0.75vw, 8px);
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--muted);
+    color: #666;
     cursor: pointer;
     font-size: clamp(1.3rem, 1.41vw, 1.5rem);
     line-height: 1;
@@ -356,6 +388,10 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+}
+
+html[data-theme="dark"] .focus-tracker-modal-close {
+    color: #aaa;
 }
 
 .focus-tracker-modal-close:hover {

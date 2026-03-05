@@ -43,7 +43,7 @@
     padding-bottom: clamp(6px, 0.75vw, 8px);
     font-size: clamp(24px, 2.2vh, 30px);
     font-weight: 700;
-    color: #111;
+    color: #222;
     flex-shrink: 0;
 }
 
@@ -95,7 +95,8 @@ html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
 
 .settings-section label {
     font-weight: 600;
-    color: #111;
+    color: #222;
+    font-size: clamp(13px, 1.4vh, 15px);
 }
 
 .settings-section.glow-label-section {
@@ -156,12 +157,13 @@ html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
     border-radius: 999px;
     border: none;
     background: transparent;
-    color: var(--text);
+    color: #666;
     cursor: pointer;
     font-size: clamp(13px, 1.3vh, 14px);
     transition: color 150ms ease;
     position: relative;
     z-index: 1;
+    font-weight: 500;
 }
 
 .theme-option input {
@@ -170,6 +172,17 @@ html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
 
 .theme-option.is-active {
     color: #ffffff;
+    font-weight: 600;
+}
+
+html[data-theme="dark"] .theme-option {
+    color: #bbb;
+    font-weight: 500;
+}
+
+html[data-theme="dark"] .theme-option.is-active {
+    color: #ffffff;
+    font-weight: 600;
 }
 
 .theme-switch input {
@@ -238,16 +251,20 @@ html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
 }
 
 .palette-swatch:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.08);
 }
 
 html[data-theme="dark"] .palette-swatch:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .palette-swatch.is-active {
     border-color: var(--swatch);
-    background: color-mix(in srgb, var(--swatch) 12%, transparent);
+    background: color-mix(in srgb, var(--swatch) 15%, transparent);
+}
+
+html[data-theme="dark"] .palette-swatch.is-active {
+    background: color-mix(in srgb, var(--swatch) 20%, transparent);
 }
 
 .palette-swatch-dot {
@@ -283,12 +300,22 @@ html[data-theme="dark"] .palette-swatch:hover {
 
 .palette-swatch-label {
     font-size: clamp(11px, 1.1vh, 13px);
-    color: var(--muted);
+    color: #666;
     white-space: nowrap;
+    font-weight: 500;
 }
 
 .palette-swatch.is-active .palette-swatch-label {
     color: var(--text);
+    font-weight: 600;
+}
+
+html[data-theme="dark"] .palette-swatch-label {
+    color: #bbb;
+}
+
+html[data-theme="dark"] .palette-swatch.is-active .palette-swatch-label {
+    color: #fff;
     font-weight: 600;
 }
 
@@ -308,18 +335,20 @@ html[data-theme="dark"] .palette-swatch:hover {
     border-radius: clamp(6px, 0.75vw, 8px);
     cursor: pointer;
     transition: background 150ms;
-    color: #111;
+    color: #333;
     font-size: clamp(13px, 1.2vh, 15px);
+    font-weight: 500;
 }
 
 .glow-option:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.08);
 }
 
 .glow-option input {
     cursor: pointer;
-    width: clamp(14px, 1.5vw, 16px);
-    height: clamp(14px, 1.5vw, 16px);
+    width: clamp(16px, 1.7vw, 18px);
+    height: clamp(16px, 1.7vw, 18px);
+    accent-color: var(--accent);
 }
 
 .glow-radio-label {
@@ -332,7 +361,7 @@ html[data-theme="dark"] .palette-swatch:hover {
     border-radius: clamp(8px, 0.94vw, 10px);
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--muted);
+    color: #666;
     cursor: pointer;
     font-size: clamp(1.3rem, 1.4vw, 1.5rem);
     line-height: 1;
@@ -362,7 +391,7 @@ html[data-theme="dark"] .palette-swatch:hover {
     border-radius: clamp(7px, 0.84vw, 9px);
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--muted);
+    color: #555;
     cursor: pointer;
     font-weight: 600;
     font-size: clamp(13px, 1.2vh, 14px);
@@ -376,13 +405,15 @@ html[data-theme="dark"] .palette-swatch:hover {
 }
 
 html[data-theme="dark"] .reset-tutorials-btn {
-    border-color: var(--border);
-    color: var(--muted);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ddd;
+    font-weight: 600;
 }
 
 html[data-theme="dark"] .reset-tutorials-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .settings-apply {
@@ -414,15 +445,16 @@ html[data-theme="dark"] .settings-section {
 }
 
 html[data-theme="dark"] .settings-section label {
-    color: #ffffff;
+    color: #fff;
+    font-weight: 600;
 }
 
 html[data-theme="dark"] .glow-option {
-    color: #ffffff;
+    color: #e5e5e5;
 }
 
 html[data-theme="dark"] .glow-option:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 html[data-theme="dark"] .theme-switch input:checked + .switch-track {
@@ -430,8 +462,8 @@ html[data-theme="dark"] .theme-switch input:checked + .switch-track {
 }
 
 html[data-theme="dark"] .settings-close {
-    border-color: var(--border);
-    color: var(--muted);
+    color: #bbb;
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 html[data-theme="dark"] .settings-close:hover {

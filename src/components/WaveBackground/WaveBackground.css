@@ -30,21 +30,34 @@
 
 /* ── Layer 1 – lowest / darkest ── */
 .wave-svg--1 {
-  opacity: 0.11;
+  opacity: 0.16;
   animation: waveDrift 38s linear infinite;
 }
 
 /* ── Layer 2 – middle ── */
 .wave-svg--2 {
-  opacity: 0.07;
+  opacity: 0.11;
   /* Drift in the opposite direction for gentle counter-motion */
   animation: waveDriftReverse 28s linear infinite;
 }
 
 /* ── Layer 3 – highest / lightest ── */
 .wave-svg--3 {
-  opacity: 0.045;
+  opacity: 0.07;
   animation: waveDrift 22s linear infinite;
+}
+
+/* ── Dark mode: reduce opacity ── */
+html[data-theme="dark"] .wave-svg--1 {
+  opacity: 0.11;
+}
+
+html[data-theme="dark"] .wave-svg--2 {
+  opacity: 0.07;
+}
+
+html[data-theme="dark"] .wave-svg--3 {
+  opacity: 0.045;
 }
 
 /* ── Keyframes ── */

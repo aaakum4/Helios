@@ -230,7 +230,7 @@
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: var(--muted);
+    color: #666;
     cursor: pointer;
     font-size: clamp(1.4rem, 1.875vw, 1.8rem);
     line-height: 1;
@@ -239,6 +239,11 @@
     justify-content: center;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="dark"] .side-panel__close {
+    color: #aaa;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .side-panel__close:hover {
@@ -357,22 +362,32 @@
     padding: clamp(0.75rem, 0.9375vw, 1rem);
     font-size: clamp(0.95rem, 1.125vw, 1.1rem);
     font-weight: 600;
-    color: white;
-    background: var(--accent);
-    border: none;
+    color: var(--text);
+    background: transparent;
+    border: 2px solid var(--accent);
     border-radius: clamp(8px, 0.75vw, 10px);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
 }
 
 .side-panel__add-btn:hover {
+    background: var(--accent);
+    color: white;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(74, 144, 226, 0.35);
 }
 
 .side-panel__add-btn:active {
     transform: scale(0.98);
+}
+
+html[data-theme="dark"] .side-panel__add-btn {
+    color: #fff;
+    border-color: var(--accent);
+}
+
+html[data-theme="dark"] .side-panel__add-btn:hover {
+    background: var(--accent);
+    color: white;
 }
 
 html[data-theme="dark"] .side-panel__tab {

@@ -97,7 +97,7 @@
 .subheading-delete-btn {
     background: transparent;
     border: none;
-    color: var(--text);
+    color: #666;
     font-size: 20px;
     cursor: pointer;
     padding: 8px;
@@ -109,6 +109,10 @@
     justify-content: center;
     opacity: 0;
     transition: all 0.2s ease;
+}
+
+html[data-theme="dark"] .subheading-delete-btn {
+    color: #aaa;
 }
 
 .subheading-item:hover .subheading-delete-btn {

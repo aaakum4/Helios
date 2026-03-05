@@ -67,7 +67,11 @@
 }
 
 .subheading-input::placeholder {
-    color: var(--muted);
+    color: #888;
+}
+
+html[data-theme="dark"] .subheading-input::placeholder {
+    color: #888;
 }
 
 .modal-actions {
@@ -100,6 +104,16 @@
     background: var(--muted);
     color: var(--bg);
     border-color: var(--muted);
+}
+
+html[data-theme="dark"] .btn-cancel {
+    color: #ddd;
+}
+
+html[data-theme="dark"] .btn-confirm {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
 }
 
 .btn-confirm:hover:not(:disabled) {

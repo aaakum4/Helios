@@ -193,7 +193,7 @@
     border-radius: 8px;
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--muted);
+    color: #666;
     cursor: pointer;
     font-size: 1.2rem;
     line-height: 1;
@@ -205,6 +205,10 @@
     padding: 0;
 }
 
+html[data-theme="dark"] .todo-delete-btn {
+    color: #aaa;
+}
+
 .todo-delete-btn:hover {
     background: #ef4444;
     border-color: #ef4444;
@@ -212,10 +216,14 @@
 }
 
 .todo-list-empty {
-    color: var(--muted);
+    color: #888;
     font-size: 16px;
     padding: 20px 0;
     text-align: center;
+}
+
+html[data-theme="dark"] .todo-list-empty {
+    color: #aaa;
 }
 
 .todo-items::-webkit-scrollbar {

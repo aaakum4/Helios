@@ -64,10 +64,14 @@
 
 .pomodoro-session-type {
     font-size: clamp(1.2rem, 1.35vw, 1.4rem);
-    color: var(--muted);
+    color: #888;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+html[data-theme="dark"] .pomodoro-session-type {
+    color: #aaa;
 }
 
 .pomodoro-progress-bar {
@@ -141,10 +145,14 @@ html[data-theme="dark"] .pomodoro-button:hover {
 .pomodoro-stat label {
     display: block;
     font-size: clamp(0.9rem, 0.95vw, 1rem);
-    color: var(--muted);
+    color: #888;
     margin-bottom: clamp(0.4rem, 0.47vw, 0.5rem);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+html[data-theme="dark"] .pomodoro-stat label {
+    color: #aaa;
 }
 
 .pomodoro-stat span {

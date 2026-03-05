@@ -153,10 +153,10 @@
 /* Position-based tilt on hover — outward on edges, alternating in the centre */
 /* 3-column default layout (≥900px) */
 .nodes-grid > .node-card-wrapper:nth-child(1):hover { rotate: -2deg; }   /* top-left  → lean left  */
-.nodes-grid > .node-card-wrapper:nth-child(2):hover { rotate: -1.2deg; } /* top-centre → bottom-right moves up */
+.nodes-grid > .node-card-wrapper:nth-child(2):hover { rotate: -1deg; } /* top-centre → bottom-right moves up */
 .nodes-grid > .node-card-wrapper:nth-child(3):hover { rotate: 1deg; }    /* top-right → left side goes up */
 .nodes-grid > .node-card-wrapper:nth-child(4):hover { rotate: -1.5deg; } /* bottom-left → lean left */
-.nodes-grid > .node-card-wrapper:nth-child(5):hover { rotate: 1.2deg; }  /* bottom-centre → opposite of top-centre */
+.nodes-grid > .node-card-wrapper:nth-child(5):hover { rotate: 0deg; }  /* bottom-centre → lift up */
 .nodes-grid > .node-card-wrapper:nth-child(6):hover { rotate: 1.5deg; }  /* bottom-right → lean right */
 
 .nodes-grid[data-dragging="true"] > .node-card-wrapper:hover {
@@ -220,11 +220,15 @@
   margin-left: 8px;
   padding: 4px 8px;
   font-size: 12px;
-  color: var(--muted);
+  color: #888;
   background: var(--surface);
   border-radius: 6px;
   opacity: 0;
   animation: fadeIn 0.2s ease forwards;
+}
+
+html[data-theme="dark"] .char-counter {
+  color: #aaa;
 }
 
 @keyframes fadeIn {
