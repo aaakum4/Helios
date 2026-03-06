@@ -140,3 +140,53 @@ html[data-theme="dark"] .subheading-delete-btn {
 .subheadings-list::-webkit-scrollbar-thumb:hover {
     background: var(--muted);
 }
+
+/* Mobile optimizations for TodoSidebar */
+@media (max-width: 599px) {
+  .todo-sidebar {
+    flex: 0 0 200px;
+    padding: 0.75rem;
+  }
+
+  .sidebar-add-btn {
+    font-size: 28px;
+    min-height: 42px;
+    margin: 0 0.5rem;
+  }
+
+  .subheadings-list {
+    padding: 0 0.5rem;
+  }
+
+  .subheading-button {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .todo-count {
+    font-size: 0.75rem;
+  }
+
+  .subheading-delete-btn {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .todo-sidebar {
+    flex: 0 0 180px;
+    padding: 0.625rem;
+  }
+
+  .sidebar-add-btn {
+    font-size: 26px;
+    min-height: 40px;
+  }
+
+  .subheading-button {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}

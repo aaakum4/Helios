@@ -65,7 +65,6 @@ export default function MainScreen({ onBack }) {
       return;
     }
 
-    e.preventDefault();
     e.stopPropagation();
     setDraggedId(nodeId);
     isDraggingRef.current = false;

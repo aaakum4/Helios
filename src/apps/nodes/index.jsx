@@ -12,7 +12,7 @@ export const nodes = [
   {
     id: 'pomodoro',
     title: 'Pomodoro',
-    description: 'Put your head down and get something done.',
+    description: 'Put your head down and do something.',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-timer-icon lucide-timer"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>,
     component: PomodoroComponent,
   },
@@ -26,7 +26,7 @@ export const nodes = [
   {
     id: 'peacefulDisplay',
     title: 'Peaceful Display',
-    description: 'Step back, breathe, and just be for a moment.',
+    description: 'Step back, breathe, and chill.',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cloud-sun-icon lucide-cloud-sun"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/></svg>,
     component: PeacefulDisplayComponent,
   },
@@ -40,7 +40,7 @@ export const nodes = [
   {
     id: 'focusTracker',
     title: 'Focus Tracker',
-    description: 'Check in with yourself and see how you\'re doing.',
+    description: 'Check in with yourself.',
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-scan-eye-icon lucide-scan-eye"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="1"/><path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"/></svg>,
     component: FocusTrackerComponent,
   },

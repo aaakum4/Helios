@@ -53,8 +53,8 @@
 .nodes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 1.5vw;
+  grid-template-rows: repeat(2, minmax(280px, 1fr));
+  gap: clamp(1.2rem, 2.5vw, 4rem);
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -63,11 +63,12 @@
   box-sizing: border-box;
 }
 
+/* Landscape tablets and medium screens */
 @media (max-width: 899px) {
   .nodes-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 1.2vw;
+    gap: 1.5rem;
   }
 
   /* 2-column tilt on hover: left col leans left, right col leans right */
@@ -75,24 +76,136 @@
   .nodes-grid > .node-card-wrapper:nth-child(even):hover { rotate:  1.8deg; }
 }
 
-@media (max-width: 599px) {
+/* Large landscape displays (Nest Hub Max, landscape tablets) */
+@media (min-width: 900px) and (max-width: 1366px) and (orientation: landscape) {
   .nodes-container {
-    padding: 8px 1.5rem 16px;
+    padding: 2.5rem 3rem;
+  }
+
+  .nodes-grid {
+    gap: 2.25rem;
+  }
+}
+
+/* Portrait-specific layouts for taller-than-wide devices */
+@media (orientation: portrait) and (min-width: 600px) {
+  /* Larger portrait devices (tablets): 3 rows x 2 columns */
+  .nodes-container {
+    padding: 2rem 2.25rem;
   }
 
   .nodes-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 1.25rem;
+    gap: 1.5rem;
+  }
+
+  /* No tilt on portrait touch devices */
+  .nodes-grid > .node-card-wrapper { rotate: 0deg !important; }
+}
+
+@media (orientation: portrait) and (max-width: 599px) and (min-width: 421px) {
+  /* Medium portrait devices: 3 rows x 2 columns */
+  .nodes-container {
+    padding: 1.25rem 1.5rem 1.75rem;
+  }
+
+  .nodes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 1rem;
+  }
+
+  /* No tilt on portrait touch devices */
+  .nodes-grid > .node-card-wrapper { rotate: 0deg !important; }
+}
+
+@media (orientation: portrait) and (max-width: 420px) {
+  /* Small portrait devices: 3 rows x 2 columns (compact) */
+  .nodes-container {
+    padding: 0.625rem 0.75rem 1rem;
+  }
+
+  .nodes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  /* No tilt on mobile */
+  .nodes-grid > .node-card-wrapper { rotate: 0deg !important; }
+}
+
+/* General mobile improvements (medium screens) */
+@media (max-width: 599px) and (min-width: 421px) {
+  .nodes-container {
+    padding: 1.25rem 1.5rem 1.75rem;
+  }
+
+  .nodes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 1rem;
     padding: 0;
   }
 
   /* No tilt on mobile */
-  .nodes-grid > .node-card-wrapper { rotate: 0deg; }
+  .nodes-grid > .node-card-wrapper { rotate: 0deg !important; }
 
   /* Mobile with sidebar expanded: hide grid completely */
   .main-screen-content[data-panel-state="expanded"] .nodes-container {
     display: none;
+  }
+}
+
+/* Smaller devices: 3x2 compact grid */
+@media (max-width: 420px) {
+  .nodes-container {
+    padding: 0.625rem 0.75rem 1rem;
+  }
+
+  .nodes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  /* Mobile with sidebar expanded: hide grid completely */
+  .main-screen-content[data-panel-state="expanded"] .nodes-container {
+    display: none;
+  }
+}
+
+/* iPad Pro and larger tablets */
+@media (min-width: 900px) and (max-width: 1366px) {
+  .nodes-container {
+    padding: clamp(2.5rem, 3.5vw, 4rem);
+  }
+
+  .nodes-grid {
+    gap: 2rem;
+  }
+}
+
+/* Laptop-like aspect ratios (medium desktop) */
+@media (min-width: 1000px) and (max-width: 1366px) {
+  .nodes-container {
+    padding: 2rem 2.5rem;
+  }
+
+  .nodes-grid {
+    gap: 1.75rem;
+  }
+}
+
+/* Large desktops */
+@media (min-width: 1367px) {
+  .nodes-container {
+    padding: clamp(3.5rem, 4.5vw, 5.5rem);
+  }
+
+  .nodes-grid {
+    gap: 3rem;
   }
 }
 

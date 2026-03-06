@@ -21,7 +21,11 @@ const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60;
 
 const BLOCK_COLORS = ["#4f86f7", "#2bb673", "#f2b632", "#f06c5c", "#3fb6d3", "#f2844b"];
 
-const createId = () => `tt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+let idCounter = 0;
+const createId = () => {
+  idCounter++;
+  return `tt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}-${idCounter}`;
+};
 
 const minutesToTimeValue = (minutes) => {
   const h = Math.floor(minutes / 60);

@@ -703,6 +703,39 @@ html[data-theme="dark"] .timetable-card-label {
   .timetable-rotation {
     align-items: flex-start;
   }
+
+  /* Enable horizontal scrolling on mobile */
+  .timetable-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  /* Set minimum widths to prevent squishing */
+  .timetable-header-row,
+  .timetable-body-row {
+    min-width: max-content;
+  }
+
+  /* Ensure day columns have minimum width */
+  .timetable-day-header,
+  .timetable-day-column {
+    min-width: var(--day-min-width);
+  }
+
+  /* Improve scrollbar appearance on mobile */
+  .timetable-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .timetable-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  html[data-theme="dark"] .timetable-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
