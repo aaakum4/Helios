@@ -83,6 +83,11 @@ export default function FocusTracker() {
     const [newSubjectName, setNewSubjectName] = useState('');
     const [newSubjectColor, setNewSubjectColor] = useState(COLORS[0]);
 
+    const [showAddPreviousLogModal, setShowAddPreviousLogModal] = useState(false);
+    const [logSubjectId, setLogSubjectId] = useState('');
+    const [logDurationMinutes, setLogDurationMinutes] = useState('');
+    const [logDate, setLogDate] = useState(getTodayKey());
+
     // todayElapsed: live in-progress seconds for the active subject, initialised from
     // stored start time so there's no flash when FocusTracker is re-opened mid-session.
     const [todayElapsed, setTodayElapsed] = useState(() => {
@@ -333,6 +338,50 @@ export default function FocusTracker() {
         setFocusSubjects((prev) => prev.filter(sub => sub.id !== subjectId));
     }
 
+    function handleAddPreviousLog() {
+      if (!logSubjectId || !logDurationMinutes) {
+        alert('Please select a subject and enter a duration.');
+        return;
+      }
+
+      const durationSeconds = Math.round(parseFloat(logDurationMinutes) * 60);
+      if (durationSeconds <= 0) {
+        alert('Duration must be greater than 0.');
+        return;
+      }
+
+      // Parse the date string and create a timestamp for that day (start of day)
+      const [year, month, day] = logDate.split('-').map(Number);
+      const dateObj = new Date(year, month - 1, day, 12, 0, 0); // 12:00 to avoid timezone issues
+      
+      // Create the session
+      const newSession = {
+        id: createId(),
+        subjectId: logSubjectId,
+        startTime: dateObj.getTime(),
+        endTime: dateObj.getTime() + durationSeconds * 1000,
+        duration: durationSeconds,
+        type: 'manual',
+        completed: true,
+      };
+
+      setStudySessions((prev) => [...prev, newSession]);
+      
+      const subjectName = focusSubjects.find((s) => s.id === logSubjectId)?.name;
+      window.posthog?.capture("focus_tracker_previous_log_added", {
+        subject_id: logSubjectId,
+        subject_name: subjectName || null,
+        duration_minutes: logDurationMinutes,
+        date: logDate,
+      });
+
+      // Reset form
+      setLogSubjectId('');
+      setLogDurationMinutes('');
+      setLogDate(getTodayKey());
+      setShowAddPreviousLogModal(false);
+    }
+
 const todaySessionTotals = useMemo(() => {
         const todayKey = currentDateKey;
         const totals = {};
@@ -448,6 +497,13 @@ const todaySessionTotals = useMemo(() => {
             onClick={() => setShowStats(!showStats)}
           >
             {showStats ? 'Hide Stats' : 'Show Stats'}
+          </button>
+          <button
+            className="focus-tracker-btn focus-tracker-btn--secondary"
+            onClick={() => setShowAddPreviousLogModal(true)}
+          >
+            <Plus size={13} style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }} />
+            Add Log
           </button>
           <button
             className="focus-tracker-btn focus-tracker-btn--primary"
@@ -619,6 +675,88 @@ const todaySessionTotals = useMemo(() => {
                     <path d="M6.5 1.5V11.5M1.5 6.5H11.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                   Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      {showAddPreviousLogModal && (
+        <div className="focus-tracker-modal-overlay" onClick={() => setShowAddPreviousLogModal(false)}>
+          <div className="focus-tracker-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="focus-tracker-modal-header">
+              <h3 className="focus-tracker-modal-title">Add Previous Log</h3>
+              <button
+                className="focus-tracker-modal-close"
+                onClick={() => setShowAddPreviousLogModal(false)}
+              >
+                <X size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+            
+            <form
+              className="focus-tracker-modal-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddPreviousLog();
+              }}
+            >
+              <div className="focus-tracker-modal-body">
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Subject</label>
+                  <select
+                    className="focus-tracker-input"
+                    value={logSubjectId}
+                    onChange={(e) => setLogSubjectId(e.target.value)}
+                  >
+                    <option value="">Select a subject...</option>
+                    {focusSubjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Duration (minutes)</label>
+                  <input
+                    type="number"
+                    className="focus-tracker-input"
+                    value={logDurationMinutes}
+                    onChange={(e) => setLogDurationMinutes(e.target.value)}
+                    placeholder="e.g., 45 or 1.5 for 1.5 hours"
+                    step="0.5"
+                    min="0.5"
+                  />
+                </div>
+
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Date</label>
+                  <input
+                    type="date"
+                    className="focus-tracker-input"
+                    value={logDate}
+                    onChange={(e) => setLogDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="focus-tracker-modal-footer">
+                <button
+                  className="focus-tracker-btn focus-tracker-btn--secondary"
+                  onClick={() => setShowAddPreviousLogModal(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  className="focus-tracker-btn focus-tracker-btn--primary"
+                  type="submit"
+                  disabled={!logSubjectId || !logDurationMinutes}
+                >
+                  Add Log
                 </button>
               </div>
             </form>

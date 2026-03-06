@@ -89,9 +89,16 @@ function applyWindowZoom(win) {
 }
 
 // PostHog client — uses env vars so keys are never hardcoded
+// Disable HTTPS certificate validation for development environments
+const https = require("https");
+const agent = new https.Agent({
+  rejectUnauthorized: false,
+});
+
 const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
   host: process.env.POSTHOG_HOST || "https://us.i.posthog.com",
   enableExceptionAutocapture: true,
+  requestOptions: { agent },
 });
 
 // Stable anonymous distinct ID for this installation (persisted across sessions).
@@ -246,11 +253,17 @@ app.whenReady().then(() => {
       node_version: process.versions.node,
       app_version: app.getVersion(),
     },
+  }).catch((err) => {
+    console.error("PostHog capture error:", err);
   });
 });
 
 app.on("window-all-closed", async () => {
-  await posthog.shutdown();
+  try {
+    await posthog.shutdown();
+  } catch (err) {
+    console.error("PostHog shutdown error:", err);
+  }
   if (process.platform !== "darwin") {
     app.quit();
   }
