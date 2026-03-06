@@ -255,7 +255,7 @@ html[data-theme="dark"] .char-counter {
   transition: box-shadow 250ms ease, background 250ms ease, border-color 250ms ease;
 }
 
-@media (max-width: 599px) {
+@media (max-width: 1199px) {
   .app-container {
     min-width: 0;
     min-height: 0;
