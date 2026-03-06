@@ -551,3 +551,10 @@ html[data-theme="dark"] .side-panel__subheading-select {
 .side-panel__add-btn--success:hover {
     transform: translateY(0) !important;
 }
+
+/* Mobile: Full-width sidebar when expanded */
+@media (max-width: 599px) {
+  .side-panel {
+    width: 100%;
+  }
+}
