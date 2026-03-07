@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Minus } from 'lucide-react';
 import { useAppContext } from '../../core/AppContext';
 import { useTime } from '../../core/TimeProvider';
 import { createId } from '../../core/idGenerator';
@@ -87,6 +87,11 @@ export default function FocusTracker() {
     const [logSubjectId, setLogSubjectId] = useState('');
     const [logDurationMinutes, setLogDurationMinutes] = useState('');
     const [logDate, setLogDate] = useState(getTodayKey());
+
+    const [showRemoveLogModal, setShowRemoveLogModal] = useState(false);
+    const [removeLogSubjectId, setRemoveLogSubjectId] = useState('');
+    const [removeLogDurationMinutes, setRemoveLogDurationMinutes] = useState('');
+    const [removeLogDate, setRemoveLogDate] = useState(getTodayKey());
 
     // todayElapsed: live in-progress seconds for the active subject, initialised from
     // stored start time so there's no flash when FocusTracker is re-opened mid-session.
@@ -382,6 +387,108 @@ export default function FocusTracker() {
       setShowAddPreviousLogModal(false);
     }
 
+    const removableSecondsForSelection = useMemo(() => {
+      if (!removeLogSubjectId || !removeLogDate) return 0;
+
+      let total = 0;
+      studySessions.forEach((session) => {
+        if (!session.startTime || session.subjectId !== removeLogSubjectId) return;
+        const key = getDateKeyFromTimestamp(session.endTime || session.startTime);
+        if (key !== removeLogDate) return;
+        total += Math.max(0, session.duration || 0);
+      });
+
+      return total;
+    }, [studySessions, removeLogSubjectId, removeLogDate]);
+
+    function handleRemoveLog() {
+      if (!removeLogSubjectId || !removeLogDurationMinutes) {
+        alert('Please select a subject and enter a duration.');
+        return;
+      }
+
+      const durationSeconds = Math.round(parseFloat(removeLogDurationMinutes) * 60);
+      if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+        alert('Duration must be greater than 0.');
+        return;
+      }
+
+      if (durationSeconds > removableSecondsForSelection) {
+        alert('You cannot remove more time than is logged for that subject and date.');
+        return;
+      }
+
+      let removedSeconds = 0;
+
+      setStudySessions((prev) => {
+        const matching = prev
+          .map((session, index) => ({ session, index }))
+          .filter(({ session }) => {
+            if (!session.startTime || session.subjectId !== removeLogSubjectId) return false;
+            const key = getDateKeyFromTimestamp(session.endTime || session.startTime);
+            return key === removeLogDate && (session.duration || 0) > 0;
+          })
+          .sort((a, b) => {
+            const aTs = a.session.endTime || a.session.startTime || 0;
+            const bTs = b.session.endTime || b.session.startTime || 0;
+            return bTs - aTs;
+          });
+
+        const totalAvailable = matching.reduce((sum, item) => sum + (item.session.duration || 0), 0);
+        if (durationSeconds > totalAvailable) {
+          return prev;
+        }
+
+        let remaining = durationSeconds;
+        const next = [...prev];
+
+        matching.forEach(({ index }) => {
+          if (remaining <= 0) return;
+
+          const existing = next[index];
+          if (!existing) return;
+
+          const existingDuration = Math.max(0, existing.duration || 0);
+          if (existingDuration <= remaining) {
+            remaining -= existingDuration;
+            removedSeconds += existingDuration;
+            next[index] = null;
+            return;
+          }
+
+          const newDuration = existingDuration - remaining;
+          removedSeconds += remaining;
+          remaining = 0;
+
+          next[index] = {
+            ...existing,
+            duration: newDuration,
+            endTime: (existing.startTime || Date.now()) + newDuration * 1000,
+          };
+        });
+
+        return next.filter(Boolean);
+      });
+
+      if (removedSeconds <= 0) {
+        alert('No logged time was removed. Please try again.');
+        return;
+      }
+
+      const subjectName = focusSubjects.find((s) => s.id === removeLogSubjectId)?.name;
+      window.posthog?.capture('focus_tracker_log_removed', {
+        subject_id: removeLogSubjectId,
+        subject_name: subjectName || null,
+        duration_minutes: removedSeconds / 60,
+        date: removeLogDate,
+      });
+
+      setRemoveLogSubjectId('');
+      setRemoveLogDurationMinutes('');
+      setRemoveLogDate(getTodayKey());
+      setShowRemoveLogModal(false);
+    }
+
 const todaySessionTotals = useMemo(() => {
         const todayKey = currentDateKey;
         const totals = {};
@@ -504,6 +611,13 @@ const todaySessionTotals = useMemo(() => {
           >
             <Plus size={13} style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }} />
             Add Log
+          </button>
+          <button
+            className="focus-tracker-btn focus-tracker-btn--danger"
+            onClick={() => setShowRemoveLogModal(true)}
+          >
+            <Minus size={13} style={{ marginRight: '0.4em', verticalAlign: '-0.1em', flexShrink: 0 }} />
+            Remove Log
           </button>
           <button
             className="focus-tracker-btn focus-tracker-btn--primary"
@@ -757,6 +871,93 @@ const todaySessionTotals = useMemo(() => {
                   disabled={!logSubjectId || !logDurationMinutes}
                 >
                   Add Log
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showRemoveLogModal && (
+        <div className="focus-tracker-modal-overlay" onClick={() => setShowRemoveLogModal(false)}>
+          <div className="focus-tracker-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="focus-tracker-modal-header">
+              <h3 className="focus-tracker-modal-title">Remove Logged Time</h3>
+              <button
+                className="focus-tracker-modal-close"
+                onClick={() => setShowRemoveLogModal(false)}
+              >
+                <X size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            <form
+              className="focus-tracker-modal-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleRemoveLog();
+              }}
+            >
+              <div className="focus-tracker-modal-body">
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Subject</label>
+                  <select
+                    className="focus-tracker-input"
+                    value={removeLogSubjectId}
+                    onChange={(e) => setRemoveLogSubjectId(e.target.value)}
+                  >
+                    <option value="">Select a subject...</option>
+                    {focusSubjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Date</label>
+                  <input
+                    type="date"
+                    className="focus-tracker-input"
+                    value={removeLogDate}
+                    onChange={(e) => setRemoveLogDate(e.target.value)}
+                  />
+                </div>
+
+                <div className="focus-tracker-field">
+                  <label className="focus-tracker-label">Duration to Remove (minutes)</label>
+                  <input
+                    type="number"
+                    className="focus-tracker-input"
+                    value={removeLogDurationMinutes}
+                    onChange={(e) => setRemoveLogDurationMinutes(e.target.value)}
+                    placeholder="e.g., 30"
+                    step="0.5"
+                    min="0.5"
+                    max={Math.max(0.5, Math.floor(removableSecondsForSelection / 30) / 2)}
+                  />
+                </div>
+
+                <div className="focus-tracker-helper-text">
+                  Logged on selected date: {formatTime(removableSecondsForSelection)}
+                </div>
+              </div>
+
+              <div className="focus-tracker-modal-footer">
+                <button
+                  className="focus-tracker-btn focus-tracker-btn--secondary"
+                  onClick={() => setShowRemoveLogModal(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  className="focus-tracker-btn focus-tracker-btn--danger"
+                  type="submit"
+                  disabled={!removeLogSubjectId || !removeLogDurationMinutes || removableSecondsForSelection <= 0}
+                >
+                  Remove Log
                 </button>
               </div>
             </form>

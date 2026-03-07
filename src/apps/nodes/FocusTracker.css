@@ -70,6 +70,19 @@ html[data-theme="dark"] .focus-tracker-btn--primary {
     border-color: var(--text);
 }
 
+.focus-tracker-btn--danger {
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    display: inline-flex;
+    align-items: center;
+}
+
+.focus-tracker-btn--danger:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
 html[data-theme="dark"] .focus-tracker-btn--secondary {
     color: #ddd;
 }
@@ -467,5 +480,14 @@ html[data-theme="dark"] .focus-tracker-modal-close {
     justify-content: flex-end;
     padding: clamp(1rem, 1.17vw, 1.25rem) clamp(1.2rem, 1.41vw, 1.5rem);
     border-top: 1px solid var(--border);
+}
+
+.focus-tracker-helper-text {
+    font-size: clamp(0.78rem, 0.85vw, 0.88rem);
+    color: #666;
+}
+
+html[data-theme="dark"] .focus-tracker-helper-text {
+    color: #aaa;
 }
 
