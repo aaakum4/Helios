@@ -89,16 +89,25 @@ function applyWindowZoom(win) {
 }
 
 // PostHog client — uses env vars so keys are never hardcoded
-// Disable HTTPS certificate validation for development environments
-const https = require("https");
-const agent = new https.Agent({
-  rejectUnauthorized: false,
-});
+function configurePostHogTls() {
+  const allowInsecureTls = process.env.POSTHOG_ALLOW_INSECURE_TLS === "true";
+
+  if (allowInsecureTls) {
+    // This ensures Node's fetch/undici stack accepts MITM/self-signed TLS chains.
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    console.warn("PostHog TLS verification disabled via POSTHOG_ALLOW_INSECURE_TLS=true");
+  }
+}
+
+configurePostHogTls();
 
 const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
   host: process.env.POSTHOG_HOST || "https://us.i.posthog.com",
   enableExceptionAutocapture: true,
-  requestOptions: { agent },
+});
+
+posthog.on("error", (err) => {
+  console.error("PostHog SDK error:", err?.message || err);
 });
 
 // Stable anonymous distinct ID for this installation (persisted across sessions).
