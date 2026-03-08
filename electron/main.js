@@ -89,17 +89,22 @@ function applyWindowZoom(win) {
 }
 
 // PostHog client — uses env vars so keys are never hardcoded
-function configurePostHogTls() {
-  const allowInsecureTls = process.env.POSTHOG_ALLOW_INSECURE_TLS === "true";
+// For development environments with TLS interception (corporate proxies, etc.):
+// Uses system certificate trust store by default (secure).
+// Set HELIOS_DEV_MODE=true in .env for development-only TLS tolerance.
 
-  if (allowInsecureTls) {
-    // This ensures Node's fetch/undici stack accepts MITM/self-signed TLS chains.
+function configureDevEnvironment() {
+  const isDevMode = process.env.HELIOS_DEV_MODE === "true";
+  
+  if (isDevMode && !app.isPackaged) {
+    // Development mode: Allow system-intercepted HTTPS (e.g., corporate proxies)
+    // This is ONLY active when HELIOS_DEV_MODE=true AND running unpackaged (dev environment)
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    console.warn("PostHog TLS verification disabled via POSTHOG_ALLOW_INSECURE_TLS=true");
+    console.warn("⚠️  Development mode: TLS verification relaxed for local development");
   }
 }
 
-configurePostHogTls();
+configureDevEnvironment();
 
 const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
   host: process.env.POSTHOG_HOST || "https://us.i.posthog.com",
@@ -107,7 +112,10 @@ const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
 });
 
 posthog.on("error", (err) => {
-  console.error("PostHog SDK error:", err?.message || err);
+  // Only log in development to avoid exposing stack traces
+  if (!app.isPackaged) {
+    console.error("PostHog SDK error:", err?.message || err);
+  }
 });
 
 // Stable anonymous distinct ID for this installation (persisted across sessions).

@@ -17,7 +17,11 @@ yarn-error.log*
 
 # Optional: Electron cache / build
 out/
+
+# Environment files (contains API keys)
 .env
+.env.local
+.env.production
 
 # AI tools
 .claude
