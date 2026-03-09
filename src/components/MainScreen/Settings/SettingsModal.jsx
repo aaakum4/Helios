@@ -45,6 +45,11 @@ export default function SettingsModal({ onClose }) {
     window.posthog?.capture("settings_reset_tutorials", {});
   };
 
+    const handleOpenDevlog = () => {
+        window.open("https://github.com/aaakum4/Helios", "_blank", "noopener,noreferrer");
+        window.posthog?.capture("settings_devlog_opened", {});
+    };
+
     return (
         <div className="settings-backdrop" onClick={onClose}>
             <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
@@ -111,6 +116,10 @@ export default function SettingsModal({ onClose }) {
 
                 <div className="settings-section">
                     <button className="reset-tutorials-btn" onClick={handleResetTutorials}>Reset Tutorials</button>
+                </div>
+
+                <div className="settings-section">
+                    <button className="reset-tutorials-btn" onClick={handleOpenDevlog}>Devlog</button>
                 </div>
 
                 <div className="settings-section glow-label-section">

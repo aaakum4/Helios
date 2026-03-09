@@ -14,10 +14,12 @@ const DAYS = [
   "Saturday"
 ];
 
-const START_HOUR = 5;
-const END_HOUR = 21;
-const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => START_HOUR + i);
+const START_HOUR = 0;
+const END_HOUR = 24;
+const HOURS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i);
 const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60;
+const MAX_TIME_INPUT_MINUTES = END_HOUR * 60 - 15;
+const MAX_AUTO_START_MINUTES = MAX_TIME_INPUT_MINUTES - 15;
 
 const BLOCK_COLORS = ["#4f86f7", "#2bb673", "#f2b632", "#f06c5c", "#3fb6d3", "#f2844b"];
 
@@ -33,18 +35,41 @@ const minutesToTimeValue = (minutes) => {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
 
+const minutesToInputValue = (minutes) => {
+  const clamped = Math.max(START_HOUR * 60, Math.min(MAX_TIME_INPUT_MINUTES, minutes));
+  return minutesToTimeValue(clamped);
+};
+
 const timeValueToMinutes = (time) => {
   if (!time) {
     return START_HOUR * 60;
   }
   const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
+  const rawMinutes = h * 60 + m;
+  return Math.max(START_HOUR * 60, Math.min(MAX_TIME_INPUT_MINUTES, rawMinutes));
 };
 
-const formatTimeLabel = (hour) => {
+const formatTimeLabel = (hour, use24Hour) => {
+  if (use24Hour) {
+    return `${String(hour).padStart(2, "0")}:00`;
+  }
   const suffix = hour >= 12 ? "PM" : "AM";
-  const h12 = ((hour + 11) % 12) +1;
-  return `${h12} ${suffix}`;
+  const h12 = ((hour + 11) % 12) + 1;
+  return `${h12}:00 ${suffix}`;
+};
+
+const formatMinutesLabel = (minutes, use24Hour) => {
+  const safeMinutes = Math.max(0, Math.min(TOTAL_MINUTES, minutes));
+  const normalized = safeMinutes === TOTAL_MINUTES ? 0 : safeMinutes;
+  const hour24 = Math.floor(normalized / 60);
+  const minute = normalized % 60;
+  if (use24Hour) {
+    return `${String(hour24).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  }
+
+  const suffix = hour24 >= 12 ? "PM" : "AM";
+  const hour12 = ((hour24 + 11) % 12) + 1;
+  return `${hour12}:${String(minute).padStart(2, "0")} ${suffix}`;
 };
 
 const roundToNearest = (minutes, step = 15) => Math.round(minutes / step) * step;
@@ -99,6 +124,7 @@ export default function Timetable() {
   } = useAppContext();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [use24HourFormat, setUse24HourFormat] = useState(true);
   const [sheetMode, setSheetMode] = useState("create");
   const [draft, setDraft] = useState(
     createDraft(1, START_HOUR * 60, START_HOUR * 60 + 60, rotationMode, activeWeekIndex, activeMonthWeek)
@@ -146,8 +172,8 @@ export default function Timetable() {
     const y = event.clientY - rect.top;
     const minuteOffset = clampMinutes(( y / rect.height) * TOTAL_MINUTES);
     const rounded = roundToNearest(minuteOffset, 15);
-    const startMinutes = START_HOUR * 60 + rounded;
-    const endMinutes = Math.min(startMinutes + 60, END_HOUR * 60);
+    const startMinutes = Math.min(START_HOUR * 60 + rounded, MAX_AUTO_START_MINUTES);
+    const endMinutes = Math.min(startMinutes + 60, MAX_TIME_INPUT_MINUTES);
     openCreateSheet(dayIndex, startMinutes, endMinutes);
   };
 
@@ -327,9 +353,9 @@ export default function Timetable() {
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
     const rounded = roundToNearest(nowMinutes, 15);
     const minStart = START_HOUR * 60;
-    const maxStart = END_HOUR * 60 - 15;
+    const maxStart = MAX_AUTO_START_MINUTES;
     const startMinutes = Math.max(minStart, Math.min(maxStart, rounded));
-    const endMinutes = Math.min(startMinutes + 60, END_HOUR * 60);
+    const endMinutes = Math.min(startMinutes + 60, MAX_TIME_INPUT_MINUTES);
     openCreateSheet(dayIndex, startMinutes, endMinutes);
   };
 
@@ -376,6 +402,13 @@ export default function Timetable() {
               Sync
             </button>
           )}
+          <button
+            className="timetable-sync-btn"
+            type="button"
+            onClick={() => setUse24HourFormat((prev) => !prev)}
+          >
+            {use24HourFormat ? "24h" : "12h"}
+          </button>
         </div>
         <div className="timetable-rotation">
           <div className="timetable-segment" role="tablist" aria-label="Rotation mode">
@@ -454,7 +487,7 @@ export default function Timetable() {
                   className="timetable-time-label"
                   ref={index === 0 ? timeLabelRef : null}
                 >
-                  {formatTimeLabel(hour)}
+                  {formatTimeLabel(hour, use24HourFormat)}
                 </div>
               ))}
             </div>
@@ -501,7 +534,7 @@ export default function Timetable() {
                           <div className="timetable-block-title">{block.title}</div>
                           {blockHeight >= 30 && (
                             <div className="timetable-block-time">
-                              {minutesToTimeValue(block.startMinutes)} - {minutesToTimeValue(block.endMinutes)}
+                              {formatMinutesLabel(block.startMinutes, use24HourFormat)} - {formatMinutesLabel(block.endMinutes, use24HourFormat)}
                             </div>
                           )}
                         </button>
@@ -573,8 +606,8 @@ export default function Timetable() {
                     type="time"
                     step={900}
                     min={minutesToTimeValue(START_HOUR * 60)}
-                    max={minutesToTimeValue(END_HOUR * 60)}
-                    value={minutesToTimeValue(draft.startMinutes)}
+                    max={minutesToInputValue(MAX_TIME_INPUT_MINUTES)}
+                    value={minutesToInputValue(draft.startMinutes)}
                     onChange={(event) =>
                       setDraft((prev) => ({ ...prev, startMinutes: timeValueToMinutes(event.target.value) }))
                     }
@@ -589,8 +622,8 @@ export default function Timetable() {
                     type="time"
                     step={900}
                     min={minutesToTimeValue(START_HOUR * 60)}
-                    max={minutesToTimeValue(END_HOUR * 60)}
-                    value={minutesToTimeValue(draft.endMinutes)}
+                    max={minutesToInputValue(MAX_TIME_INPUT_MINUTES)}
+                    value={minutesToInputValue(draft.endMinutes)}
                     onChange={(event) =>
                       setDraft((prev) => ({ ...prev, endMinutes: timeValueToMinutes(event.target.value) }))
                     }
