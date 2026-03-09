@@ -201,6 +201,12 @@ export default function Timetable() {
 
     if (sheetMode === "edit") {
       setTimetableBlocks((prev) => prev.map((block) => (block.id === draft.id ? { ...draft } : block)));
+      window.posthog?.capture("timetable_block_edited", {
+        title: draft.title,
+        rotation: draft.rotation,
+        duration_minutes: draft.endMinutes - draft.startMinutes,
+        has_info: !!draft.info?.trim(),
+      });
       setSheetOpen(false);
       return;
     }
@@ -257,6 +263,12 @@ export default function Timetable() {
       return newBlock;
     });
     setTimetableBlocks((prev) => [...prev, ...newBlocks]);
+    window.posthog?.capture("timetable_blocks_synced", {
+      blocks_count: newBlocks.length,
+      target_rotation: syncTarget?.rotation,
+      target_week_index: syncTarget?.weekIndex ?? null,
+      target_month_week_index: syncTarget?.monthWeekIndex ?? null,
+    });
     setSyncModalOpen(false);
   };
 

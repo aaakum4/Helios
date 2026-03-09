@@ -35,15 +35,28 @@ function useTodoState() {
       subheadings: [...prev.subheadings, newSubheading],
     }));
 
+    window.posthog?.capture("todo_subheading_added", {
+      title,
+      total_subheadings: todosData.subheadings.length + 1,
+    });
     setSelectedSubheadingID(newSubheading.id);
     return newSubheading.id;
   };
 
   const deleteSubheading = (subheadingID) => {
+    const subheading = todosData.subheadings.find((s) => s.id === subheadingID);
+    const todoCount = subheading?.todos?.length ?? 0;
+
     setTodosData((prev) => ({
       ...prev,
       subheadings: prev.subheadings.filter((s) => s.id !== subheadingID),
     }));
+
+    window.posthog?.capture("todo_subheading_deleted", {
+      subheading_id: subheadingID,
+      todos_in_subheading: todoCount,
+      remaining_subheadings: todosData.subheadings.length - 1,
+    });
 
     if (selectedSubheadingID === subheadingID && todosData.subheadings.length > 1) {
       const remainingSubheadings = todosData.subheadings.filter((s) => s.id !== subheadingID);

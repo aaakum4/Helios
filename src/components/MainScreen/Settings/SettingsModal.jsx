@@ -125,7 +125,12 @@ export default function SettingsModal({ onClose }) {
                                 name="glow"
                                 value={color}
                                 checked={glowColor === color}
-                                onChange={(e) => setGlowColor(e.target.value)}
+                                onChange={(e) => {
+                                    setGlowColor(e.target.value);
+                                    window.posthog?.capture("settings_glow_changed", {
+                                        glow_color: e.target.value,
+                                    });
+                                }}
                             />
                             <span className="glow-radio-label">{color.charAt(0).toUpperCase() + color.slice(1)}</span>
                         </label>

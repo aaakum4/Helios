@@ -5,6 +5,8 @@ The wizard has completed a deep integration of PostHog analytics into **Helios**
 
 A stable per-installation anonymous distinct ID is generated on first launch and persisted to the user's app data directory, ensuring consistent user identity across sessions without requiring an account.
 
+Five additional tracking gaps were closed in this session, adding new event captures across the Timetable, Todo, and Settings components.
+
 ## Files changed
 
 | File | Changes |
@@ -14,11 +16,11 @@ A stable per-installation anonymous distinct ID is generated on first launch and
 | `src/components/StartupScreen.jsx` | `app_launched` event when user clicks to launch the app |
 | `src/apps/nodes/Pomodoro.jsx` | `pomodoro_session_started`, `pomodoro_session_paused`, `pomodoro_session_reset`, `pomodoro_session_completed`, `pomodoro_subject_added` |
 | `src/apps/nodes/FocusTracker.jsx` | `focus_tracker_session_started`, `focus_tracker_session_stopped`, `focus_tracker_subject_created`, `focus_tracker_subject_deleted` |
-| `src/apps/nodes/Todo.jsx` | `todo_added`, `todo_completed` |
+| `src/apps/nodes/Todo.jsx` | `todo_added`, `todo_completed`, **`todo_subheading_added`**, **`todo_subheading_deleted`** |
 | `src/apps/nodes/Reflection.jsx` | `reflection_submitted`, `journal_entry_saved` |
-| `src/apps/nodes/Timetable.jsx` | `timetable_block_created`, `timetable_block_deleted` |
-| `src/components/MainScreen/Settings/SettingsModal.jsx` | `settings_theme_changed`, `settings_palette_changed` |
-| `.env` | `POSTHOG_API_KEY` and `POSTHOG_HOST` added (covered by `.gitignore`) |
+| `src/apps/nodes/Timetable.jsx` | `timetable_block_created`, `timetable_block_deleted`, **`timetable_block_edited`**, **`timetable_blocks_synced`** |
+| `src/components/MainScreen/Settings/SettingsModal.jsx` | `settings_theme_changed`, `settings_palette_changed`, `settings_reset_tutorials`, **`settings_glow_changed`** |
+| `.env` | `POSTHOG_API_KEY` and `POSTHOG_HOST` confirmed and updated |
 
 ## Events instrumented
 
@@ -36,23 +38,30 @@ A stable per-installation anonymous distinct ID is generated on first launch and
 | `focus_tracker_subject_deleted` | User deleted a focus tracking subject | `src/apps/nodes/FocusTracker.jsx` |
 | `todo_added` | User added a new todo item | `src/apps/nodes/Todo.jsx` |
 | `todo_completed` | User marked a todo as completed | `src/apps/nodes/Todo.jsx` |
+| `todo_subheading_added` | User created a new todo list category/subheading | `src/apps/nodes/Todo.jsx` |
+| `todo_subheading_deleted` | User deleted a todo list category (captures todo count inside it) | `src/apps/nodes/Todo.jsx` |
 | `reflection_submitted` | User submitted daily reflection answers | `src/apps/nodes/Reflection.jsx` |
 | `journal_entry_saved` | User saved or edited a journal entry | `src/apps/nodes/Reflection.jsx` |
 | `timetable_block_created` | User created a new timetable block | `src/apps/nodes/Timetable.jsx` |
+| `timetable_block_edited` | User saved edits to an existing timetable block | `src/apps/nodes/Timetable.jsx` |
 | `timetable_block_deleted` | User deleted a timetable block | `src/apps/nodes/Timetable.jsx` |
+| `timetable_blocks_synced` | User copied blocks from one rotation period to another | `src/apps/nodes/Timetable.jsx` |
 | `settings_theme_changed` | User changed the app theme (light/dark/system) | `src/components/MainScreen/Settings/SettingsModal.jsx` |
 | `settings_palette_changed` | User changed the color palette | `src/components/MainScreen/Settings/SettingsModal.jsx` |
+| `settings_glow_changed` | User changed the window glow color | `src/components/MainScreen/Settings/SettingsModal.jsx` |
+| `settings_reset_tutorials` | User reset all tutorial states | `src/components/MainScreen/Settings/SettingsModal.jsx` |
 
 ## Next steps
 
 We've built some insights and a dashboard for you to keep an eye on user behavior, based on the events we just instrumented:
 
-- 📊 **Dashboard: Analytics basics** — https://us.posthog.com/project/329489/dashboard/1324528
-  - 📈 [Daily App Launches](https://us.posthog.com/project/329489/insights/2gVn7fms) — Daily trend of how often the app is opened
-  - 🔽 [Pomodoro Session Completion Funnel](https://us.posthog.com/project/329489/insights/SRs0wN1J) — Measures how many started sessions are completed vs abandoned
-  - 📊 [Pomodoro Session Activity](https://us.posthog.com/project/329489/insights/srvi2C65) — Weekly breakdown of started/completed/paused/reset sessions
-  - 📈 [Productivity Feature Usage](https://us.posthog.com/project/329489/insights/SwsfLd7o) — Todos, journal entries, and reflections over time
-  - 📊 [Focus & Schedule Activity](https://us.posthog.com/project/329489/insights/il4KfSYS) — Manual focus sessions and timetable block creation
+- 📊 **Dashboard: Analytics basics** — https://us.posthog.com/project/329489/dashboard/1342823
+
+  - 📈 [Daily Focus Activity (Pomodoro & Focus Tracker)](https://us.posthog.com/project/329489/insights/6xTYKQgM) — Day-by-day line chart of completed Pomodoro sessions and stopped Focus Tracker sessions
+  - 🔽 [Pomodoro Session Completion Funnel](https://us.posthog.com/project/329489/insights/knkVbEGI) — Conversion funnel: App Launched → Started Pomodoro → Completed Pomodoro
+  - 📊 [Content Creation Overview (Todos, Reflections, Journal)](https://us.posthog.com/project/329489/insights/vKyj61Lw) — Weekly bar chart of todos, reflections, and journal entries
+  - 🎨 [Settings Customization Activity](https://us.posthog.com/project/329489/insights/9F49VPUY) — Theme, palette, and glow color change frequency
+  - 🗓️ [Timetable Block Lifecycle (Create / Edit / Sync / Delete)](https://us.posthog.com/project/329489/insights/nl5DbNQf) — Weekly breakdown of all timetable operations
 
 ### Agent skill
 
