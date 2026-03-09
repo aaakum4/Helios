@@ -41,15 +41,7 @@ Before the first stable release, I would like the following features to be imple
 
 - No account system yet
 - Data stored locally in browser
-- Not optimised for mobile
 - Some features may reset
-
-**IMPORTANT!**
-This app must remain above a dynamically calculated minimum window size to function correctly.
-
-If the window is resized below the supported threshold, an “Unsupported Screen Size” screen will appear. Resize the window back above the minimum size to continue using the app normally.
-
-**Alternatively**, you can reduce your browser zoom level using ⌘ − (Mac) or Ctrl − (Windows) to fit the interface within the supported size range.
 
 ## Prerequisites
 
