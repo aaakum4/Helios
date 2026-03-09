@@ -51,6 +51,20 @@ None — just:
 
 That’s it.
 
+## Priority Email Reminders (Desktop)
+
+Priority timetable reminders use SMTP from the Electron main process.
+Set these variables in `.env` for email delivery:
+
+- `SMTP_HOST`
+- `SMTP_PORT` (for example `587`)
+- `SMTP_SECURE` (`true` for SSL, usually `false` for STARTTLS on 587)
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM` (sender address)
+
+Without SMTP config, the priority reminder UI still works, but emails are not sent.
+
 ## Using Helios
 
 Please refer to the [Getting Started]() tutorial.

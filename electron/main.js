@@ -300,3 +300,72 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   posthog.captureException(reason instanceof Error ? reason : new Error(String(reason)), DISTINCT_ID);
 });
+
+const smtpPort = Number(process.env.SMTP_PORT || 587);
+const smtpSecure = process.env.SMTP_SECURE === "true";
+const smtpRequiredKeys = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"];
+const missingSmtpKeys = smtpRequiredKeys.filter((key) => !process.env[key]);
+const smtpConfigured = missingSmtpKeys.length === 0;
+
+let mailTransporter = null;
+
+if (smtpConfigured) {
+  try {
+    const nodemailer = require("nodemailer");
+    mailTransporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  } catch {
+    mailTransporter = null;
+  }
+}
+
+ipcMain.handle("priority-email:send", async (_event, payload) => {
+  try {
+    if (!mailTransporter) {
+      return {
+        ok: false,
+        error:
+          missingSmtpKeys.length > 0
+            ? `SMTP is not configured. Missing: ${missingSmtpKeys.join(", ")}. Add these to .env and restart the app.`
+            : "SMTP is not configured. Check SMTP_HOST/SMTP_PORT/SMTP_SECURE/SMTP_USER/SMTP_PASS/SMTP_FROM and restart the app.",
+      };
+    }
+
+    const toEmail = String(payload?.toEmail || "").trim();
+    const subject = String(payload?.subject || "Helios priority reminder").trim();
+    const text = String(payload?.text || "").trim();
+    const html = String(payload?.html || "").trim();
+
+    if (!toEmail || !text) {
+      return { ok: false, error: "Missing required email fields" };
+    }
+
+    await mailTransporter.sendMail({
+      from: process.env.SMTP_FROM,
+      to: toEmail,
+      subject,
+      text,
+      html: html || undefined,
+    });
+
+    return { ok: true };
+  } catch (error) {
+    // Log detailed error for debugging
+    console.error("Email send error:", error);
+    posthog.captureException(error instanceof Error ? error : new Error(String(error)), DISTINCT_ID);
+    
+    // Return more detailed error message
+    const errorMsg = error?.message || String(error);
+    return { 
+      ok: false, 
+      error: `Failed to send email: ${errorMsg}` 
+    };
+  }
+});

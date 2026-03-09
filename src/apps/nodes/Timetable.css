@@ -331,6 +331,22 @@ html[data-theme="dark"] .timetable-day-column {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.timetable-block.is-priority {
+  padding-right: 1.7rem;
+}
+
+.timetable-priority-badge {
+  position: absolute;
+  top: 0.38rem;
+  right: 0.4rem;
+  color: #ffd24d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+}
+
 .timetable-block:hover {
   transform: translateY(-2px);
   box-shadow: 0 16px 24px rgba(15, 23, 42, 0.2);
@@ -634,6 +650,32 @@ html[data-theme="dark"] .timetable-card-label {
   color: #c4493a;
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+.timetable-inline-input-group {
+  width: 100%;
+}
+
+.timetable-verify-code-input {
+  width: min(180px, 100%);
+}
+
+.timetable-verify-ok {
+  padding: 0.55rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(43, 182, 115, 0.16);
+  color: #1f7f53;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.timetable-verify-info {
+  padding: 0.55rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(79, 134, 247, 0.14);
+  color: #285eb6;
+  font-weight: 600;
+  font-size: 0.92rem;
 }
 
 .timetable-sheet-footer {

@@ -48,3 +48,8 @@ contextBridge.exposeInMainWorld("windowApi", {
 		};
 	},
 });
+
+// Priority email bridge — renderer can request a basic reminder email via main process SMTP.
+contextBridge.exposeInMainWorld("priorityEmail", {
+	sendReminderEmail: (payload) => ipcRenderer.invoke("priority-email:send", payload),
+});

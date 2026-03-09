@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Star } from 'lucide-react';
 import { useAppContext } from '../../core/AppContext';
 import { useTime } from '../../core/TimeProvider';
+import { useLocalStorage } from '../../core/useLocalStorage';
 import './Timetable.css';
 
 const DAYS = [
@@ -102,8 +103,54 @@ const createDraft = (dayIndex, startMinutes, endMinutes, rotationMode, weekIndex
   rotation: rotationMode,
   weekIndex: rotationMode === "fortnightly" ? weekIndex : undefined,
   monthWeekIndex: rotationMode === "monthly" ? monthWeekIndex : undefined,
+  isPriority: false,
   info: "",
   attachments: []
+});
+
+const DEFAULT_PRIORITY_NOTIFICATION_SETTINGS = {
+  email: "",
+  enabled: false,
+  morningReminderMinutes: 8 * 60,
+  dayBeforeReminderMinutes: 18 * 60,
+  emailVerified: false,
+  verifiedEmail: "",
+};
+
+const toDateKey = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+const parseTimeInputToMinutes = (timeValue, fallbackMinutes) => {
+  if (!timeValue || typeof timeValue !== "string") {
+    return fallbackMinutes;
+  }
+  const [hoursRaw, minutesRaw] = timeValue.split(":");
+  const h = Number(hoursRaw);
+  const m = Number(minutesRaw);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) {
+    return fallbackMinutes;
+  }
+  return Math.max(0, Math.min(1439, h * 60 + m));
+};
+
+const normalizePrioritySettings = (settings) => ({
+  ...DEFAULT_PRIORITY_NOTIFICATION_SETTINGS,
+  ...(settings || {}),
+  morningReminderMinutes: Math.max(
+    0,
+    Math.min(1439, Number(settings?.morningReminderMinutes ?? DEFAULT_PRIORITY_NOTIFICATION_SETTINGS.morningReminderMinutes))
+  ),
+  dayBeforeReminderMinutes: Math.max(
+    0,
+    Math.min(1439, Number(settings?.dayBeforeReminderMinutes ?? DEFAULT_PRIORITY_NOTIFICATION_SETTINGS.dayBeforeReminderMinutes))
+  ),
+  emailVerified: Boolean(settings?.emailVerified),
+  verifiedEmail: String(settings?.verifiedEmail || ""),
+});
+
+const normalizeBlock = (block) => ({
+  ...block,
+  isPriority: Boolean(block.isPriority),
 });
 
 export default function Timetable() {
@@ -125,6 +172,7 @@ export default function Timetable() {
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [use24HourFormat, setUse24HourFormat] = useState(true);
+  const [priorityModalOpen, setPriorityModalOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState("create");
   const [draft, setDraft] = useState(
     createDraft(1, START_HOUR * 60, START_HOUR * 60 + 60, rotationMode, activeWeekIndex, activeMonthWeek)
@@ -135,9 +183,41 @@ export default function Timetable() {
   const [syncModalOpen, setSyncModalOpen] = useState(false);
   const [syncTarget, setSyncTarget] = useState(null);
   const [syncStep, setSyncStep] = useState("pick");
+  const [priorityNotifications, setPriorityNotifications] = useLocalStorage(
+    "timetablePriorityNotifications",
+    DEFAULT_PRIORITY_NOTIFICATION_SETTINGS
+  );
+  const normalizedPriorityNotifications = useMemo(
+    () => normalizePrioritySettings(priorityNotifications),
+    [priorityNotifications]
+  );
+  const [priorityEmailDraft, setPriorityEmailDraft] = useState(normalizedPriorityNotifications.email || "");
+  const [priorityEnabledDraft, setPriorityEnabledDraft] = useState(Boolean(normalizedPriorityNotifications.enabled));
+  const [morningReminderDraft, setMorningReminderDraft] = useState(
+    minutesToTimeValue(normalizedPriorityNotifications.morningReminderMinutes)
+  );
+  const [dayBeforeReminderDraft, setDayBeforeReminderDraft] = useState(
+    minutesToTimeValue(normalizedPriorityNotifications.dayBeforeReminderMinutes)
+  );
+  const [verificationCodeDraft, setVerificationCodeDraft] = useState("");
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(
+    Boolean(
+      normalizedPriorityNotifications.emailVerified &&
+      normalizedPriorityNotifications.verifiedEmail === normalizedPriorityNotifications.email
+    )
+  );
+  const [pendingVerification, setPendingVerification] = useState(null);
+  const [prioritySettingsError, setPrioritySettingsError] = useState("");
+  const [prioritySettingsNotice, setPrioritySettingsNotice] = useState("");
+  const [priorityReminderLog, setPriorityReminderLog] = useLocalStorage("timetablePriorityReminderLog", {});
+  const priorityEmailServiceAvailable =
+    typeof window !== "undefined" && typeof window.priorityEmail?.sendReminderEmail === "function";
 
   const visibleBlocks = useMemo(() => {
-    return timetableBlocks.filter((block) => matchesRotation(block, rotationMode, activeWeekIndex, activeMonthWeek));
+    return timetableBlocks
+      .map(normalizeBlock)
+      .filter((block) => matchesRotation(block, rotationMode, activeWeekIndex, activeMonthWeek));
   }, [timetableBlocks, rotationMode, activeWeekIndex, activeMonthWeek]);
 
   const blocksByDay = useMemo(() => {
@@ -231,6 +311,7 @@ export default function Timetable() {
         title: draft.title,
         rotation: draft.rotation,
         duration_minutes: draft.endMinutes - draft.startMinutes,
+        is_priority: draft.isPriority,
         has_info: !!draft.info?.trim(),
       });
       setSheetOpen(false);
@@ -248,6 +329,7 @@ export default function Timetable() {
       title: draft.title,
       rotation: draft.rotation,
       duration_minutes: draft.endMinutes - draft.startMinutes,
+      is_priority: draft.isPriority,
       days_count: targetDays.length,
       has_info: !!draft.info?.trim(),
     });
@@ -390,6 +472,235 @@ export default function Timetable() {
     return () => cancelAnimationFrame(rafId);
   }, [time]);
 
+  useEffect(() => {
+    const verifiedForEmail =
+      normalizedPriorityNotifications.emailVerified &&
+      normalizedPriorityNotifications.verifiedEmail === normalizedPriorityNotifications.email;
+
+    if (!normalizedPriorityNotifications.enabled || !normalizedPriorityNotifications.email.trim() || !verifiedForEmail) {
+      return;
+    }
+
+    const sendPriorityReminder = async (payload) => {
+      if (!priorityEmailServiceAvailable) {
+        return false;
+      }
+      try {
+        const result = await window.priorityEmail.sendReminderEmail(payload);
+        return Boolean(result?.ok);
+      } catch {
+        return false;
+      }
+    };
+
+    const tick = async () => {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      const isMorningWindow = currentMinutes === normalizedPriorityNotifications.morningReminderMinutes;
+      const isDayBeforeWindow = currentMinutes === normalizedPriorityNotifications.dayBeforeReminderMinutes;
+
+      if (!isMorningWindow && !isDayBeforeWindow) {
+        return;
+      }
+
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
+
+      const reminders = [];
+
+      if (isMorningWindow) {
+        const todayDayIndex = now.getDay();
+        visibleBlocks
+          .filter((block) => block.isPriority && block.dayIndex === todayDayIndex)
+          .forEach((block) => {
+            reminders.push({
+              type: "today",
+              block,
+              referenceDate: new Date(now),
+            });
+          });
+      }
+
+      if (isDayBeforeWindow) {
+        const tomorrowDayIndex = tomorrow.getDay();
+        visibleBlocks
+          .filter((block) => block.isPriority && block.dayIndex === tomorrowDayIndex)
+          .forEach((block) => {
+            reminders.push({
+              type: "tomorrow",
+              block,
+              referenceDate: tomorrow,
+            });
+          });
+      }
+
+      for (const reminder of reminders) {
+        const key = `${reminder.type}:${reminder.block.id}:${toDateKey(reminder.referenceDate)}`;
+        if (priorityReminderLog[key]) {
+          continue;
+        }
+
+        const descriptor = reminder.type === "today" ? "today" : "tomorrow";
+        const whenTime = formatMinutesLabel(reminder.block.startMinutes, false);
+
+        const ok = await sendPriorityReminder({
+          toEmail: normalizedPriorityNotifications.email.trim(),
+          subject: `Helios reminder: ${reminder.block.title} is ${descriptor}`,
+          text: `Your task, ${reminder.block.title}, is ${descriptor} at ${whenTime}.`,
+          html: `<p>Your task, <strong>${reminder.block.title}</strong>, is ${descriptor} at <strong>${whenTime}</strong>.</p>`,
+        });
+
+        if (ok) {
+          setPriorityReminderLog((prev) => ({
+            ...prev,
+            [key]: Date.now(),
+          }));
+        }
+      }
+    };
+
+    tick();
+    const intervalId = setInterval(tick, 60000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [
+    normalizedPriorityNotifications,
+    priorityReminderLog,
+    priorityEmailServiceAvailable,
+    setPriorityReminderLog,
+    visibleBlocks,
+  ]);
+
+  const handleSendVerificationCode = async () => {
+    setPrioritySettingsError("");
+    setPrioritySettingsNotice("");
+
+    const email = priorityEmailDraft.trim();
+    if (!email) {
+      setPrioritySettingsError("Email is required");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setPrioritySettingsError("Enter a valid email address");
+      return;
+    }
+
+    if (!priorityEmailServiceAvailable) {
+      setPrioritySettingsError(
+        "Priority email is unavailable. Use the desktop app (`npm start`) and restart it after updates to enable verification emails."
+      );
+      return;
+    }
+
+    setIsSendingVerification(true);
+    try {
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = Date.now() + 10 * 60 * 1000;
+      const result = await window.priorityEmail.sendReminderEmail({
+        toEmail: email,
+        subject: "Helios email verification code",
+        text: `Your Helios verification code is ${code}. It expires in 10 minutes.`,
+        html: `<p>Your Helios verification code is <strong>${code}</strong>. It expires in 10 minutes.</p>`,
+      });
+
+      if (!result?.ok) {
+        setPrioritySettingsError(result?.error || "Could not send verification code");
+        return;
+      }
+
+      setPendingVerification({ email, code, expiresAt });
+      setVerificationCodeDraft("");
+      setIsEmailVerified(false);
+      setPrioritySettingsNotice("Verification code sent. Check your email.");
+    } catch {
+      setPrioritySettingsError("Could not send verification code");
+    } finally {
+      setIsSendingVerification(false);
+    }
+  };
+
+  const handleVerifyCode = () => {
+    setPrioritySettingsError("");
+    setPrioritySettingsNotice("");
+
+    if (!pendingVerification) {
+      setPrioritySettingsError("Send a verification code first");
+      return;
+    }
+
+    if (priorityEmailDraft.trim() !== pendingVerification.email) {
+      setPrioritySettingsError("Email changed. Send a new verification code.");
+      return;
+    }
+
+    if (Date.now() > pendingVerification.expiresAt) {
+      setPrioritySettingsError("Verification code expired. Request a new one.");
+      return;
+    }
+
+    if (verificationCodeDraft.trim() !== pendingVerification.code) {
+      setPrioritySettingsError("Incorrect verification code");
+      return;
+    }
+
+    setIsEmailVerified(true);
+    setPendingVerification(null);
+    setVerificationCodeDraft("");
+    setPrioritySettingsNotice("Email verified.");
+  };
+
+  const handleSavePrioritySettings = () => {
+    const email = priorityEmailDraft.trim();
+    if (!email) {
+      setPrioritySettingsError("Email is required");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setPrioritySettingsError("Enter a valid email address");
+      return;
+    }
+
+    if (!priorityEmailServiceAvailable && priorityEnabledDraft) {
+      setPrioritySettingsError(
+        "Cannot enable priority emails here. Open the desktop app (`npm start`) and verify your email there."
+      );
+      return;
+    }
+
+    if (!isEmailVerified && priorityEnabledDraft) {
+      setPrioritySettingsError("Verify your email before saving");
+      return;
+    }
+
+    const morningMinutes = parseTimeInputToMinutes(
+      morningReminderDraft,
+      DEFAULT_PRIORITY_NOTIFICATION_SETTINGS.morningReminderMinutes
+    );
+    const dayBeforeMinutes = parseTimeInputToMinutes(
+      dayBeforeReminderDraft,
+      DEFAULT_PRIORITY_NOTIFICATION_SETTINGS.dayBeforeReminderMinutes
+    );
+
+    setPriorityNotifications({
+      ...normalizedPriorityNotifications,
+      email,
+      enabled: priorityEnabledDraft,
+      morningReminderMinutes: morningMinutes,
+      dayBeforeReminderMinutes: dayBeforeMinutes,
+      emailVerified: true,
+      verifiedEmail: email,
+    });
+    setPrioritySettingsError("");
+    setPrioritySettingsNotice("");
+    setPriorityModalOpen(false);
+  };
+
   return (
     <div className="timetable-root">
       <div className="timetable-controls">
@@ -408,6 +719,29 @@ export default function Timetable() {
             onClick={() => setUse24HourFormat((prev) => !prev)}
           >
             {use24HourFormat ? "24h" : "12h"}
+          </button>
+          <button
+            className="timetable-sync-btn"
+            type="button"
+            onClick={() => {
+              setPriorityEmailDraft(normalizedPriorityNotifications.email || "");
+              setPriorityEnabledDraft(Boolean(normalizedPriorityNotifications.enabled));
+              setMorningReminderDraft(minutesToTimeValue(normalizedPriorityNotifications.morningReminderMinutes));
+              setDayBeforeReminderDraft(minutesToTimeValue(normalizedPriorityNotifications.dayBeforeReminderMinutes));
+              setIsEmailVerified(
+                Boolean(
+                  normalizedPriorityNotifications.emailVerified &&
+                  normalizedPriorityNotifications.verifiedEmail === normalizedPriorityNotifications.email
+                )
+              );
+              setPendingVerification(null);
+              setVerificationCodeDraft("");
+              setPrioritySettingsError("");
+              setPrioritySettingsNotice("");
+              setPriorityModalOpen(true);
+            }}
+          >
+            Priority notifications
           </button>
         </div>
         <div className="timetable-rotation">
@@ -519,7 +853,7 @@ export default function Timetable() {
                       return (
                         <button
                           key={block.id}
-                          className="timetable-block"
+                          className={`timetable-block${block.isPriority ? " is-priority" : ""}`}
                           style={{
                             top: `calc(${offsetMinutes} * var(--minute-height))`,
                             height: `calc(${blockHeight} * var(--minute-height))`,
@@ -531,6 +865,11 @@ export default function Timetable() {
                           }}
                           type="button"
                         >
+                          {block.isPriority && (
+                            <span className="timetable-priority-badge" aria-hidden="true">
+                              <Star size={12} fill="currentColor" strokeWidth={2.1} />
+                            </span>
+                          )}
                           <div className="timetable-block-title">{block.title}</div>
                           {blockHeight >= 30 && (
                             <div className="timetable-block-time">
@@ -638,6 +977,17 @@ export default function Timetable() {
                     checked={addMultiple}
                     onChange={(event) => setAddMultiple(event.target.checked)}
                     disabled={sheetMode === "edit"}
+                  />
+                  <span className="timetable-toggle-track" />
+                </label>
+              </div>
+              <div className="timetable-card-row">
+                <span className="timetable-card-label">Priority</span>
+                <label className="timetable-toggle">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(draft.isPriority)}
+                    onChange={(event) => setDraft((prev) => ({ ...prev, isPriority: event.target.checked }))}
                   />
                   <span className="timetable-toggle-track" />
                 </label>
@@ -810,6 +1160,125 @@ export default function Timetable() {
               </div>
             </>
           )}
+        </div>
+      </div>
+    )}
+
+    {priorityModalOpen && (
+      <div className="timetable-sheet-overlay" role="dialog" aria-modal="true">
+        <div className="timetable-sheet">
+          <div className="timetable-sheet-header">
+            <button
+              className="timetable-sheet-action"
+              onClick={() => setPriorityModalOpen(false)}
+              type="button"
+            >
+              Cancel
+            </button>
+            <div className="timetable-sheet-title">Priority notifications</div>
+            <button className="timetable-sheet-action is-primary" onClick={handleSavePrioritySettings} type="button">
+              Save
+            </button>
+          </div>
+          <div className="timetable-sheet-body">
+            <label className="timetable-field">
+              <span className="timetable-field-label">Email</span>
+              <input
+                className="timetable-input"
+                type="email"
+                value={priorityEmailDraft}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setPriorityEmailDraft(value);
+                  if (value.trim() !== normalizedPriorityNotifications.verifiedEmail) {
+                    setIsEmailVerified(false);
+                  }
+                }}
+                placeholder="you@example.com"
+              />
+            </label>
+
+            <div className="timetable-card-row">
+              <span className="timetable-card-label">Email verification</span>
+              <div className="timetable-card-content">
+                <button
+                  className="timetable-sheet-action"
+                  onClick={handleSendVerificationCode}
+                  type="button"
+                  disabled={isSendingVerification}
+                >
+                  {isSendingVerification ? "Sending..." : "Send code"}
+                </button>
+              </div>
+            </div>
+
+            <div className="timetable-card-row">
+              <span className="timetable-card-label">Code</span>
+              <div className="timetable-card-content timetable-inline-input-group">
+                <input
+                  className="timetable-input timetable-verify-code-input"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={verificationCodeDraft}
+                  onChange={(event) => setVerificationCodeDraft(event.target.value)}
+                  placeholder="6-digit code"
+                />
+                <button className="timetable-sheet-action" onClick={handleVerifyCode} type="button">
+                  Verify
+                </button>
+              </div>
+            </div>
+
+            <div className="timetable-card-row">
+              <span className="timetable-card-label">Day before reminder</span>
+              <div className="timetable-card-content">
+                <input
+                  className="timetable-input"
+                  type="time"
+                  step={900}
+                  value={dayBeforeReminderDraft}
+                  onChange={(event) => setDayBeforeReminderDraft(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="timetable-card-row">
+              <span className="timetable-card-label">Morning reminder</span>
+              <div className="timetable-card-content">
+                <input
+                  className="timetable-input"
+                  type="time"
+                  step={900}
+                  value={morningReminderDraft}
+                  onChange={(event) => setMorningReminderDraft(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <p className="timetable-sync-note">
+              Priority blocks send reminders with a generic message for each marked task.
+            </p>
+            <div className="timetable-card-row">
+              <span className="timetable-card-label">Enabled</span>
+              <label className="timetable-toggle">
+                <input
+                  type="checkbox"
+                  checked={priorityEnabledDraft}
+                  onChange={(event) => setPriorityEnabledDraft(event.target.checked)}
+                />
+                <span className="timetable-toggle-track" />
+              </label>
+            </div>
+            {!priorityEmailServiceAvailable && (
+              <div className="timetable-verify-info">
+                Email verification is only available in the desktop app with SMTP configured.
+              </div>
+            )}
+            {isEmailVerified && <div className="timetable-verify-ok">Email verified</div>}
+            {prioritySettingsNotice && <div className="timetable-verify-info">{prioritySettingsNotice}</div>}
+            {prioritySettingsError && <div className="timetable-error">{prioritySettingsError}</div>}
+          </div>
         </div>
       </div>
     )}
