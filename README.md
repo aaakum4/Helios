@@ -35,6 +35,7 @@ Before the first stable release, I would like the following features to be imple
 - [x] All other nodes functional and operational
 - [x] User friendly
 - [x] Nodes work with each other
+- [x] Mobile compatability
 - [ ] ...
 
 ## Known Limitations
@@ -54,6 +55,8 @@ That’s it.
 ## Priority Email Reminders
 
 Priority timetable reminders can send email notifications for your scheduled tasks.
+
+Before this, you must verify that the email is your own. Most schools block unauthrozied emails so be sure to use a personal or other email and check junk mail.
 
 ## Using Helios
 
