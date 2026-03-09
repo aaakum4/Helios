@@ -24,6 +24,8 @@ In my final year of school, juggling assessments, homework, deadlines, and study
 Demo
 Live App: [https://helios-sigma.vercel.app/](https://helios-app-ui.vercel.app/)
 
+**Deployment Guide:** See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying your own instance with email support.
+
 ## Roadmap
 
 Before the first stable release, I would like the following features to be implemented:
@@ -51,9 +53,22 @@ None — just:
 
 That’s it.
 
-## Priority Email Reminders (Desktop)
+## Priority Email Reminders
 
-Priority timetable reminders use SMTP from the Electron main process.
+Priority timetable reminders can send email notifications for your scheduled tasks.
+
+### For Web Users
+Email functionality requires a backend server. To enable:
+
+1. Install dependencies: `npm install`
+2. Configure SMTP in `.env` (see `.env.example`)
+3. Run with: `npm run start:web`
+
+This starts both the frontend (port 5173) and email server (port 3001).
+
+See [server/README.md](server/README.md) for deployment details.
+
+### For Desktop Users (Electron)
 Set these variables in `.env` for email delivery:
 
 - `SMTP_HOST`
@@ -62,6 +77,8 @@ Set these variables in `.env` for email delivery:
 - `SMTP_USER`
 - `SMTP_PASS`
 - `SMTP_FROM` (sender address)
+
+Run with: `npm start`
 
 Without SMTP config, the priority reminder UI still works, but emails are not sent.
 

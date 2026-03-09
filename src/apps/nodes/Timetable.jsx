@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Plus, Star } from 'lucide-react';
+import { Plus, Star, Check } from 'lucide-react';
 import { useAppContext } from '../../core/AppContext';
 import { useTime } from '../../core/TimeProvider';
 import { useLocalStorage } from '../../core/useLocalStorage';
@@ -592,7 +592,7 @@ export default function Timetable() {
 
     if (!priorityEmailServiceAvailable) {
       setPrioritySettingsError(
-        "Priority email is unavailable. Use the desktop app (`npm start`) and restart it after updates to enable verification emails."
+        "Priority email is unavailable. Make sure the email server is running with `npm run start:web` or use the desktop app with `npm start`."
       );
       return;
     }
@@ -1007,7 +1007,8 @@ export default function Timetable() {
                           );
                         }}
                       >
-                        {day.slice(0, 3)}
+                        {active && <Check className="timetable-day-chip-icon" size={14} strokeWidth={3} />}
+                        <span>{day.slice(0, 3)}</span>
                       </button>
                     );
                   })}

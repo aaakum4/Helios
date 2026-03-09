@@ -8,14 +8,32 @@ export function initializePriorityEmailBridge() {
     return;
   }
 
-  // Web fallback: explicit unsupported response for email features.
+  // Web fallback: use backend API for email sending
   window.priorityEmail = {
-    async sendReminderEmail() {
-      return {
-        ok: false,
-        error:
-          "Priority email requires the desktop app (Electron) with SMTP configured. Start with `npm start` and restart the app after preload changes.",
-      };
+    async sendReminderEmail(payload) {
+      // Default to Vercel serverless function in production, localhost in dev
+      const apiUrl = import.meta.env.VITE_EMAIL_API_URL || 
+        (window.location.hostname === "localhost" 
+          ? "http://localhost:3001/api/send-email"
+          : "/api/send-email");
+      
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        return {
+          ok: false,
+          error: "Failed to connect to email server. Make sure the backend is running.",
+        };
+      }
     },
   };
 }
