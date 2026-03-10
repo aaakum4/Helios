@@ -34,7 +34,7 @@
 
 .node-card-icon {
     font-size: clamp(2.5rem, 4vw, 4rem);
-    margin-top: clamp(10px, 1.8vw, 40px);
+    margin-top: clamp(0px, 1vw, 20px);
     margin-bottom: clamp(0.4rem, 1.2vw, 1rem);
     flex-shrink: 0;
     color: var(--text);
@@ -58,7 +58,7 @@
 .node-card-description {
     font-size: clamp(0.75rem, 1.1vw, 1rem);
     color: var(--muted, #121212);
-    margin: clamp(0.5rem, 1.2vh, 0.8rem) 0 clamp(0.65rem, 1.4vh, 1rem);
+    margin: clamp(0.3rem, 0.8vh, 0.6rem) 0 clamp(0.65rem, 1.4vh, 1rem);
     line-height: 1.45;
     flex: 1 1 auto;
     width: 100%;
