@@ -105,30 +105,43 @@ html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
     padding-top: clamp(3px, 0.38vw, 4px);
 }
 
+.settings-section.theme-section {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.settings-section.shortcuts-label-section {
+    justify-content: flex-start;
+    margin-top: clamp(6px, 0.7vw, 8px);
+    padding-top: clamp(3px, 0.38vw, 4px);
+}
+
 .theme-switch {
     display: inline-block;
 }
 
 .theme-options {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    padding: clamp(2.5px, 0.28vw, 3px);
+    padding: 3px;
     border-radius: 999px;
     background: var(--surface);
     border: 1px solid var(--border);
-    min-width: clamp(210px, 21vw, 250px);
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .theme-options::before {
     content: "";
     position: absolute;
-    top: clamp(2.5px, 0.28vw, 3px);
-    bottom: clamp(2.5px, 0.28vw, 3px);
-    left: clamp(2.5px, 0.28vw, 3px);
-    width: calc((100% - clamp(5px, 0.56vw, 6px)) / 3);
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc((100% - 6px) / 4);
     background: var(--accent);
     border-radius: 999px;
     transform: translateX(0);
@@ -147,19 +160,53 @@ html[data-theme="dark"] .settings-content::-webkit-scrollbar-thumb:hover {
     transform: translateX(200%);
 }
 
+.theme-options[data-active="oled"]::before {
+    transform: translateX(300%);
+}
+
+.shortcut-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 clamp(4px, 0.47vw, 5px) clamp(8px, 0.9vw, 10px);
+}
+
+.shortcut-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: clamp(12px, 1.15vh, 14px);
+    color: #555;
+}
+
+.shortcut-row kbd {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: clamp(11px, 1.05vh, 13px);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+html[data-theme="dark"] .shortcut-row {
+    color: #d0d0d0;
+}
+
 .theme-option {
     display: inline-flex;
-    flex: 1;
     align-items: center;
-    gap: clamp(5px, 0.56vw, 6px);
     justify-content: center;
-    padding: clamp(5px, 0.56vw, 6px) clamp(8px, 0.94vw, 10px);
+    padding: clamp(6px, 0.62vw, 8px) clamp(8px, 0.94vw, 10px);
     border-radius: 999px;
     border: none;
     background: transparent;
     color: #666;
     cursor: pointer;
-    font-size: clamp(13px, 1.3vh, 14px);
+    font-size: clamp(12px, 1.2vh, 14px);
+    white-space: nowrap;
+    min-width: 0;
     transition: color 150ms ease;
     position: relative;
     z-index: 1;

@@ -1,5 +1,5 @@
 const THEME_STORAGE_KEY = "theme";
-const VALID_MODES = new Set(["light", "dark", "system"]);
+const VALID_MODES = new Set(["light", "dark", "oled", "system"]);
 
 let currentMode = null;
 let unsubscribeNativeTheme = null;
@@ -31,7 +31,7 @@ function getSystemThemeFromPayload(payload) {
   return getSystemThemeFromMedia();
 }
 
-function applyResolvedTheme(theme) {
+function applyResolvedTheme(theme, mode) {
   if (typeof document === "undefined") {
     return;
   }
@@ -41,6 +41,7 @@ function applyResolvedTheme(theme) {
   document.head.appendChild(style);
 
   document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.setAttribute("data-theme-mode", mode || theme);
 
   // Force a reflow so the suppression takes effect before transitions are restored
   document.documentElement.offsetHeight; // eslint-disable-line no-unused-expressions
@@ -87,7 +88,7 @@ function attachMediaListener() {
       return;
     }
 
-    applyResolvedTheme(event.matches ? "dark" : "light");
+    applyResolvedTheme(event.matches ? "dark" : "light", "system");
   };
 
   if (typeof mediaQuery.addEventListener === "function") {
@@ -109,7 +110,7 @@ function attachNativeThemeListener() {
       return;
     }
 
-    applyResolvedTheme(getSystemThemeFromPayload(payload));
+    applyResolvedTheme(getSystemThemeFromPayload(payload), "system");
   });
 
   return true;
@@ -117,7 +118,7 @@ function attachNativeThemeListener() {
 
 async function applySystemTheme() {
   const payload = await getNativeThemePayload();
-  applyResolvedTheme(getSystemThemeFromPayload(payload));
+  applyResolvedTheme(getSystemThemeFromPayload(payload), "system");
 }
 
 export function getStoredThemeMode() {
@@ -155,8 +156,14 @@ export async function setThemeMode(mode, options = {}) {
     return;
   }
 
+  if (nextMode === "oled") {
+    cleanupSystemListeners();
+    applyResolvedTheme("dark", "oled");
+    return;
+  }
+
   cleanupSystemListeners();
-  applyResolvedTheme(nextMode);
+  applyResolvedTheme(nextMode, nextMode);
 }
 
 export async function initializeTheme() {

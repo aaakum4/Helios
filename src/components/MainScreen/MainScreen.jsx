@@ -15,10 +15,39 @@ import "./MainScreen.css";
 
 const MAX_CHARS = 50;
 
+function isEditableTarget(target) {
+  if (!target || !(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tag = target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+    return true;
+  }
+
+  return target.isContentEditable;
+}
+
+function getShortcutDigit(event) {
+  if (event.code && /^Digit[1-9]$/.test(event.code)) {
+    return Number(event.code.replace("Digit", ""));
+  }
+
+  if (/^[1-9]$/.test(event.key)) {
+    return Number(event.key);
+  }
+
+  return null;
+}
+
 export default function MainScreen({ onBack }) {
   const [text, setText] = useState("");
   const [showCounter, setShowCounter] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+  const [quickAddTitle, setQuickAddTitle] = useState("");
+  const [quickAddDueDate, setQuickAddDueDate] = useState("");
+  const [quickAddSubheadingId, setQuickAddSubheadingId] = useState("inbox-default");
   const [panelState, setPanelState] = useState('hidden');
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [nodeOrder, setNodeOrder] = useState(() => {
@@ -32,6 +61,7 @@ export default function MainScreen({ onBack }) {
   const [draggedId, setDraggedId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const hideTimer = useRef(null);
+  const quickAddInputRef = useRef(null);
   const isDraggingRef = useRef(false);
   const lastSwapTargetRef = useRef(null);
 
@@ -234,6 +264,130 @@ export default function MainScreen({ onBack }) {
     });
   }, [setTodosData]);
 
+  const openQuickAddModal = useCallback(() => {
+    setQuickAddTitle("");
+    setQuickAddDueDate("");
+    setQuickAddSubheadingId("inbox-default");
+    setShowQuickAddModal(true);
+  }, []);
+
+  const closeQuickAddModal = useCallback(() => {
+    setShowQuickAddModal(false);
+  }, []);
+
+  const submitQuickAddModal = useCallback(() => {
+    const trimmed = quickAddTitle.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    handleQuickAddTodo(trimmed, quickAddSubheadingId || "inbox-default", quickAddDueDate);
+    setShowQuickAddModal(false);
+    setActiveNodeId("todo");
+    window.posthog?.capture("todo_quick_add_shortcut", {
+      has_due_date: Boolean(quickAddDueDate),
+      subheading_id: quickAddSubheadingId || "inbox-default",
+    });
+  }, [handleQuickAddTodo, quickAddDueDate, quickAddSubheadingId, quickAddTitle]);
+
+  useEffect(() => {
+    if (!showQuickAddModal) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      quickAddInputRef.current?.focus();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [showQuickAddModal]);
+
+  useEffect(() => {
+    const handleGlobalShortcuts = (event) => {
+      const hasCommandModifier = event.metaKey || event.ctrlKey;
+      const editable = isEditableTarget(event.target);
+
+      if (event.key === "Escape") {
+        if (showQuickAddModal) {
+          event.preventDefault();
+          closeQuickAddModal();
+          return;
+        }
+
+        if (showSettings) {
+          event.preventDefault();
+          setShowSettings(false);
+          return;
+        }
+
+        if (activeNodeId) {
+          event.preventDefault();
+          setActiveNodeId(null);
+          return;
+        }
+
+        if (panelState === "expanded") {
+          event.preventDefault();
+          setPanelState("hidden");
+        }
+        return;
+      }
+
+      if (hasCommandModifier && event.shiftKey && event.key.toLowerCase() === "a") {
+        event.preventDefault();
+        openQuickAddModal();
+        return;
+      }
+
+      if (!hasCommandModifier || editable) {
+        return;
+      }
+
+      if (event.key === ",") {
+        event.preventDefault();
+        setShowSettings(true);
+        return;
+      }
+
+      if (event.key.toLowerCase() === "b") {
+        event.preventDefault();
+        handlePanelToggle();
+        return;
+      }
+
+      if (event.shiftKey && event.key.toLowerCase() === "t") {
+        event.preventDefault();
+        setActiveNodeId("todo");
+        return;
+      }
+
+      const digit = getShortcutDigit(event);
+      if (!digit) {
+        return;
+      }
+
+      const targetNode = sortedNodes[digit - 1];
+      if (!targetNode) {
+        return;
+      }
+
+      event.preventDefault();
+      setActiveNodeId(targetNode.id);
+    };
+
+    window.addEventListener("keydown", handleGlobalShortcuts);
+    return () => window.removeEventListener("keydown", handleGlobalShortcuts);
+  }, [
+    activeNodeId,
+    closeQuickAddModal,
+    handlePanelToggle,
+    openQuickAddModal,
+    panelState,
+    showQuickAddModal,
+    showSettings,
+    sortedNodes,
+  ]);
+
   return (
     <div className="app-container">
       <div className="main-screen" data-tod={timeOfDay}>
@@ -277,6 +431,60 @@ export default function MainScreen({ onBack }) {
         />
 
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+
+        {showQuickAddModal && (
+          <div className="quick-add-backdrop" onClick={closeQuickAddModal}>
+            <div className="quick-add-modal" onClick={(event) => event.stopPropagation()}>
+              <h3>Quick Add Todo</h3>
+              <input
+                ref={quickAddInputRef}
+                type="text"
+                className="quick-add-input"
+                placeholder="Todo title"
+                value={quickAddTitle}
+                onChange={(event) => setQuickAddTitle(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    submitQuickAddModal();
+                  }
+                }}
+              />
+              <div className="quick-add-row">
+                <input
+                  type="date"
+                  className="quick-add-date"
+                  value={quickAddDueDate}
+                  onChange={(event) => setQuickAddDueDate(event.target.value)}
+                />
+                <select
+                  className="quick-add-select"
+                  value={quickAddSubheadingId}
+                  onChange={(event) => setQuickAddSubheadingId(event.target.value)}
+                >
+                  {(Array.isArray(todosData?.subheadings) ? todosData.subheadings : []).map((subheading) => (
+                    <option key={subheading.id} value={subheading.id}>
+                      {subheading.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="quick-add-actions">
+                <button type="button" className="quick-add-cancel" onClick={closeQuickAddModal}>
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="quick-add-submit"
+                  onClick={submitQuickAddModal}
+                  disabled={!quickAddTitle.trim()}
+                >
+                  Add Todo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="main-screen-content" data-panel-state={panelState}>
           <div className="nodes-container">

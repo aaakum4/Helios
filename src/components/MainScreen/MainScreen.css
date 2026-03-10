@@ -453,6 +453,81 @@ html[data-glow="pink"] .app-container {
   flex-shrink: 0;
 }
 
+.quick-add-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+}
+
+.quick-add-modal {
+  width: min(460px, calc(100vw - 2rem));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quick-add-modal h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.quick-add-input,
+.quick-add-date,
+.quick-add-select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.quick-add-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quick-add-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.quick-add-cancel,
+.quick-add-submit {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.quick-add-cancel {
+  background: transparent;
+  color: var(--text);
+}
+
+.quick-add-submit {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.quick-add-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 html[data-theme="dark"] .back-button {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);

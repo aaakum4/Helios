@@ -13,6 +13,13 @@ const CONFETTI_DIRS = [
     { dx:   '0px', dy:  '48px' },
 ];
 
+const FILTER_OPTIONS = [
+    { value: 'all', label: 'All' },
+    { value: 'active', label: 'Active' },
+    { value: 'completed', label: 'Done' },
+    { value: 'dueToday', label: 'Due today' },
+];
+
 export default function TodoList({
     currentSubheading,
     onAddTodo,
@@ -24,8 +31,52 @@ export default function TodoList({
     const [dueDate, setDueDate] = useState('');
     const [removingTodoIds, setRemovingTodoIds] = useState(() => new Set());
     const [confettiIds, setConfettiIds] = useState(() => new Set());
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterMode, setFilterMode] = useState('all');
     const removalTimersRef = useRef(new Map());
     const addingTodoRef = useRef(false);
+    const searchInputRef = useRef(null);
+
+    const allTodos = currentSubheading?.todos || [];
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    const visibleTodos = allTodos.filter((todo) => {
+        const matchesSearch = !normalizedQuery || todo.title.toLowerCase().includes(normalizedQuery);
+        if (!matchesSearch) {
+            return false;
+        }
+
+        if (filterMode === 'active') {
+            return !todo.completed;
+        }
+
+        if (filterMode === 'completed') {
+            return !!todo.completed;
+        }
+
+        if (filterMode === 'dueToday') {
+            return !todo.completed && todo.dueDate === todayStr;
+        }
+
+        return true;
+    });
+
+    useEffect(() => {
+        const handleSearchShortcut = (event) => {
+            const hasCommandModifier = event.metaKey || event.ctrlKey;
+            if (!hasCommandModifier || event.key.toLowerCase() !== 'f') {
+                return;
+            }
+
+            event.preventDefault();
+            searchInputRef.current?.focus();
+            searchInputRef.current?.select();
+        };
+
+        window.addEventListener('keydown', handleSearchShortcut);
+        return () => window.removeEventListener('keydown', handleSearchShortcut);
+    }, []);
 
     if (!currentSubheading) {
         return (
@@ -119,7 +170,30 @@ export default function TodoList({
         <div className="todo-list">
             <div className="todo-list-header">
                 <h2>{currentSubheading.title}</h2>
-                <span className="todo-count-badge">{currentSubheading.todos.length}</span>
+                <span className="todo-count-badge">{visibleTodos.length}/{allTodos.length}</span>
+            </div>
+
+            <div className="todo-search-row">
+                <input
+                    ref={searchInputRef}
+                    type="search"
+                    className="todo-search-input"
+                    placeholder="Search todos..."
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                />
+                <div className="todo-filter-pills" role="tablist" aria-label="Todo filters">
+                    {FILTER_OPTIONS.map((option) => (
+                        <button
+                            key={option.value}
+                            type="button"
+                            className={`todo-filter-pill ${filterMode === option.value ? 'is-active' : ''}`}
+                            onClick={() => setFilterMode(option.value)}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <form className="todo-inputs" onSubmit={handleSubmit}>
@@ -144,11 +218,13 @@ export default function TodoList({
                 </button>
             </form>
 
-            {currentSubheading.todos.length === 0 ? (
-                <div className="todo-list-empty">No todos yet.</div>
+            {visibleTodos.length === 0 ? (
+                <div className="todo-list-empty">
+                    {allTodos.length === 0 ? 'No todos yet.' : 'No todos match this search/filter.'}
+                </div>
             ) : (
                 <div className="todo-items">
-                    {currentSubheading.todos.map((todo) => (
+                    {visibleTodos.map((todo) => (
                         <div 
                             key={todo.id} 
                             className={`todo-item ${todo.completed ? 'done' : ''} ${

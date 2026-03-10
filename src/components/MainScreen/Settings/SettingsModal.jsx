@@ -63,6 +63,7 @@ export default function SettingsModal({ onClose }) {
                             { value: "system", label: "System" },
                             { value: "light", label: "Light" },
                             { value: "dark", label: "Dark" },
+                            { value: "oled", label: "OLED" },
                         ].map((option) => (
                             <label
                                 key={option.value}
@@ -120,6 +121,20 @@ export default function SettingsModal({ onClose }) {
 
                 <div className="settings-section">
                     <button className="reset-tutorials-btn" onClick={handleOpenDevlog}>Devlog</button>
+                </div>
+
+                <div className="settings-section shortcuts-label-section">
+                    <label>Keyboard shortcuts</label>
+                </div>
+
+                <div className="shortcut-list" aria-label="Keyboard shortcuts">
+                    <div className="shortcut-row"><span>Open settings</span><kbd>Cmd/Ctrl + ,</kbd></div>
+                    <div className="shortcut-row"><span>Toggle side panel</span><kbd>Cmd/Ctrl + B</kbd></div>
+                    <div className="shortcut-row"><span>Quick add todo modal</span><kbd>Cmd/Ctrl + Shift + A</kbd></div>
+                    <div className="shortcut-row"><span>Open Todo node</span><kbd>Cmd/Ctrl + Shift + T</kbd></div>
+                    <div className="shortcut-row"><span>Open node by position</span><kbd>Cmd/Ctrl + 1-6</kbd></div>
+                    <div className="shortcut-row"><span>Close modal/panel/node</span><kbd>Esc</kbd></div>
+                    <div className="shortcut-row"><span>Search todos</span><kbd>Cmd/Ctrl + F</kbd></div>
                 </div>
 
                 <div className="settings-section glow-label-section">

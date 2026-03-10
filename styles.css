@@ -60,6 +60,15 @@ html[data-theme="dark"] {
     --danger:       #e07070;
 }
 
+/* True OLED mode keeps dark-mode component styles while forcing near-black surfaces. */
+html[data-theme-mode="oled"] {
+    --bg:           #000000 !important;
+    --surface:      #050505 !important;
+    --top-bar-bg:   #000000 !important;
+    --border:       #171717 !important;
+    --accent-soft:  #101010 !important;
+}
+
 body {
     height: 100%;
     margin: 0;
