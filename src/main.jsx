@@ -57,4 +57,5 @@ function renderApp() {
   );
 }
 
-bootstrapCloudSession().finally(renderApp);
+renderApp();
+bootstrapCloudSession();
