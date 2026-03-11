@@ -36,13 +36,12 @@ Before the first stable release, I would like the following features to be imple
 - [x] User friendly
 - [x] Nodes work with each other
 - [x] Mobile compatability
+- [x] Cloud syncing
 - [ ] ...
 
 ## Known Limitations
 
-- No account system yet
-- Data stored locally in browser
-- Some features may reset
+- In some screen sizes, the app may bug. Can be fixed with either CMD -, or CTRL -
 
 ## Prerequisites
 
