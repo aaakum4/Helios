@@ -190,6 +190,19 @@ export default function MainScreen({ onBack }) {
     [activeNodeId]
   );
 
+  const closeActiveNode = useCallback((reason = "node_closed") => {
+    if (!activeNodeId) {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent("helios:cloud-save-request", {
+        detail: { reason },
+      })
+    );
+    setActiveNodeId(null);
+  }, [activeNodeId]);
+
   const getLiveState = useCallback((nodeId) => {
     if (nodeId === 'pomodoro' && pomodoroIsRunning) {
       return pomodoroIsWorkSession ? 'Focus · Running' : 'Break · Running';
@@ -322,7 +335,7 @@ export default function MainScreen({ onBack }) {
 
         if (activeNodeId) {
           event.preventDefault();
-          setActiveNodeId(null);
+          closeActiveNode("node_closed_escape");
           return;
         }
 
@@ -379,6 +392,7 @@ export default function MainScreen({ onBack }) {
     return () => window.removeEventListener("keydown", handleGlobalShortcuts);
   }, [
     activeNodeId,
+    closeActiveNode,
     closeQuickAddModal,
     handlePanelToggle,
     openQuickAddModal,
@@ -542,7 +556,7 @@ export default function MainScreen({ onBack }) {
             <NodeFullScreen
               key={activeNode.id}
               node={activeNode}
-              onClose={() => setActiveNodeId(null)}
+              onClose={() => closeActiveNode("node_closed_overlay")}
             />
           )}
         </AnimatePresence>
