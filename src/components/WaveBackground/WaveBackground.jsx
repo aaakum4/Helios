@@ -1,24 +1,11 @@
 import { memo } from "react";
 import "./WaveBackground.css";
 
-/**
- * WaveBackground
- *
- * Three layered SVG waves anchored to the bottom of the screen.
- * All fills derive from --accent so they adapt to every palette
- * automatically. Opacity varies per layer (darkest → bottom,
- * lightest → top). A slow horizontal drift loops seamlessly.
- *
- * The SVG is 200 % wide (2880 viewBox units, period = 720 units × 4).
- * Animating translateX(0 → -50 %) shifts exactly one full tile and
- * loops with no seam.
- *
- * Memoized to prevent re-renders.
- */
+// Memoized layered wave background.
 function WaveBackground() {
   return (
     <div className="wave-bg" aria-hidden="true">
-      {/* ── Layer 1 – bottom / darkest ── */}
+      {/* Bottom layer */}
       <svg
         className="wave-svg wave-svg--1"
         viewBox="0 0 2880 180"
@@ -38,7 +25,7 @@ function WaveBackground() {
         />
       </svg>
 
-      {/* ── Layer 2 – middle ── */}
+      {/* Middle layer */}
       <svg
         className="wave-svg wave-svg--2"
         viewBox="0 0 2880 180"
@@ -58,7 +45,7 @@ function WaveBackground() {
         />
       </svg>
 
-      {/* ── Layer 3 – top / lightest ── */}
+      {/* Top layer */}
       <svg
         className="wave-svg wave-svg--3"
         viewBox="0 0 2880 180"

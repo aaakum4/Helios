@@ -4,7 +4,7 @@ const { PostHog } = require("posthog-node");
 
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
-// Soft linear scaling model baseline.
+// Baseline values for soft linear min-size scaling.
 const BASE_DISPLAY_WIDTH = 1800;
 const BASE_DISPLAY_HEIGHT = 1169;
 const BASE_MIN_WIDTH = 980;
@@ -12,13 +12,13 @@ const BASE_MIN_HEIGHT = 620;
 const WIDTH_SCALE_FACTOR = 70 / 288;
 const HEIGHT_SCALE_FACTOR = 25 / 187;
 
-// Clamps for computed minimum window size.
+// Clamp computed minimum window size.
 const MIN_WIDTH_CLAMP = 900;
 const MAX_WIDTH_CLAMP = 1320;
 const MIN_HEIGHT_CLAMP = 560;
 const MAX_HEIGHT_CLAMP = 860;
 
-// Zoom scaling baseline (proportional app scaling instead of layout squish).
+// Baseline values for zoom scaling.
 const BASE_SCALE_WIDTH = 1600;
 const BASE_SCALE_HEIGHT = 1169;
 const MIN_ZOOM_FACTOR = 0.75;
@@ -31,7 +31,7 @@ function clamp(value, min, max) {
 function computeMinimumWindowSizeForDisplay(display) {
   const { width: displayWidth, height: displayHeight } = display.size;
 
-  // Soft linear scaling (not proportional scaling).
+  // Soft linear scaling.
   const rawMinWidth = BASE_MIN_WIDTH + (displayWidth - BASE_DISPLAY_WIDTH) * WIDTH_SCALE_FACTOR;
   const rawMinHeight = BASE_MIN_HEIGHT + (displayHeight - BASE_DISPLAY_HEIGHT) * HEIGHT_SCALE_FACTOR;
 
@@ -88,17 +88,13 @@ function applyWindowZoom(win) {
   }
 }
 
-// PostHog client — uses env vars so keys are never hardcoded
-// For development environments with TLS interception (corporate proxies, etc.):
-// Uses system certificate trust store by default (secure).
-// Set HELIOS_DEV_MODE=true in .env for development-only TLS tolerance.
+// PostHog client and dev TLS behavior.
 
 function configureDevEnvironment() {
   const isDevMode = process.env.HELIOS_DEV_MODE === "true";
-  
+
   if (isDevMode && !app.isPackaged) {
-    // Development mode: Allow system-intercepted HTTPS (e.g., corporate proxies)
-    // This is ONLY active when HELIOS_DEV_MODE=true AND running unpackaged (dev environment)
+    // Development-only TLS relaxation for intercepted HTTPS traffic.
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     console.warn("⚠️  Development mode: TLS verification relaxed for local development");
   }
@@ -118,8 +114,8 @@ posthog.on("error", (err) => {
   }
 });
 
-// Stable anonymous distinct ID for this installation (persisted across sessions).
-// Initialized lazily after app is ready (app.getPath requires app to be ready).
+// Stable anonymous distinct ID for this installation.
+// Initialized after app is ready (app.getPath requires readiness).
 let DISTINCT_ID = "helios-anonymous";
 
 function initDistinctId() {
@@ -133,9 +129,7 @@ function initDistinctId() {
       DISTINCT_ID = randomUUID();
       fs.writeFileSync(storePath, DISTINCT_ID, "utf8");
     }
-  } catch {
-    // Keep the fallback value
-  }
+  } catch {}
 }
 
 function getNativeThemePayload() {
@@ -155,7 +149,7 @@ function broadcastNativeTheme() {
 }
 
 function createWindow() {
-  // Create with requested default minimums first, then sync to active display.
+  // Start with defaults, then sync minimum size to the active display.
   const minWidth = 900;
   const minHeight = 560;
 
@@ -184,7 +178,7 @@ function createWindow() {
 
   win.loadURL("http://localhost:5173");
 
-  // Track monitor changes while dragging between displays.
+  // Re-evaluate while moving between displays.
   win.on("move", () => {
     applyDynamicMinimumSize(win);
     applyWindowZoom(win);
@@ -194,14 +188,14 @@ function createWindow() {
     applyWindowZoom(win);
   });
 
-  // Initial sync after the window has been created and placed.
+  // Initial sync after window placement.
   applyDynamicMinimumSize(win);
   applyWindowZoom(win);
 }
 
 ipcMain.handle("native-theme:get", () => getNativeThemePayload());
 
-// Expose current minimum window size to renderer
+// Expose current minimum window size to renderer.
 ipcMain.handle("window:get-min-size", () => {
   const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0];
 
@@ -213,7 +207,7 @@ ipcMain.handle("window:get-min-size", () => {
   return computeMinimumWindowSizeForDisplay(display);
 });
 
-// PostHog IPC bridge — renderer sends events to the main process for capture
+// PostHog IPC bridge.
 ipcMain.on("posthog:capture", (_event, { eventName, properties }) => {
   try {
     posthog.capture({
@@ -226,7 +220,7 @@ ipcMain.on("posthog:capture", (_event, { eventName, properties }) => {
   }
 });
 
-// Expose the distinct ID to the renderer if needed for correlation
+// Expose distinct ID to the renderer when needed.
 ipcMain.handle("posthog:get-distinct-id", () => DISTINCT_ID);
 
 nativeTheme.on("updated", () => {
@@ -237,7 +231,7 @@ app.whenReady().then(() => {
   initDistinctId();
   createWindow();
 
-  // Recalculate when OS display metrics are updated.
+  // Recalculate when display metrics change.
   screen.on("display-metrics-changed", () => {
     BrowserWindow.getAllWindows().forEach((win) => {
       applyDynamicMinimumSize(win);

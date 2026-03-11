@@ -14,7 +14,6 @@ function createId() {
 export default function PeacefulDisplay() {
   const { time } = useTime();
 
-  // ── Clock settings ────────────────────────────────────────────────────────
   const [mode, setMode] = useLocalStorage('peacefulDisplay:Mode', 'summer');
   const [clockFont, setClockFont] = useLocalStorage('peacefulDisplay:clockFont', 'sans');
   const [clockColor, setClockColor] = useLocalStorage('peacefulDisplay:clockColor', 'white');
@@ -22,14 +21,13 @@ export default function PeacefulDisplay() {
   const [showClockSettings, setShowClockSettings] = useState(false);
   const [hasSeenClockTutorial, setHasSeenClockTutorial] = useLocalStorage('peacefulDisplay:hasSeenClockTutorial', false);
 
-  // ── Particles (respawning) ─────────────────────────────────────────────────
   const [particles, setParticles] = useState([]);
 
-  // Spawn particles individually at staggered intervals
+  // Spawn particles at a steady interval.
   useEffect(() => {
     const spawnInterval = setInterval(() => {
       const particleType = mode === 'winter' ? 'snow' : mode === 'autumn' ? 'leaf' : null;
-      if (!particleType) return; // Don't spawn in summer
+      if (!particleType) return;
       
       const newParticle = {
         id: `${Date.now()}-${Math.random()}`,
@@ -37,12 +35,12 @@ export default function PeacefulDisplay() {
         type: particleType,
       };
       setParticles(prev => [...prev, newParticle]);
-    }, 1200); // spawn ~13-14 particles over 16 seconds for smoother flow
+    }, 1200);
     
     return () => clearInterval(spawnInterval);
   }, [mode]);
 
-  // Clean up particles after animation completes
+  // Clean up particles after animation completes.
   useEffect(() => {
     const cleanup = setInterval(() => {
       setParticles(prev => {
@@ -57,7 +55,7 @@ export default function PeacefulDisplay() {
     return () => clearInterval(cleanup);
   }, []);
 
-  // ── Pomodoro state (same keys as Pomodoro node — shared) ──────────────────
+  // Pomodoro state shared with the Pomodoro node.
   const {
     focusSubjects, setStudySessions,
     ftActiveSubjectId, setFtActiveSubjectId,
@@ -99,7 +97,6 @@ export default function PeacefulDisplay() {
     }
   }, []);
 
-  // ── FocusTracker helpers ───────────────────────────────────────────────────
   const getTodayKey = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -156,7 +153,6 @@ export default function PeacefulDisplay() {
     setActiveStudySession(null);
   };
 
-  // ── Timer interval ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isRunning) {
       if (timerIntervalRef.current) { clearInterval(timerIntervalRef.current); timerIntervalRef.current = null; }
@@ -226,14 +222,12 @@ export default function PeacefulDisplay() {
     setElapsed(0);
   };
 
-  // ── Derived display values ────────────────────────────────────────────────
   const remaining = Math.max(0, sessionTime - elapsed);
   const pomMinutes = Math.floor(remaining / 60);
   const pomSeconds = remaining % 60;
   const progress = ((sessionTime - remaining) / sessionTime) * 100;
   const selectedSubject = focusSubjects.find((s) => s.id === selectedSubjectId);
 
-  // ── Clock ─────────────────────────────────────────────────────────────────
   const hours24 = time.getHours();
   const minutes = time.getMinutes();
   const seconds = time.getSeconds();

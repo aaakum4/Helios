@@ -57,7 +57,7 @@ const normalizeDataMap = (data) => {
 };
 
 export default function Reflection() {
-    // Single unified archive keyed by date: { "2026-02-16": { journal: {...}, reflection: {...} } }
+    // Unified archive keyed by date.
     const [reflectionArchive, setReflectionArchive] = useLocalStorage('reflection:archive', {});
     const [activeTab, setActiveTab] = useState('reflect');
 
@@ -76,14 +76,13 @@ export default function Reflection() {
     const [archiveMonth, setArchiveMonth] = useState(new Date().getMonth() + 1);
     const [archiveDay, setArchiveDay] = useState(new Date().getDate());
 
-    // Helper to get entry for a specific date from unified archive
     const getArchiveEntryByDate = (year, month, day) => {
         const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const entry = reflectionArchive[key];
         if (entry) {
             return entry;
         }
-        // Fallback: search by parsed key for legacy format compatibility
+        // Fallback for legacy key formats.
         for (const archiveKey in reflectionArchive) {
             const parsed = parseYYYYMMDD(archiveKey);
             if (parsed && parsed.year === year && parsed.month === month && parsed.day === day) {
@@ -93,7 +92,6 @@ export default function Reflection() {
         return undefined;
     };
 
-    // Normalize archive keys for calculations
     const normalizedArchiveKeys = useMemo(() => {
         return Object.keys(reflectionArchive).map(key => {
             const parsed = parseYYYYMMDD(key);
@@ -104,12 +102,10 @@ export default function Reflection() {
         });
     }, [reflectionArchive]);
 
-    // --- Calendar range generation (independent of which days have logs) ---
-
     const availableYears = useMemo(() => {
         const today = new Date();
         const currentYear = today.getFullYear();
-        // Start from the earliest log year, or current year if no logs yet.
+        // Start from earliest log year, or current year when empty.
         const logYears = normalizedArchiveKeys
             .map(k => parseYYYYMMDD(k)?.year)
             .filter(Boolean);
@@ -119,25 +115,20 @@ export default function Reflection() {
 
     const availableMonths = useMemo(() => {
         const today = new Date();
-        // Cap at current month only when viewing the current year.
         const maxMonth = archiveYear === today.getFullYear() ? today.getMonth() + 1 : 12;
         return Array.from({ length: maxMonth }, (_, i) => i + 1);
     }, [archiveYear]);
 
     const availableDays = useMemo(() => {
-        // Use actual calendar days for the selected year+month.
-        // new Date(y, m, 0).getDate() gives the last day of month m in year y
-        // (JS months are 0-indexed, so month m here = calendar month m).
         const today = new Date();
         const rawMax = new Date(archiveYear, archiveMonth, 0).getDate();
-        // Cap at today when viewing the current year+month.
         const isCurrentMonth =
             archiveYear === today.getFullYear() && archiveMonth === today.getMonth() + 1;
         const maxDay = isCurrentMonth ? today.getDate() : rawMax;
         return Array.from({ length: maxDay }, (_, i) => i + 1);
     }, [archiveYear, archiveMonth]);
 
-    // Sets of months/days that actually have log entries — used for tick indicators.
+    // Months and days that have log entries.
     const logMonthsInYear = useMemo(() => {
         return new Set(
             normalizedArchiveKeys
@@ -187,10 +178,8 @@ export default function Reflection() {
 
         prevDayKeyRef.current = currentDayKey;
         
-        // Parse the current day key to get year, month, day
         const currentDateParsed = parseYYYYMMDD(currentDayKey);
         if (!currentDateParsed) {
-            // Wipe editor state if date is invalid
             setCurrentQuestion(0);
             setAnswers(Array(QUESTIONS.length).fill(''));
             setJournalTitle('');
@@ -198,25 +187,20 @@ export default function Reflection() {
             return;
         }
 
-        // Get the archive entry for this date (contains both journal and reflection)
         const archiveEntry = getArchiveEntryByDate(currentDateParsed.year, currentDateParsed.month, currentDateParsed.day);
 
-        // Hydrate reflection answers from archive for this date
         if (archiveEntry && archiveEntry.reflection && archiveEntry.reflection.answers) {
             setCurrentQuestion(0);
             setAnswers(archiveEntry.reflection.answers);
         } else {
-            // Wipe reflection editor state if no saved answers
             setCurrentQuestion(0);
             setAnswers(Array(QUESTIONS.length).fill(''));
         }
 
-        // Hydrate journal from archive for this date
         if (archiveEntry && archiveEntry.journal) {
             setJournalTitle(archiveEntry.journal.title || '');
             setJournalBody(archiveEntry.journal.body || '');
         } else {
-            // Wipe journal editor state if no saved entry
             setJournalTitle('');
             setJournalBody('');
         }
@@ -236,11 +220,9 @@ export default function Reflection() {
 
         setReflectionArchive(prev => {
             const next = { ...prev };
-            // Get or create the entry for this date
             const key = currentDayKey;
             const entry = next[key] || {};
 
-            // Update only the reflection part, preserve journal
             entry.reflection = {
                 answers: answers,
                 submittedAt: new Date().toISOString(),
@@ -278,11 +260,9 @@ export default function Reflection() {
 
         setReflectionArchive(prev => {
             const next = { ...prev };
-            // Get or create the entry for this date
             const key = currentDayKey;
             const entry = next[key] || {};
-            
-            // Update only the journal part, preserve reflection
+
             entry.journal = {
                 title: journalTitle,
                 body: journalBody,
@@ -319,7 +299,6 @@ export default function Reflection() {
     const hasArchiveData = !!archiveEntry;
 
     const deleteEntryForDate = (type) => {
-        // type is 'journal' or 'reflection'
         setReflectionArchive(prev => {
             const next = { ...prev };
             const entry = next[archiveKey];
@@ -329,14 +308,11 @@ export default function Reflection() {
             }
             
             if (type === 'journal') {
-                // Remove only journal, keep reflection
                 delete entry.journal;
             } else if (type === 'reflection') {
-                // Remove only reflection, keep journal
                 delete entry.reflection;
             }
-            
-            // If entry is now completely empty, remove it
+
             if (!entry.journal && !entry.reflection) {
                 delete next[archiveKey];
             } else {
@@ -368,7 +344,6 @@ export default function Reflection() {
     const currentMonth = currentDateParsed?.month || (new Date().getMonth() + 1);
     const currentDay = currentDateParsed?.day || new Date().getDate();
     
-    // Get current day entry from unified archive
     const currentArchiveEntry = getArchiveEntryByDate(currentYear, currentMonth, currentDay);
     const isReflectionCompleted = !!currentArchiveEntry?.reflection;
     const isJournalEdited = !!currentArchiveEntry?.journal && (
@@ -495,7 +470,6 @@ export default function Reflection() {
                                     onChange={(e) => {
                                         const newYear = parseInt(e.target.value);
                                         setArchiveYear(newYear);
-                                        // Reset to month 1 and clamp day within that month.
                                         setArchiveMonth(1);
                                         const daysInNewMonth = new Date(newYear, 1, 0).getDate();
                                         setArchiveDay(d => Math.min(d, daysInNewMonth));
@@ -517,7 +491,6 @@ export default function Reflection() {
                                     onChange={(e) => {
                                         const newMonth = parseInt(e.target.value);
                                         setArchiveMonth(newMonth);
-                                        // Clamp the selected day within the new month's range.
                                         const daysInNewMonth = new Date(archiveYear, newMonth, 0).getDate();
                                         setArchiveDay(d => Math.min(d, daysInNewMonth));
                                     }}

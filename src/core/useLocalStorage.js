@@ -11,15 +11,11 @@ export function useLocalStorage(key, initialValue) {
     }
   });
 
-  // Tracks whether the upcoming localStorageChange event was dispatched by
-  // this hook instance so the listener can ignore it and avoid a self-update loop.
+  // Marks events dispatched by this instance to avoid self-update loops.
   const isInternalUpdateRef = useRef(false);
-  // Skip the effect on the very first render (value was just loaded from storage).
+  // Skip persisting on first render because state was loaded from storage.
   const isInitialMountRef = useRef(true);
 
-  // setValue is now a pure React state updater — no side effects inside the updater.
-  // Side effects are handled by the useEffect below, which runs AFTER React commits
-  // the final state (i.e. never during React's StrictMode "dry-run" invocations).
   const setValue = (value) => {
     try {
       setStoredValue((prev) => {
@@ -30,9 +26,7 @@ export function useLocalStorage(key, initialValue) {
     }
   };
 
-  // Persist to localStorage and notify other hook instances whenever the value changes.
-  // useEffect only runs once per committed state update, so StrictMode double-invocation
-  // of the state updater above does NOT double-fire this effect.
+  // Persist value and notify other hook instances sharing this key.
   useEffect(() => {
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
@@ -41,9 +35,7 @@ export function useLocalStorage(key, initialValue) {
     try {
       window.localStorage.setItem(key, JSON.stringify(storedValue));
 
-      // Mark as an internal dispatch so our own listener skips it.
-      // dispatchEvent is synchronous: the listener runs before we return from dispatchEvent,
-      // so the flag is guaranteed to be set when the listener checks it.
+      // Flag this dispatch so this instance can ignore it.
       isInternalUpdateRef.current = true;
       window.dispatchEvent(new CustomEvent('localStorageChange', {
         detail: { key, value: storedValue },
@@ -53,12 +45,11 @@ export function useLocalStorage(key, initialValue) {
     }
   }, [key, storedValue]);
 
-  // Listen for changes from OTHER hook instances sharing the same key.
+  // Listen for changes from other hook instances sharing this key.
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.detail?.key !== key) return;
 
-      // Skip events that this instance dispatched to avoid a self-update loop.
       if (isInternalUpdateRef.current) {
         isInternalUpdateRef.current = false;
         return;

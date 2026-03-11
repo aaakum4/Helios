@@ -1,13 +1,10 @@
 const nodemailer = require("nodemailer");
 
-// Serverless function for Vercel
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  // CORS headers
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
@@ -16,13 +13,11 @@ export default async function handler(req, res) {
     "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
   );
 
-  // Handle preflight
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
   try {
-    // Check SMTP configuration
     const requiredKeys = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"];
     const missingKeys = requiredKeys.filter((key) => !process.env[key]);
 
@@ -35,7 +30,6 @@ export default async function handler(req, res) {
 
     const { toEmail, subject, text, html } = req.body;
 
-    // Validate required fields
     if (!toEmail || !text) {
       return res.status(400).json({
         ok: false,
@@ -43,7 +37,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(toEmail)) {
       return res.status(400).json({
@@ -52,7 +45,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Create transporter for this request
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT, 10) || 587,
@@ -63,7 +55,6 @@ export default async function handler(req, res) {
       },
     });
 
-    // Send email
     await transporter.sendMail({
       from: process.env.SMTP_FROM,
       to: toEmail,

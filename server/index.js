@@ -6,14 +6,14 @@ const nodemailer = require("nodemailer");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS configuration - allow requests from your frontend
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || "*"
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || "*",
+  })
+);
 
 app.use(express.json());
 
-// Create SMTP transporter
 let mailTransporter = null;
 
 function initializeMailTransporter() {
@@ -43,15 +43,13 @@ function initializeMailTransporter() {
 
 mailTransporter = initializeMailTransporter();
 
-// Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({ 
-    ok: true, 
-    smtp_configured: !!mailTransporter 
+  res.json({
+    ok: true,
+    smtp_configured: !!mailTransporter,
   });
 });
 
-// Email sending endpoint
 app.post("/api/send-email", async (req, res) => {
   try {
     if (!mailTransporter) {
@@ -63,7 +61,6 @@ app.post("/api/send-email", async (req, res) => {
 
     const { toEmail, subject, text, html } = req.body;
 
-    // Validate required fields
     if (!toEmail || !text) {
       return res.status(400).json({
         ok: false,
@@ -71,7 +68,6 @@ app.post("/api/send-email", async (req, res) => {
       });
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(toEmail)) {
       return res.status(400).json({
@@ -80,7 +76,6 @@ app.post("/api/send-email", async (req, res) => {
       });
     }
 
-    // Send email
     await mailTransporter.sendMail({
       from: process.env.SMTP_FROM,
       to: toEmail,

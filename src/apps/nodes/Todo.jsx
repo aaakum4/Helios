@@ -65,9 +65,7 @@ function useTodoState() {
   };
 
   const addTodo = (subheadingID, title, dueDate = '') => {
-    // Create the todo object OUTSIDE the updater so it is created exactly once.
-    // The updater may be invoked twice by React StrictMode (dry-run + real run),
-    // but both runs will close over the same object, making the updater idempotent.
+    // Create once outside the updater to keep StrictMode re-runs idempotent.
     const newTodo = {
       id: `todo-${createId()}`,
       title,
@@ -118,7 +116,7 @@ function useTodoState() {
   };
 
   const toggleTodoCompletion = (subheadingID, todoID) => {
-    // Capture the current completion state before toggling
+    // Capture current completion state before toggling.
     const currentTodo = todosData.subheadings
       .find((s) => s.id === subheadingID)
       ?.todos.find((t) => t.id === todoID);

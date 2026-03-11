@@ -31,7 +31,7 @@ export default function Pomodoro() {
     const [pausedElapsed, setPausedElapsed] = useLocalStorage('pomodoro:pausedElapsed', 0);
     const [newSubjectName, setNewSubjectName] = useState('');
     const [subjectError, setSubjectError] = useState('');
-    // Initialise elapsed from stored start time (running) or stored paused value (paused).
+    // Initialize elapsed from persisted run/pause state.
     const [elapsed, setElapsed] = useState(() => {
         try {
             const running = JSON.parse(localStorage.getItem('pomodoro:isRunning'));
@@ -46,18 +46,14 @@ export default function Pomodoro() {
     const sessionStartTimeRef = useRef(null);
     const timerIntervalRef = useRef(null);
 
-    // Restore in-memory ref from persisted start time on mount.
-    // When paused, offset by pausedElapsed so the ref is correct if the user resumes.
+    // Restore in-memory ref from persisted state on mount.
     useEffect(() => {
         if (isRunning && sessionStartTime) {
             sessionStartTimeRef.current = sessionStartTime;
         } else if (!isRunning && pausedElapsed > 0) {
-            // Pre-compute what the ref would be so interval starts correctly on resume
             sessionStartTimeRef.current = null; // will be set in handlePlayPause
         }
     }, []);
-
-    // ── FocusTracker sync helpers ──────────────────────────────────────────────
 
     const getTodayKey = () => {
         const d = new Date();
@@ -66,7 +62,7 @@ export default function Pomodoro() {
 
     const startFocusTrackerSession = (startTimeMs) => {
         if (!selectedSubjectId) return;
-        // If a different subject is being tracked manually, save and stop it first.
+        // If another manual subject is active, close it first.
         if (ftActiveSubjectId && ftActiveSubjectId !== selectedSubjectId && ftSessionStartTime && ftSessionSource === 'manual') {
             const dur = Math.floor((Date.now() - ftSessionStartTime) / 1000);
             if (dur > 0) {
@@ -90,8 +86,7 @@ export default function Pomodoro() {
     const stopFocusTrackerSession = () => {
         if (!ftActiveSubjectId || !ftSessionStartTime) return;
         
-        // Only create a session if this was started manually (not by Pomodoro)
-        // Pomodoro manages its own study sessions via finalizeStudySession
+        // Pomodoro sessions are finalized separately.
         if (ftSessionSource === 'manual') {
             const dur = Math.floor((Date.now() - ftSessionStartTime) / 1000);
             if (dur > 0) {
@@ -239,13 +234,13 @@ const handlePlayPause = () => {
     if (!isRunning) {
         let sessionStart;
         if (pausedElapsed > 0) {
-            // Resuming from pause — offset start time so elapsed continues from where it was
+            // Offset start time so elapsed resumes from paused value.
             const resumeStart = Date.now() - pausedElapsed * 1000;
             sessionStartTimeRef.current = resumeStart;
             setSessionStartTime(resumeStart);
             setPausedElapsed(0);
             sessionStart = resumeStart;
-            // Update the existing session's start time to account for the pause
+            // Update existing session start time after resume.
             if (activeStudySession) {
                 setActiveStudySession({
                     ...activeStudySession,
@@ -257,9 +252,7 @@ const handlePlayPause = () => {
                         : entry
                 ));
             }
-            // elapsed state stays at pausedElapsed; interval will recalculate on next tick
         } else {
-            // Fresh start
             const now = Date.now();
             sessionStartTimeRef.current = now;
             setSessionStartTime(now);
@@ -267,7 +260,6 @@ const handlePlayPause = () => {
             sessionStart = now;
         }
         if (isWorkSession) {
-            // Only create a new session if one doesn't exist (fresh start, not resume)
             if (!activeStudySession) {
                 createStudySession(sessionStart);
             }
@@ -283,13 +275,10 @@ const handlePlayPause = () => {
             is_resume: pausedElapsed > 0,
         });
     } else {
-        // Pausing
         const currentElapsed = sessionStartTimeRef.current
             ? Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
             : elapsed;
         setPausedElapsed(currentElapsed);
-        // Don't finalize the session when pausing - keep it active so we can resume it
-        // Only finalize when actually completing or resetting
         stopFocusTrackerSession();
         window.posthog?.capture("pomodoro_session_paused", {
             session_type: isWorkSession ? "work" : "break",

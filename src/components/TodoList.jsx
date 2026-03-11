@@ -93,12 +93,24 @@ export default function TodoList({
 
         if (isCompleting) {
             // Play confetti immediately
-            setConfettiIds((prev) => { const next = new Set(prev); next.add(todo.id); return next; });
+            setConfettiIds((prev) => {
+                const next = new Set(prev);
+                next.add(todo.id);
+                return next;
+            });
 
             // After confetti finishes (650ms), start the height-collapse
             const confettiDone = setTimeout(() => {
-                setConfettiIds((prev) => { const next = new Set(prev); next.delete(todo.id); return next; });
-                setRemovingTodoIds((prev) => { const next = new Set(prev); next.add(todo.id); return next; });
+                setConfettiIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(todo.id);
+                    return next;
+                });
+                setRemovingTodoIds((prev) => {
+                    const next = new Set(prev);
+                    next.add(todo.id);
+                    return next;
+                });
             }, 650);
             removalTimersRef.current.set(todo.id + '-confetti', confettiDone);
 
@@ -107,7 +119,11 @@ export default function TodoList({
                 onDeleteTodo(currentSubheading.id, todo.id);
                 removalTimersRef.current.delete(todo.id);
                 removalTimersRef.current.delete(todo.id + '-confetti');
-                setRemovingTodoIds((prev) => { const next = new Set(prev); next.delete(todo.id); return next; });
+                setRemovingTodoIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(todo.id);
+                    return next;
+                });
             }, 1200);
 
             removalTimersRef.current.set(todo.id, timerId);
@@ -122,7 +138,11 @@ export default function TodoList({
                 clearTimeout(confettiTimer);
                 removalTimersRef.current.delete(todo.id + '-confetti');
             }
-            setConfettiIds((prev) => { const next = new Set(prev); next.delete(todo.id); return next; });
+            setConfettiIds((prev) => {
+                const next = new Set(prev);
+                next.delete(todo.id);
+                return next;
+            });
             setRemovingTodoIds((prev) => {
                 const next = new Set(prev);
                 next.delete(todo.id);
