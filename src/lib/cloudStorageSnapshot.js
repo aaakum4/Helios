@@ -12,11 +12,8 @@ export function buildLocalStorageSnapshot() {
       continue;
     }
 
-    try {
-      storageSnapshot[key] = JSON.parse(rawValue);
-    } catch {
-      storageSnapshot[key] = rawValue;
-    }
+    // Preserve the exact serialized localStorage value so restore is lossless.
+    storageSnapshot[key] = rawValue;
   }
 
   return storageSnapshot;
@@ -62,6 +59,7 @@ export function rehydrateLocalStorage(snapshot) {
       return;
     }
 
+    // Backward-compatible with older backups that stored parsed JSON values.
     const serialized = typeof value === "string" ? value : JSON.stringify(value);
     localStorage.setItem(key, serialized);
   });

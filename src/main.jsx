@@ -57,5 +57,9 @@ function renderApp() {
   );
 }
 
-renderApp();
-bootstrapCloudSession();
+async function startApp() {
+  await bootstrapCloudSession();
+  renderApp();
+}
+
+void startApp();
