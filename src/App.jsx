@@ -12,11 +12,34 @@ const CLOUD_AUTOSAVE_INTERVAL_MS = 60 * 1000;
 
 export default function App() {
   const [launched, setLaunched] = useState(false);
+  const [cloudHydrationVersion, setCloudHydrationVersion] = useState(0);
   const autosaveInFlightRef = useRef(false);
 
   useEffect(() => {
     initializeTheme();
     initializePalette();
+  }, []);
+
+  useEffect(() => {
+    const handleStartupCloudSync = (event) => {
+      const detail = event?.detail || {};
+
+      if (detail.outcome === "applied") {
+        setCloudHydrationVersion((value) => value + 1);
+      }
+
+      window.posthog?.capture("app_observed_startup_cloud_sync", {
+        outcome: detail.outcome || "unknown",
+        cloudSavedAtMs: detail.cloudSavedAtMs ?? null,
+        localLastWriteAtMs: detail.localLastWriteAtMs ?? null,
+        snapshotKeyCount: detail.snapshotKeyCount ?? null,
+      });
+    };
+
+    window.addEventListener("helios:startup-cloud-sync", handleStartupCloudSync);
+    return () => {
+      window.removeEventListener("helios:startup-cloud-sync", handleStartupCloudSync);
+    };
   }, []);
 
   useEffect(() => {
@@ -95,7 +118,7 @@ export default function App() {
         {!launched ? (
           <StartupScreen onLaunch={() => setLaunched(true)} />
         ) : (
-          <MainScreen onBack={() => setLaunched(false)} />
+          <MainScreen key={cloudHydrationVersion} onBack={() => setLaunched(false)} />
         )}
       </div>
   );

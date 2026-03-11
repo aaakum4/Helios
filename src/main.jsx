@@ -8,16 +8,45 @@ import { initializePriorityEmailBridge } from "./core/priorityEmailWebBridge";
 import { initializeDemoData } from "./core/demoData";
 import { getSupabaseClient, isSupabaseConfigured } from "./lib/supabase";
 import { loadFromCloud } from "./lib/sync";
-import { extractSnapshotFromCloudPayload, rehydrateLocalStorage } from "./lib/cloudStorageSnapshot";
+import { applyCloudPayloadIfNewer } from "./lib/cloudStorageSnapshot";
 import "../styles.css";
+
+const CLOUD_STARTUP_TIMEOUT_MS = 5000;
 
 initializePosthogWebBridge();
 initializePriorityEmailBridge();
 initializeDemoData();
 
+function withTimeout(promise, timeoutMs, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => {
+        const timeoutError = new Error(`${label} timed out`);
+        timeoutError.code = "TIMEOUT";
+        reject(timeoutError);
+      }, timeoutMs);
+    }),
+  ]);
+}
+
+function emitStartupSyncOutcome(outcome, details = {}) {
+  window.dispatchEvent(
+    new CustomEvent("helios:startup-cloud-sync", {
+      detail: { outcome, ...details },
+    })
+  );
+
+  window.posthog?.capture("startup_cloud_sync", {
+    outcome,
+    ...details,
+  });
+}
+
 async function bootstrapCloudSession() {
   try {
     if (!isSupabaseConfigured()) {
+      emitStartupSyncOutcome("not_configured");
       return;
     }
 
@@ -25,20 +54,31 @@ async function bootstrapCloudSession() {
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser();
+    } = await withTimeout(supabase.auth.getUser(), CLOUD_STARTUP_TIMEOUT_MS, "auth lookup");
 
     if (error || !user) {
+      emitStartupSyncOutcome("unauthenticated");
       return;
     }
 
-    const cloudPayload = await loadFromCloud();
+    const cloudPayload = await withTimeout(loadFromCloud(), CLOUD_STARTUP_TIMEOUT_MS, "cloud fetch");
     if (!cloudPayload) {
+      emitStartupSyncOutcome("no_backup");
       return;
     }
 
-    const snapshot = extractSnapshotFromCloudPayload(cloudPayload);
-    rehydrateLocalStorage(snapshot);
+    const result = applyCloudPayloadIfNewer(cloudPayload, { dispatchEvents: true });
+    emitStartupSyncOutcome(result.applied ? "applied" : result.reason, {
+      cloudSavedAtMs: result.cloudSavedAtMs,
+      localLastWriteAtMs: result.localLastWriteAtMs,
+      snapshotKeyCount: result.snapshotKeyCount,
+    });
   } catch (error) {
+    const isTimeout = error?.code === "TIMEOUT";
+    emitStartupSyncOutcome(isTimeout ? "timeout" : "failed", {
+      message: error?.message || "unknown",
+    });
+
     if (import.meta.env.DEV) {
       console.warn("[cloud] Startup restore failed.", error);
     }
@@ -58,8 +98,8 @@ function renderApp() {
 }
 
 async function startApp() {
-  await bootstrapCloudSession();
   renderApp();
+  void bootstrapCloudSession();
 }
 
 void startApp();

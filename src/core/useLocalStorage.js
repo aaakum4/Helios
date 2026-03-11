@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { setLocalWriteTimestamp } from '../lib/cloudStorageSnapshot';
 
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(() => {
@@ -39,6 +40,7 @@ export function useLocalStorage(key, initialValue) {
     }
     try {
       window.localStorage.setItem(key, JSON.stringify(storedValue));
+      setLocalWriteTimestamp(Date.now());
 
       // Flag this dispatch so this instance can ignore it.
       isInternalUpdateRef.current = true;

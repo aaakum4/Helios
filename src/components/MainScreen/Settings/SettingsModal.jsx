@@ -7,9 +7,8 @@ import { PALETTES, getStoredPalette, applyPalette } from "../../../core/palette"
 import { getSupabaseClient, isSupabaseConfigured } from "../../../lib/supabase";
 import { loadFromCloud, saveToCloud } from "../../../lib/sync";
 import {
+    applyCloudPayloadIfNewer,
     buildCloudPayload,
-    extractSnapshotFromCloudPayload,
-    rehydrateLocalStorage,
 } from "../../../lib/cloudStorageSnapshot";
 
 export default function SettingsModal({ onClose }) {
@@ -70,8 +69,10 @@ export default function SettingsModal({ onClose }) {
             return;
         }
 
-        const snapshot = extractSnapshotFromCloudPayload(cloudPayload);
-        rehydrateLocalStorage(snapshot);
+        const result = applyCloudPayloadIfNewer(cloudPayload, {
+            force: true,
+            dispatchEvents: true,
+        });
 
         setCloudStatus({
             type: "success",
@@ -79,7 +80,8 @@ export default function SettingsModal({ onClose }) {
         });
 
         window.posthog?.capture("settings_cloud_restore_success", {
-            restored_key_count: Object.keys(snapshot).length,
+            restored_key_count: result.snapshotKeyCount,
+            mode: result.reason,
         });
 
         if (reloadOnSuccess) {
