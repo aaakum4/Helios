@@ -15,9 +15,8 @@ const CONFETTI_DIRS = [
 
 const FILTER_OPTIONS = [
     { value: 'all', label: 'All' },
-    { value: 'active', label: 'Active' },
-    { value: 'completed', label: 'Done' },
     { value: 'dueToday', label: 'Due today' },
+    { value: 'dueThisWeek', label: 'Due this week' },
 ];
 
 export default function TodoList({
@@ -39,7 +38,8 @@ export default function TodoList({
 
     const allTodos = currentSubheading?.todos || [];
     const normalizedQuery = searchQuery.trim().toLowerCase();
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const _td = new Date();
+    const todayStr = `${_td.getFullYear()}-${String(_td.getMonth() + 1).padStart(2, '0')}-${String(_td.getDate()).padStart(2, '0')}`;
 
     const visibleTodos = allTodos.filter((todo) => {
         const matchesSearch = !normalizedQuery || todo.title.toLowerCase().includes(normalizedQuery);
@@ -47,16 +47,17 @@ export default function TodoList({
             return false;
         }
 
-        if (filterMode === 'active') {
-            return !todo.completed;
-        }
-
-        if (filterMode === 'completed') {
-            return !!todo.completed;
-        }
-
         if (filterMode === 'dueToday') {
             return !todo.completed && todo.dueDate === todayStr;
+        }
+
+        if (filterMode === 'dueThisWeek') {
+            if (todo.completed || !todo.dueDate) return false;
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+            const _wd = sevenDaysFromNow;
+            const weekEndStr = `${_wd.getFullYear()}-${String(_wd.getMonth() + 1).padStart(2, '0')}-${String(_wd.getDate()).padStart(2, '0')}`;
+            return todo.dueDate >= todayStr && todo.dueDate <= weekEndStr;
         }
 
         return true;

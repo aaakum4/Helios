@@ -208,7 +208,8 @@ export default function MainScreen({ onBack }) {
       return pomodoroIsWorkSession ? 'Focus · Running' : 'Break · Running';
     }
     if (nodeId === 'todo') {
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const _td = new Date();
+      const todayStr = `${_td.getFullYear()}-${String(_td.getMonth() + 1).padStart(2, '0')}-${String(_td.getDate()).padStart(2, '0')}`;
       const dueTodayCount = (todosData?.subheadings ?? [])
         .flatMap((s) => s.todos ?? [])
         .filter((t) => !t.completed && t.dueDate === todayStr).length;
