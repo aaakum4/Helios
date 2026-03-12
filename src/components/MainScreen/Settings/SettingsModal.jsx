@@ -4,7 +4,7 @@ import "./SettingsModal.css";
 import { useLocalStorage } from "../../../core/useLocalStorage";
 import { getStoredThemeMode, setThemeMode as applyThemeMode } from "../../../core/theme";
 import { PALETTES, getStoredPalette, applyPalette } from "../../../core/palette";
-import { getSupabaseClient, isSupabaseConfigured } from "../../../lib/supabase";
+import { getSupabaseAuthRedirectUrl, getSupabaseClient, isSupabaseConfigured } from "../../../lib/supabase";
 import { loadFromCloud, saveToCloud } from "../../../lib/sync";
 import {
     applyCloudPayloadIfNewer,
@@ -151,7 +151,12 @@ export default function SettingsModal({ onClose }) {
 
         try {
             const supabase = getSupabaseClient();
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const authRedirectUrl = getSupabaseAuthRedirectUrl();
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: authRedirectUrl ? { emailRedirectTo: authRedirectUrl } : undefined,
+            });
             if (error) {
                 throw error;
             }
@@ -260,7 +265,11 @@ export default function SettingsModal({ onClose }) {
 
         try {
             const supabase = getSupabaseClient();
-            const { error } = await supabase.auth.resetPasswordForEmail(email);
+            const authRedirectUrl = getSupabaseAuthRedirectUrl();
+            const { error } = await supabase.auth.resetPasswordForEmail(
+                email,
+                authRedirectUrl ? { redirectTo: authRedirectUrl } : undefined
+            );
             if (error) {
                 throw error;
             }
