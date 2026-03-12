@@ -4,7 +4,7 @@ import "./SettingsModal.css";
 import { useLocalStorage } from "../../../core/useLocalStorage";
 import { getStoredThemeMode, setThemeMode as applyThemeMode } from "../../../core/theme";
 import { PALETTES, getStoredPalette, applyPalette } from "../../../core/palette";
-import { getSupabaseAuthRedirectUrl, getSupabaseClient, isSupabaseConfigured } from "../../../lib/supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "../../../lib/supabase";
 import { loadFromCloud, saveToCloud } from "../../../lib/sync";
 import {
     applyCloudPayloadIfNewer,
@@ -151,12 +151,7 @@ export default function SettingsModal({ onClose }) {
 
         try {
             const supabase = getSupabaseClient();
-            const authRedirectUrl = getSupabaseAuthRedirectUrl();
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: authRedirectUrl ? { emailRedirectTo: authRedirectUrl } : undefined,
-            });
+            const { data, error } = await supabase.auth.signUp({ email, password });
             if (error) {
                 throw error;
             }
@@ -265,11 +260,7 @@ export default function SettingsModal({ onClose }) {
 
         try {
             const supabase = getSupabaseClient();
-            const authRedirectUrl = getSupabaseAuthRedirectUrl();
-            const { error } = await supabase.auth.resetPasswordForEmail(
-                email,
-                authRedirectUrl ? { redirectTo: authRedirectUrl } : undefined
-            );
+            const { error } = await supabase.auth.resetPasswordForEmail(email);
             if (error) {
                 throw error;
             }
